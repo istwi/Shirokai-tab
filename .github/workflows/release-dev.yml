@@ -1,0 +1,57 @@
+name: Publish development release
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Full validated commit SHA
+        required: true
+      tag:
+        description: Development release tag
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Validate release target
+        env:
+          TARGET_COMMIT: ${{ inputs.commit }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$TARGET_COMMIT"
+          [[ "$TARGET_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-dev$ ]]
+      - run: bash ./gradlew --no-daemon build smokeClasses --max-workers=2
+      - name: Attach verified build and publish prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          artifact="shirokai-core-${RELEASE_TAG#v}.jar"
+          test -f "build/libs/$artifact"
+          cd build/libs
+          sha256sum "$artifact" > SHA256SUMS
+          gh release view "$RELEASE_TAG" --json body --jq .body > release-notes.md
+          export RELEASE_ARTIFACT="$artifact"
+          python3 - <<'PY'
+          import hashlib, os, re
+          from pathlib import Path
+          artifact = Path(os.environ['RELEASE_ARTIFACT'])
+          digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+          notes = Path('release-notes.md')
+          body = re.sub(r'SHA-256 do JAR: [0-9a-f]{64}', 'SHA-256 do JAR: ' + digest, notes.read_text())
+          notes.write_text(body + '\n\nArtefato compilado e testes JUnit executados no GitHub Actions. O checksum acima corresponde ao JAR anexado.\n')
+          PY
+          gh release upload "$RELEASE_TAG" "$artifact" SHA256SUMS
+          gh release edit "$RELEASE_TAG" --notes-file release-notes.md --draft=false --prerelease
