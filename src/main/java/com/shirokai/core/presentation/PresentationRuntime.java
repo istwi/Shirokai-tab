@@ -29,6 +29,14 @@ public final class PresentationRuntime implements SurfaceRenderer {
     public PresentationPlan plan(){return plan;}public void replacePlan(PresentationPlan candidate){plan=candidate;}
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(p->p.getUuid().equals(id)&&!p.isDisconnected()).findFirst().orElse(null);}
     @Override public boolean menusEnabled(){return plan.config().menusEnabled();}
+    @Override public Text renderTitle(UUID subject,com.shirokai.core.titles.TitleDefinition definition){
+        if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
+        if(definition.category()!=com.shirokai.core.titles.TitleDefinition.Category.CLAN){
+            var fixed=plan.titleTemplate(definition.id());
+            if(fixed.isPresent())return plan.styles().render(fixed.get(),key->definition.display(),0,false);
+        }
+        return SurfaceRenderer.super.renderTitle(subject,definition);
+    }
     @Override public Text render(UUID subject,Surface surface,String value){
         if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
         if(surface.name().startsWith("MENU_")&&!plan.config().menusEnabled())return Text.literal(value);

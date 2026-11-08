@@ -160,3 +160,28 @@ Códigos & válidos/autorizados agora permitem unsignedContent visual somente pa
 não filtrados/máscara pass-through, preservando dados originais e possível indicador
 cliente de modificação. Isto é distinto da reanálise de markup/tags, que segue proibida.
 Detalhes e opções em CHAT_APPEARANCE.md.
+
+## Estilo fixo por identificação — 0.13.2
+
+Campo opcional `titleTemplates` no objeto raiz de presentation.json (schema1):
+
+```json
+"titleTemplates": {
+  "owner": "<gradient:#ff3333:#ffcc33><bold>%visual:value%</bold></gradient>",
+  "admin": "<gradient:#3355ff:#33ffff><bold>%visual:value%</bold></gradient>"
+}
+```
+
+As chaves são IDs do titles.json, não grupos primários LP. Cada identificação
+é renderizada separadamente em chat, TAB/sidebar e preview do perfil. A entrada
+fixa tem precedência sobre presets pessoais e regras por grupo: um jogador com
+OWNER e ADMIN exibe cada tag com suas próprias cores. Permissões e seleção das
+tags continuam necessárias; isto não equipa cargos automaticamente. Displays
+continuam literais, sem markup. Títulos sem entrada mantêm o comportamento anterior;
+CLAN usa o estilo próprio de clã. Nenhuma escolha salva é apagada.
+
+Templates exigem exatamente `%visual:value%` uma vez, sem animação/ações. Todos
+compilam no candidato transacional de reload, inclusive IDs ainda não usados.
+Até500 entradas. Arquivos antigos sem o campo funcionam sem migração/regravação.
+Use `/shirokaicore reload`; nenhum reinício é necessário para trocar as cores.
+Exemplo completo: examples/presentation-ranks.json. Cores são sugestões editáveis.

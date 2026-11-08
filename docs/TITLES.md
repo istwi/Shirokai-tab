@@ -162,3 +162,7 @@ player_style_choices, separado de selected_visual. O mesmo preset envolve ROLE/S
 no preview/chat e título compartilhado TAB/sidebar. CLAN usa escolha do clã.
 Entitlement de título continua independente: perder título limpa seleção inválida
 como antes; perder permissão do preset preserva o ID e usa fallback. Ver CUSTOMIZATION.md.
+
+Desde0.13.2, uma entrada por ID em presentation.titleTemplates tem precedência
+sobre o preset pessoal para essa identificação. Tags sem entrada e escolhas salvas
+continuam preservadas. Ver PRESENTATION.md e examples/presentation-ranks.json.

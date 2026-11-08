@@ -11,11 +11,16 @@ import java.util.regex.*;
 /** Compile every candidate, including inactive rules, before publishing any configuration. */
 public final class PresentationPlan {
     private record Rule(PresentationConfig.Rule definition,Map<Surface,StyleEngine.Compiled> templates,Map<Channel,StyleEngine.Compiled> chat) { }
+    private final Map<String,StyleEngine.Compiled> titleTemplates;
     private final PresentationConfig config;private final StyleEngine styles;
     private final Map<Surface,StyleEngine.Compiled> templates;private final Map<Channel,StyleEngine.Compiled> chat;private final List<Rule> rules;
     private static final Set<String> CHAT_KEYS=Set.of("chat:name","chat:tags","chat:target","chat:channel");
     public PresentationPlan(PresentationConfig config,StyleEngine styles,ChatConfig chat){
-        this.config=config;this.styles=styles;templates=compile(config.templates());this.chat=compileChat(chat.nameFormats());
+        this.config=config;this.styles=styles;
+        var fixed=new HashMap<String,StyleEngine.Compiled>();
+        config.titleTemplates().forEach((id,source)->fixed.put(id,compile(Map.of(Surface.TITLE,source)).get(Surface.TITLE)));
+        titleTemplates=Map.copyOf(fixed);
+        templates=compile(config.templates());this.chat=compileChat(chat.nameFormats());
         rules=config.rules().stream().sorted(Comparator.comparingInt(PresentationConfig.Rule::priority).reversed().thenComparing(PresentationConfig.Rule::id)).map(r->new Rule(r,compile(r.templates()),compileChat(r.chatFormats()))).toList();
     }
     private Map<Surface,StyleEngine.Compiled> compile(Map<Surface,String> source){
@@ -41,5 +46,6 @@ public final class PresentationPlan {
     private boolean matches(Rule rule,PermissionService.Metadata metadata,String world,Predicate<String> permissions){return TabPlan.matches(rule.definition().condition(),metadata,world,permissions);}
     public StyleEngine.Compiled template(Surface surface,PermissionService.Metadata meta,String world,Predicate<String> permissions){return rules.stream().filter(r->r.templates().containsKey(surface)&&matches(r,meta,world,permissions)).map(r->r.templates().get(surface)).findFirst().orElse(templates.get(surface));}
     public StyleEngine.Compiled chat(Channel channel,PermissionService.Metadata meta,String world,Predicate<String> permissions){return rules.stream().filter(r->r.chat().containsKey(channel)&&matches(r,meta,world,permissions)).map(r->r.chat().get(channel)).findFirst().orElse(chat.get(channel));}
+    public Optional<StyleEngine.Compiled> titleTemplate(String id){return Optional.ofNullable(titleTemplates.get(id));}
     public PresentationConfig config(){return config;}public StyleEngine styles(){return styles;}
 }

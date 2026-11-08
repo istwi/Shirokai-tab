@@ -9,7 +9,11 @@ import java.nio.file.*;
 import java.util.*;
 
 public record PresentationConfig(int schemaVersion, boolean chatEnabled, boolean menusEnabled, boolean mentionsEnabled,
-        String mentionPermission, Map<Surface,String> templates, List<Rule> rules) {
+        String mentionPermission, Map<Surface,String> templates, List<Rule> rules, Map<String,String> titleTemplates) {
+    public PresentationConfig(int schemaVersion,boolean chatEnabled,boolean menusEnabled,boolean mentionsEnabled,
+            String mentionPermission,Map<Surface,String> templates,List<Rule> rules){
+        this(schemaVersion,chatEnabled,menusEnabled,mentionsEnabled,mentionPermission,templates,rules,Map.of());
+    }
     public record Rule(String id,int priority,Condition condition,Map<Surface,String> templates,Map<Channel,String> chatFormats) {
         public Rule {
             templates=Map.copyOf(templates);chatFormats=Map.copyOf(chatFormats);
@@ -19,6 +23,8 @@ public record PresentationConfig(int schemaVersion, boolean chatEnabled, boolean
     private static final Gson GSON=new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public PresentationConfig {
         templates=Map.copyOf(templates);rules=List.copyOf(rules);
+        titleTemplates=titleTemplates==null?Map.of():Map.copyOf(titleTemplates);
+        if(titleTemplates.size()>500||titleTemplates.keySet().stream().anyMatch(id->!id.matches("[a-z0-9][a-z0-9_-]{0,63}")||id.startsWith("clan_")))throw new IllegalArgumentException("IDs de titleTemplates inválidos");
         if(schemaVersion!=1||mentionPermission==null||!mentionPermission.matches("[a-zA-Z0-9_.-]{0,128}")||templates.size()!=Surface.values().length||rules.size()>50)throw new IllegalArgumentException("Configuração visual inválida");
         var ids=new HashSet<String>();for(var rule:rules)if(!ids.add(rule.id()))throw new IllegalArgumentException("Regra visual duplicada");
     }
@@ -33,7 +39,7 @@ public record PresentationConfig(int schemaVersion, boolean chatEnabled, boolean
     }
     private static void strings(JsonObject object,Set<String> keys){JsonValidation.fields(object,keys);for(String key:object.keySet())JsonValidation.string(object,key,false);}
     public static PresentationConfig parse(String input)throws IOException{
-        var root=JsonValidation.object(input);JsonValidation.fields(root,Set.of("schemaVersion","chatEnabled","menusEnabled","mentionsEnabled","mentionPermission","templates","rules"));
+        var root=JsonValidation.object(input);JsonValidation.fields(root,Set.of("schemaVersion","chatEnabled","menusEnabled","mentionsEnabled","mentionPermission","templates","rules","titleTemplates"));
         JsonValidation.integer(root,"schemaVersion");for(String key:List.of("chatEnabled","menusEnabled","mentionsEnabled"))JsonValidation.bool(root,key);JsonValidation.string(root,"mentionPermission",false);
         var surfaces=new HashSet<String>();for(var surface:Surface.values())surfaces.add(surface.name());var channels=new HashSet<String>();for(var channel:Channel.values())channels.add(channel.name());
         if(!root.has("templates")||!root.get("templates").isJsonObject())throw new IllegalArgumentException("templates deve ser objeto");strings(root.getAsJsonObject("templates"),surfaces);
@@ -43,6 +49,11 @@ public record PresentationConfig(int schemaVersion, boolean chatEnabled, boolean
             if(!r.has("condition")||!r.get("condition").isJsonObject())throw new IllegalArgumentException("condition deve ser objeto");var c=r.getAsJsonObject("condition");JsonValidation.fields(c,Set.of("permission","group","worlds"));JsonValidation.string(c,"permission",true);JsonValidation.string(c,"group",true);JsonValidation.strings(c,"worlds");
             for(String key:List.of("templates","chatFormats"))if(!r.has(key)||!r.get(key).isJsonObject())throw new IllegalArgumentException(key+" deve ser objeto");
             strings(r.getAsJsonObject("templates"),surfaces);strings(r.getAsJsonObject("chatFormats"),channels);
+        }
+        if(root.has("titleTemplates")){
+            if(!root.get("titleTemplates").isJsonObject())throw new IllegalArgumentException("titleTemplates deve ser objeto");
+            var entries=root.getAsJsonObject("titleTemplates");
+            for(String id:entries.keySet())JsonValidation.string(entries,id,false);
         }
         return GSON.fromJson(root,PresentationConfig.class);
     }

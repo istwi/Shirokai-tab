@@ -79,6 +79,18 @@ public final class StyleChoiceSmoke implements ModInitializer {
             },server).thenComposeAsync(v->{
                 var visual=titles.visualPresentation(a.getUuid());
                 check(color(visual,0xffaa00),"Equipped title did not use saved preset");
+                var base=PresentationConfig.defaults();
+                var fixedConfig=new PresentationConfig(1,true,true,true,"",base.templates(),List.of(),Map.of(
+                    "owner","<gradient:#ff3333:#ffcc33>%visual:value%</gradient>",
+                    "admin","<gradient:#3355ff:#33ffff>%visual:value%</gradient>"));
+                presentation.replacePlan(new PresentationPlan(fixedConfig,styles,ChatConfig.defaults()));
+                var owner=new TitleDefinition("owner","Owner","[OWNER]","",TitleDefinition.Category.ROLE,100,"title.owner",false,true,true,true);
+                var admin=new TitleDefinition("admin","Admin","[ADMIN]","",TitleDefinition.Category.ROLE,99,"title.admin",false,true,true,true);
+                check(color(titles.display(a.getUuid(),owner),0xff3333),"Owner fixed gradient overridden by personal preset");
+                check(color(titles.display(a.getUuid(),admin),0x3355ff),"Admin inherited owner gradient");
+                check(color(titles.visualPresentation(a.getUuid()),0xffaa00),"Unconfigured special title lost personal preset");
+                presentation.replacePlan(new PresentationPlan(base,styles,ChatConfig.defaults()));
+
                 packetsA.clear();packetsB.clear();tab.update();
                 var name=packetsB.stream().filter(net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.class::isInstance)
                     .map(net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.class::cast).flatMap(packet->packet.getEntries().stream())

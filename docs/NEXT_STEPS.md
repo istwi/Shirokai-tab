@@ -55,3 +55,6 @@ Falha de DNS/publickeys não autoriza desativar online-mode. Sem desabilitar TLS
 mudar checksums/JARs ou fabricar integrações para passar. Preserve mixins/refmap1.21.1.
 Salvar progresso autorizado em main sem reescrever histórico; não publicar ambiente
 ou release automaticamente, nem reaplicar o setup publicado.
+
+0.13.2 acrescenta titleTemplates por ID (PRESENTATION.md), com precedência sobre
+presets pessoais. Conferir cores no cliente real com examples/presentation-ranks.json.

@@ -110,3 +110,7 @@ transições e edição arbitrária de cores não foram implementadas. A animaç
 dos layouts de TAB/sidebar continua disponível. Não se reescreve histórico do chat.
 Testes em servidor usam jogadores/conexões sintéticos; cliente real, autenticação,
 assinatura criptográfica, escala e carga continuam pendentes.
+
+Desde0.13.2, uma entrada por ID em presentation.titleTemplates tem precedência
+sobre o preset pessoal para essa identificação. Tags sem entrada e escolhas salvas
+continuam preservadas. Ver PRESENTATION.md e examples/presentation-ranks.json.

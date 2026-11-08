@@ -141,3 +141,9 @@ externas continuam pendentes. Evidências e SHA em PROJECT_STATUS.md.
 
 - Auditoria de checkout vazio e preservação do prompt integral.
 - Bootstrap Fabric/Gradle/Java21, lifecycle inicial, CI e documentação de continuidade.
+
+## 0.13.2-dev
+
+- Estilo administrativo fixo por ID de título em presentation.titleTemplates;
+  mesma renderização em chat, TAB/sidebar e preview, sem herdar preset pessoal.
+- Configurações antigas e títulos sem entrada preservados; reload valida todo candidato.

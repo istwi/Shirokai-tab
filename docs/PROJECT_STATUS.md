@@ -1,4 +1,4 @@
-# Estado real do projeto — 0.13.1-dev
+# Estado real do projeto — 0.13.2-dev
 
 ## Entrega atual
 
@@ -86,3 +86,13 @@ Código/JAR mantêm Minecraft1.21.1/Fabric/Java21 e APIs externas fixadas.
 Commit/push de código/testes/docs autorizados para main sem reescrever histórico.
 Publicação de pré-release de desenvolvimento segue a solicitação do usuário;
 não publicar release estável nem configuração de ambiente.
+
+0.13.2: titleTemplates opcional por ID, antes de presets/regras, sem migração SQLite.
+Build0.13.2 passou:105 testes JUnit, sem falhas. Smoke Fabric de estilos passou
+com OWNER/ADMIN independentes e precedência sobre preset salvo.
+JAR: build/libs/shirokai-core-0.13.2-dev.jar
+SHA256:800ffeb052c2e14520055681e228015b364bea09213ebe248b9970e72362b1ee.
+Renderização em cliente real continua pendente.
+
+Suite server_smoke0.13.2:48 verificações aprovadas, incluindo reinício e isolamento
+de falha de storage; relatório em build/server-smoke/result.json.

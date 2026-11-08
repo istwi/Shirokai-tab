@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "chatEnabled": true,
+  "menusEnabled": true,
+  "mentionsEnabled": true,
+  "mentionPermission": "",
+  "templates": {
+    "TITLE": "<gold>%visual:value%</gold>",
+    "CLAN_TAG": "<aqua>%visual:value%</aqua>",
+    "CLAN_NAME": "<aqua>%visual:value%</aqua>",
+    "MENTION": "<yellow>%visual:value%</yellow>",
+    "MENU_LORE": "<gray>%visual:value%</gray>",
+    "MENU_NAME": "<aqua>%visual:value%</aqua>",
+    "MENU_TITLE": "<gold><bold>%visual:value%</bold></gold>"
+  },
+  "rules": [],
+  "titleTemplates": {
+    "owner": "<gradient:#ff3333:#ffcc33><bold>%visual:value%</bold></gradient>",
+    "admin": "<gradient:#3355ff:#33ffff><bold>%visual:value%</bold></gradient>",
+    "moderator": "<gradient:#22aa55:#aaff77><bold>%visual:value%</bold></gradient>",
+    "helper": "<gradient:#33ccff:#bbffff><bold>%visual:value%</bold></gradient>",
+    "galactic": "<gradient:#9933ff:#ff77dd><bold>%visual:value%</bold></gradient>",
+    "plasma": "<gradient:#bb33ff:#ff88ff><bold>%visual:value%</bold></gradient>",
+    "aqua": "<gradient:#0099cc:#66ffff><bold>%visual:value%</bold></gradient>",
+    "magma": "<gradient:#ff3300:#ffaa33><bold>%visual:value%</bold></gradient>",
+    "champion": "<gradient:#ffaa00:#ffff99><bold>%visual:value%</bold></gradient>",
+    "member": "<gradient:#aaaaaa:#ffffff><bold>%visual:value%</bold></gradient>",
+    "influencer": "<gradient:#ff55aa:#cc99ff><bold>%visual:value%</bold></gradient>"
+  }
+}

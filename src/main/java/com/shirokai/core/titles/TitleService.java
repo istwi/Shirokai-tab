@@ -22,7 +22,7 @@ public final class TitleService {
     public void openCustomization(net.minecraft.server.network.ServerPlayerEntity player){presentation.openCustomization(player,com.shirokai.core.presentation.Surface.TITLE,null);}
     public boolean menuPresentationEnabled(){return presentation.menusEnabled();}
     public net.minecraft.text.Text present(UUID player,com.shirokai.core.presentation.Surface surface,String value){return presentation.render(player,surface,value);}
-    public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return present(player,definition.category()==TitleDefinition.Category.CLAN?com.shirokai.core.presentation.Surface.CLAN_TAG:com.shirokai.core.presentation.Surface.TITLE,definition.display());}
+    public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return presentation.renderTitle(player,definition);}
     public net.minecraft.text.Text visualPresentation(UUID player){return cached(player).map(TitleState::selectedVisual).map(catalog(player).definitions()::get).map(def->display(player,def)).orElseGet(net.minecraft.text.Text::empty);}
     public List<net.minecraft.text.Text> chatPresentation(UUID player){return cached(player).map(state->state.chatIds().stream().limit(2).map(catalog(player).definitions()::get).filter(Objects::nonNull).map(def->display(player,def)).toList()).orElse(List.of());}
     private TitleCatalog catalog;

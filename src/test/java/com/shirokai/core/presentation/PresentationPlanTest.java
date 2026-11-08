@@ -49,4 +49,23 @@ class PresentationPlanTest {
         var plain=engine.render(engine.compile("<red>%test:value%</red>"),key->"x",0,false);
         engine.renderRich(template,key->plain,0,false);assertEquals("x",plain.getString());
     }
+    @Test void fixedTitlesAreIndependentStrictAndSurviveReload()throws Exception{
+        var json=new Gson().toJsonTree(PresentationConfig.defaults()).getAsJsonObject();
+        // Existing schema1 files remain valid without the new optional map.
+        json.remove("titleTemplates");assertTrue(PresentationConfig.parse(json.toString()).titleTemplates().isEmpty());
+        var fixed=new JsonObject();fixed.addProperty("owner","<gradient:#ff3333:#ffcc33>%visual:value%</gradient>");
+        fixed.addProperty("admin","<gradient:#3355ff:#33ffff>%visual:value%</gradient>");json.add("titleTemplates",fixed);
+        var file=directory.resolve("presentation.json");Files.writeString(file,json.toString());
+        var config=PresentationConfig.load(file);var styles=new StyleEngine(StyleConfig.defaults());
+        var plan=new PresentationPlan(config,styles,ChatConfig.defaults());
+        assertNotEquals(plan.titleTemplate("owner").orElseThrow().source(),plan.titleTemplate("admin").orElseThrow().source());
+        assertTrue(plan.titleTemplate("traveler").isEmpty());
+        assertEquals(config,PresentationConfig.load(file));
+        for(String bad:List.of("%visual:other%","%animation:gold_wave%","<click:run_command:/op>%visual:value%</click>")){
+            fixed.addProperty("owner",bad);
+            assertThrows(Exception.class,()->new PresentationPlan(PresentationConfig.parse(json.toString()),styles,ChatConfig.defaults()));
+        }
+        fixed.addProperty("owner",true);assertThrows(Exception.class,()->PresentationConfig.parse(json.toString()));
+    }
+
 }
