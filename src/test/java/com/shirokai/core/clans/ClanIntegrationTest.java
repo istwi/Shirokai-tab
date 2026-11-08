@@ -51,10 +51,11 @@ class ClanIntegrationTest {
             var clan=main.submit(()->clans.create(leader,"Members",0)).get().get();main.submit(()->clans.identity(leader,"MBR",true)).get().get();
             main.submit(()->clans.invite(leader,member)).get().get();main.submit(()->clans.accept(member,"Members")).get().get();
             String tag=ClanTitle.id(clan.id());
-            var selection=main.submit(()->titleService.equip(member,tag,false)).get().get();
+            assertThrows(ExecutionException.class,()->main.submit(()->titleService.equip(member,tag,false)).get().get());
             main.submit(()->titleService.equip(member,"traveler",true)).get().get();
-            selection=main.submit(()->titleService.equip(member,tag,true)).get().get();assertEquals(List.of("traveler",tag),selection.chatIds());
-            assertEquals(Optional.of("[MBR]"),main.submit(()->titleService.placeholder(member,"shirokai:selected_title")).get());
+            var selection=main.submit(()->titleService.equip(member,tag,true)).get().get();assertEquals(List.of("traveler",tag),selection.chatIds());
+            assertTrue(main.submit(()->titleService.placeholder(member,"shirokai:selected_title")).get().isEmpty());
+            assertEquals(Optional.of("[MBR]"),main.submit(()->titleService.placeholder(member,"shirokai:chat_tag_2")).get());
             assertThrows(ExecutionException.class,()->main.submit(()->titleService.equip(outsider,tag,true)).get().get());
             long revision=selection.revision();repo.leave(member).get();var after=storage.titleState(member).get();
             assertNull(after.selectedVisual());assertEquals(List.of("traveler"),after.chatIds());assertTrue(after.revision()>revision);

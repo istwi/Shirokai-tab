@@ -28,10 +28,10 @@ public record TabExtrasConfig(int schemaVersion, Listed listed, Nametags nametag
     }
     private static void node(String value){if(value==null||!value.matches("[a-zA-Z0-9_.-]{1,128}"))throw new IllegalArgumentException("Permissão de listagem inválida");}
     private static final Gson GSON=new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    public TabExtrasConfig { if(schemaVersion!=1||listed==null||nametags==null||belowName==null||bossbar==null)throw new IllegalArgumentException("Extras de TAB inválidos"); }
-    public static TabExtrasConfig defaults(){return new TabExtrasConfig(1,
+    public TabExtrasConfig { if((schemaVersion!=1 && schemaVersion!=2)||listed==null||nametags==null||belowName==null||bossbar==null)throw new IllegalArgumentException("Extras de TAB inválidos"); }
+    public static TabExtrasConfig defaults(){return new TabExtrasConfig(2,
         new Listed(false,"shirokaicore.tab.hidden","shirokaicore.tab.seehidden",false),
-        new Nametags(false,"%shirokai:title_prefix%","","ALWAYS"),
+        new Nametags(true,"%shirokai:title_prefix%","","ALWAYS"),
         new BelowName(false,"<gray>ms</gray>","%shirokai:ping%"),
         new Bossbar(false,"<gold>✦ SHIROKAI ✦</gold>","1","YELLOW","PROGRESS",TabConfig.Condition.any()));}
     public boolean requiresRestartComparedTo(TabExtrasConfig previous){
@@ -55,6 +55,10 @@ public record TabExtrasConfig(int schemaVersion, Listed listed, Nametags nametag
         var bar=object(root,"bossbar",Set.of("enabled","title","progress","color","style","condition"));JsonValidation.bool(bar,"enabled");
         for(String key:List.of("title","progress","color","style"))JsonValidation.string(bar,key,false);
         var c=object(bar,"condition",Set.of("permission","group","worlds"));JsonValidation.string(c,"permission",true);JsonValidation.string(c,"group",true);JsonValidation.strings(c,"worlds");
+        int version=root.get("schemaVersion").getAsInt();
+        // Upgrade only the exact old default; schema 2 allows an explicit opt-out.
+        if(version==1 && !n.get("enabled").getAsBoolean() && n.get("prefix").getAsString().equals("%shirokai:title_prefix%") && n.get("suffix").getAsString().isEmpty() && n.get("visibility").getAsString().equals("ALWAYS")) n.addProperty("enabled",true);
+        if(version==1)root.addProperty("schemaVersion",2);
         return GSON.fromJson(root,TabExtrasConfig.class);
     }
     private static JsonObject object(JsonObject parent,String name,Set<String> fields){

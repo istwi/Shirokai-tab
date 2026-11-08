@@ -63,7 +63,7 @@ public final class PresentationSmoke implements ModInitializer {
         check(composed.getString().equals(untrusted.getString())&&untrusted.getStyle().getHoverEvent()!=null,"Rich slot reparsed or source mutated");
         composed.visit((style,part)->{check(style.getClickEvent()==null&&style.getHoverEvent()==null&&style.getInsertion()==null,"Rich slot leaked executable actions");return Optional.empty();},Style.EMPTY);
         var result=storage.ready().thenComposeAsync(v->clans.create(a.getUuid(),"StyledClan",0),server).thenComposeAsync(v->clans.identity(a.getUuid(),"STY",true),server)
-            .thenComposeAsync(v->titles.equip(a.getUuid(),"traveler",false),server).thenComposeAsync(v->titles.equip(a.getUuid(),"traveler",true),server)
+            .thenComposeAsync(v->titles.equip(a.getUuid(),"traveler",true),server)
             .thenComposeAsync(v->titles.equip(a.getUuid(),ClanTitle.id(clans.cached(a.getUuid()).orElseThrow().id()),true),server)
             .thenComposeAsync(v->chat.join(a.getUuid()),server).thenComposeAsync(v->chat.join(b.getUuid()),server).thenComposeAsync(v->chat.join(c.getUuid()),server)
             .thenComposeAsync(v->board.join(a.getUuid()),server).thenRunAsync(()->{
@@ -81,13 +81,13 @@ public final class PresentationSmoke implements ModInitializer {
                 check(system.getString().endsWith(body)&&color(system,0xffff55),"System mention not styled literally");
                 system.getSiblings().getLast().visit((style,part)->{check(style.getClickEvent()==null,"Body inherited sender click");return Optional.empty();},Style.EMPTY);
                 clear.run();chat.send(a.getUuid(),Channel.LOCAL,"@StyledFar outside local",endpoint::system);check(pc.isEmpty(),"Undelivered mention leaked notification");
-                vip[0]=false;check(!color(titles.visualPresentation(a.getUuid()),0xff0000),"Revoked visual permission kept premium style");check(titles.cached(a.getUuid()).orElseThrow().selectedVisual().equals("traveler"),"Visual permission erased title selection");
-                vip[0]=true;check(color(titles.visualPresentation(a.getUuid()),0xff0000)&&renderer.plan().config().equals(visualConfig),"Configured style lost after permission restored");
+                vip[0]=false;check(!color(titles.chatPresentation(a.getUuid()).getFirst(),0xff0000),"Revoked visual permission kept premium style");check(titles.cached(a.getUuid()).orElseThrow().chatIds().contains("traveler"),"Visual permission erased title selection");
+                vip[0]=true;check(color(titles.chatPresentation(a.getUuid()).getFirst(),0xff0000)&&renderer.plan().config().equals(visualConfig),"Configured style lost after permission restored");
                 clear.run();tab.update();board.refresh(a.getUuid());
-                var names=pb.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).filter(e->e.profileId().equals(a.getUuid())).findFirst().orElseThrow().displayName();check(color(names,0xff0000),"TAB lost rich title style");
+                var names=pb.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).filter(e->e.profileId().equals(a.getUuid())).findFirst().orElseThrow().displayName();check(!names.getString().contains("VIAJANTE")&&!names.getString().contains("STY"),"Optional tags leaked into TAB");
                 // Initial board frame may already be cached; inspect title directly and assert a config frame update below.
                 var modified=new ScoreboardConfig(1,20,List.of(new ScoreboardConfig.Layout("default",0,TabConfig.Condition.any(),"Title",List.of(new ScoreboardConfig.Line("title",TabConfig.Condition.any(),"%shirokai:selected_title%")))));
-                board.replacePlan(new ScoreboardPlan(modified,engine));var score=pa.stream().filter(ScoreboardScoreUpdateS2CPacket.class::isInstance).map(ScoreboardScoreUpdateS2CPacket.class::cast).findFirst().orElseThrow();check(color(score.display().orElseThrow(),0xff0000),"Sidebar lost same title style");
+                board.replacePlan(new ScoreboardPlan(modified,engine));var score=pa.stream().filter(ScoreboardScoreUpdateS2CPacket.class::isInstance).map(ScoreboardScoreUpdateS2CPacket.class::cast).findFirst().orElseThrow();check(score.display().orElseThrow().getString().isEmpty(),"Optional tag leaked into sidebar rank");
                 var menu=new ProfileMenu(91,a.getInventory(),a,titles,titles.cached(a.getUuid()).orElseThrow());a.currentScreenHandler=menu;
                 check(color(menu.getInventory().getStack(9).get(DataComponentTypes.CUSTOM_NAME),0xff0000),"Profile title preview lost style");
                 ClanMenu.open(a,clans);

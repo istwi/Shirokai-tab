@@ -1,3 +1,42 @@
+# Estado real do projeto — 0.14.0-dev
+
+Cargo principal do LuckPerms agora é automático e fixo no TAB/sidebar/chat/nametag,
+sem seleção no perfil. ROLE configurado personaliza o rótulo; sem definição, usa
+[GRUPO] e ID do grupo para titleTemplates. Presets pessoais não alteram ROLE.
+Eventos e identificação nativa de clã são opcionais exclusivamente no chat.
+Mantido limite de duas identificações totais: cargo + uma opcional (sem metadados,
+até duas opcionais). /perfil e sugestões excluem ROLE; limpar não remove cargo.
+
+Nametags agora habilitadas por padrão em tab-extras schema2. Schema1 com nametag
+igual ao antigo padrão desligado é promovido em memória; opt-out explícito por
+schema2 false e configs personalizadas preservados. Teams externos continuam
+preservados. Acima da cabeça usa prefixo vanilla na mesma linha do nome.
+SQLite permanece6; seleções visuais antigas e ROLE opcionais são normalizados
+online. Concessões/presets preservados; consulta offline não limpa seleções.
+
+## Validação desta entrega
+
+- Build/smokeClasses aprovados, 105 testes JUnit, sem falhas/erros.
+- Suite Fabric: 48 verificações, incluindo reinício e falha isolada de storage.
+- Integrações opcionais reais: 14 verificações, incluindo mudança de cargo
+  via LuckPerms5.4.140, pesos e invalidação de cache da API na fixture. Cinco mods
+  oficiais/53 dependências aninhadas revalidados sem alterar artefatos.
+- Perfil: ROLE escondido, cliques seguros, tags só no chat; TAB/nametag mudam de
+  OWNER para ADMIN sem equipar; estilos pessoais não mudam o padrão de ROLE.
+- Artefato inspecionado: versão/refmap presentes, sem classes smoke em produção.
+
+JAR: build/libs/shirokai-core-0.14.0-dev.jar
+SHA256: c902d1d27b7948af8496172cde2c933a76b728a178cf57dcbea5ba3230fb4841
+
+Relatórios locais: build/reports/tests/test, build/server-smoke/result.json e
+build/integration-smoke/result.json. Testes Fabric usam jogadores sintéticos;
+cliente autenticado, visual no jogo, contextos LP de clientes e carga não foram
+certificados. DNS/publickeys pode falhar; online-mode permanece habilitado.
+RANKS.md documenta comandos, primary group, pesos, migração e configuração.
+Base: ef900cd. Histórico abaixo preserva evidências das versões anteriores.
+
+---
+
 # Estado real do projeto — 0.13.4-dev
 
 ## Entrega atual

@@ -49,6 +49,7 @@ public final class ScoreboardSmoke implements ModInitializer {
             public Metadata metadata(UUID id) { return meta.get(id); }
         };
         var titles = new TitleService(storage, TitleCatalog.defaults(), permissions::allowed, server, id -> true, Clock.systemUTC(), (message, error) -> {});
+        titles.bindRanks(permissions::metadata);
         var placeholders = new PlaceholderService((key, error) -> {}); var dynamic = new String[]{"<click:run_command:/op>literal</click>"};
         placeholders.register("smoke:value", c -> Optional.of(dynamic[0]));
         var any = TabConfig.Condition.any(); var vip = new TabConfig.Condition("sidebar.vip", "vip", Set.of("minecraft:overworld"));
@@ -69,7 +70,7 @@ public final class ScoreboardSmoke implements ModInitializer {
         // Real send() mixin must capture private packets already sent before runtime JOIN.
         b.networkHandler.sendPacket(new BundleS2CPacket(List.of(new ScoreboardObjectiveUpdateS2CPacket(old, 0), new ScoreboardDisplayS2CPacket(ScoreboardDisplaySlot.SIDEBAR, old))));
         var result = storage.ready().thenCompose(v -> storage.setAnimations(a.getUuid(), false)).thenCompose(v -> storage.setAnimations(b.getUuid(), false))
-            .thenComposeAsync(v -> titles.equip(a.getUuid(), "traveler", false), server)
+            .thenComposeAsync(v -> titles.view(a.getUuid()), server)
             .thenComposeAsync(v -> endpoint.join(a.getUuid()), server)
             .thenRunAsync(() -> {
                 check(endpoint.status().contains("viewers=0"), "Early join unexpectedly registered unavailable player");
@@ -79,7 +80,7 @@ public final class ScoreboardSmoke implements ModInitializer {
             .thenRunAsync(() -> {
                 owned[0] = objective(pa); check(owned[0].length() == 16, "Unsafe objective identifier");
                 var initial = scores(pa); check(initial.size() == 6, "Initial rows missing");
-                check(initial.getFirst().display().orElseThrow().getString().equals("[VIAJANTE]"), "Selected title missing");
+                check(initial.getFirst().display().orElseThrow().getString().equals("[VIP]"), "Selected title missing");
                 check(initial.stream().filter(p -> p.display().orElseThrow().getString().isEmpty()).count() == 2, "Duplicate blanks collapsed");
                 check(initial.stream().map(ScoreboardScoreUpdateS2CPacket::scoreHolderName).distinct().count() == 6, "Holders not unique");
                 check(initial.stream().map(ScoreboardScoreUpdateS2CPacket::score).toList().equals(List.of(15, 14, 13, 12, 11, 10)), "Line order wrong");
@@ -89,7 +90,7 @@ public final class ScoreboardSmoke implements ModInitializer {
                 check(!SidebarPackets.state(a.networkHandler).names().contains(owned[0]), "Own packets mistaken for foreign");
                 check(pb.stream().noneMatch(ScoreboardScoreUpdateS2CPacket.class::isInstance), "Foreign sidebar overwritten at join");
                 tab.update(); var names = pa.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p -> p.getEntries().stream()).filter(e -> e.profileId().equals(a.getUuid())).findFirst().orElseThrow();
-                check(names.displayName().getString().equals("[VIAJANTE] SideAlice"), "TAB and scoreboard selections diverged");
+                check(names.displayName().getString().equals("[VIP] SideAlice"), "TAB and scoreboard selections diverged");
                 pa.clear(); pb.clear(); endpoint.update(); check(pa.isEmpty() && pb.isEmpty(), "Unchanged frame sent packets");
                 dynamic[0] = "Changed"; endpoint.update(); check(scores(pa).size() == 1, "One line change rebuilt scoreboard");
                 pa.clear(); dynamic[0] = "x".repeat(257); endpoint.update(); check(pa.isEmpty(), "Invalid dynamic frame partially published"); dynamic[0] = "Changed";

@@ -1,3 +1,7 @@
+> Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
+> SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
+> As regras antigas de seleção visual abaixo são históricas e foram substituídas.
+
 # Títulos e perfil — 0.5.0-dev
 
 ## Catálogo real

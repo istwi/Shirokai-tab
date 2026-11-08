@@ -88,6 +88,7 @@ public final class ProfileSmoke implements ModInitializer {
         var storage = new SqliteStorage(FabricLoader.getInstance().getGameDir().resolve("profile-smoke-" + UUID.randomUUID() + ".db"));
         var definitions = new HashMap<String, TitleDefinition>();
         for (String id : List.of("a", "b", "c")) definitions.put(id, new TitleDefinition(id,id,"["+id+"]","",TitleDefinition.Category.SPECIAL,0,null,true,true,true,true));
+        definitions.put("owner",new TitleDefinition("owner","Owner","[OWNER]","",TitleDefinition.Category.ROLE,100,"group.owner",false,true,true,true));
         var service = new TitleService(storage,new TitleCatalog(1,definitions),(id,node)->false,server,id->true,Clock.systemUTC(),(message,error)->{
             org.slf4j.LoggerFactory.getLogger("shirokai-profile-smoke").error(message,error);
         });
@@ -109,9 +110,6 @@ public final class ProfileSmoke implements ModInitializer {
             check(service.cached(id).orElseThrow().selectedVisual()==null,"Malformed click mutated profile");
             check(owner.getInventory().getStack(0).getCount()==5,"Menu changed player inventory");
             menu.onSlotClick(9,0,SlotActionType.PICKUP,owner);
-            return until(() -> "a".equals(service.cached(id).orElseThrow().selectedVisual()));
-        },server).thenComposeAsync(v -> {
-            ((ProfileMenu)owner.currentScreenHandler).onSlotClick(9,1,SlotActionType.PICKUP,owner);
             return until(() -> service.cached(id).orElseThrow().chatIds().equals(List.of("a")));
         },server).thenComposeAsync(v -> {
             ((ProfileMenu)owner.currentScreenHandler).onSlotClick(10,1,SlotActionType.PICKUP,owner);
@@ -122,7 +120,7 @@ public final class ProfileSmoke implements ModInitializer {
             return until(() -> tick >= after);
         },server).thenComposeAsync(v -> storage.titleState(id),server).thenComposeAsync(state -> {
             check(state.chatIds().equals(List.of("a","b")),"Third identification was accepted");
-            check("a".equals(state.selectedVisual()),"Chat selection changed shared visual title");
+            check(state.selectedVisual()==null,"Optional chat tag leaked into visual rank");
             var menu = (ProfileMenu)owner.currentScreenHandler;
             menu.onSlotClick(48,0,SlotActionType.PICKUP,owner);
             return until(() -> service.cached(id).orElseThrow().selectedVisual()==null && service.cached(id).orElseThrow().chatIds().isEmpty());

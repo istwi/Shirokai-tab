@@ -1,3 +1,7 @@
+> Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
+> SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
+> As regras antigas de seleção visual abaixo são históricas e foram substituídas.
+
 # Integrações opcionais — 0.9.0-dev
 
 O Core continua funcionando sem Cobblemon, Impactor, Shirokai Dex, PAPI ou LuckPerms.

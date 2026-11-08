@@ -52,19 +52,21 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
     private void render() {
         display.clear();
         display.setStack(4, icon(Items.PLAYER_HEAD, owner.getGameProfile().getName(),
-                "Título: " + (state.selectedVisual() == null ? "Nenhum" : java.util.Optional.ofNullable(titles.catalog(owner.getUuid()).definitions().get(state.selectedVisual())).map(TitleDefinition::name).orElse("Nenhum")),
+                "Cargo fixo: " + titles.rank(owner.getUuid()).map(TitleDefinition::name).orElse("Nenhum"),
                 "Clã: " + titles.clanName(owner.getUuid()).orElse("Nenhum"),
-                "Identificações equipadas: " + state.chatIds().size() + "/2", "Esquerdo: título TAB/scoreboard", "Direito: equipar/remover no chat"));
+                "Tags opcionais: " + state.chatIds().size(), "Clique: equipar/remover no chat", "O cargo é definido pelo servidor."));
         entries = titles.catalog(owner.getUuid()).definitions().values().stream()
+                .filter(t -> t.category() != TitleDefinition.Category.ROLE && t.chat())
                 .sorted(Comparator.comparing(TitleDefinition::category).thenComparing(Comparator.comparingInt(TitleDefinition::priority).reversed()).thenComparing(TitleDefinition::id)).toList();
+        var activeChat=titles.chatDefinitions(owner.getUuid()).stream().map(TitleDefinition::id).collect(java.util.stream.Collectors.toSet());
         page = Math.min(page, Math.max(0, (entries.size() - 1) / 36));
         for (int i = 0; i < 36 && page * 36 + i < entries.size(); i++) {
             var title = entries.get(page * 36 + i);
             var availability = titles.rules().availability(title, state, titles.now());
             var stack=icon(availability == TitleRules.Availability.UNLOCKED ? Items.NAME_TAG : Items.BARRIER,
                     title.display(), title.description(), "Estado: " + switch(availability){case UNLOCKED->"Disponível";case LOCKED->"Bloqueado";case EXPIRED->"Expirado";case UNAVAILABLE->"Indisponível";},
-                    "Categoria: " + switch(title.category()){case ROLE->"Cargo";case SPECIAL->"Especial";case CLAN->"Clã";}, "TAB e scoreboard: " + (title.id().equals(state.selectedVisual())?"Equipado":"Não equipado"),
-                    "Chat: " + (state.chatIds().contains(title.id())?"Equipado":"Não equipado"));
+                    "Categoria: " + switch(title.category()){case ROLE->"Cargo";case SPECIAL->"Especial";case CLAN->"Clã";}, "Exclusiva do chat",
+                    "Chat: " + (state.chatIds().contains(title.id())?(activeChat.contains(title.id())?"Equipado":"Salvo (fora do limite atual)"):"Não equipado"));
             if(titles.menuPresentationEnabled())stack.set(DataComponentTypes.CUSTOM_NAME,titles.display(owner.getUuid(),title).copy().formatted(Formatting.AQUA));
             display.setStack(9+i,stack);
         }
@@ -102,7 +104,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
             if (slot == 48) operation = titles.clear(owner.getUuid());
             else if (slot == 49) operation = titles.view(owner.getUuid());
             else if (slot >= 9 && slot < 45 && page * 36 + slot - 9 < entries.size())
-                operation = titles.equip(owner.getUuid(), entries.get(page * 36 + slot - 9).id(), button == 1);
+                operation = titles.equip(owner.getUuid(), entries.get(page * 36 + slot - 9).id(), true);
             else return;
         } catch (Exception error) { failure(error); return; }
         busy = true;

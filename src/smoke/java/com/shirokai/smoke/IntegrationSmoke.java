@@ -103,7 +103,19 @@ public final class IntegrationSmoke implements ModInitializer {
         check(styles.render(styles.compile("Gyms %player:objective smoke_gyms%"), key -> service.render("%" + key + "%", context, "N/D"), 0, false).getString().equals("Gyms 7"), "StyleEngine did not import PAPI arguments");
         var api = LuckPermsProvider.get();
         BigDecimal[] before = new BigDecimal[2];
-        var result = api.getUserManager().loadUser(player.getUuid()).thenComposeAsync(user -> {
+        var result = api.getGroupManager().createAndLoadGroup("smoke_owner")
+            .thenCompose(group->{group.data().add(net.luckperms.api.node.types.WeightNode.builder(100).build());return api.getGroupManager().createAndLoadGroup("smoke_admin");})
+            .thenCompose(group->{group.data().add(net.luckperms.api.node.types.WeightNode.builder(200).build());return api.getUserManager().loadUser(player.getUuid());}).thenComposeAsync(user -> {
+            var rankTitles=new com.shirokai.core.titles.TitleService(null,com.shirokai.core.titles.TitleCatalog.defaults(),permissions::allowed,server,id->true,java.time.Clock.systemUTC(),(m,e)->{throw new AssertionError(m,e);});
+            rankTitles.bindRanks(permissions::metadata);
+            user.data().add(net.luckperms.api.node.types.InheritanceNode.builder("smoke_owner").build());
+            user.setPrimaryGroup("smoke_owner");
+            user.getCachedData().invalidate();
+            check(rankTitles.visualPresentation(player.getUuid()).getString().equals("[SMOKE_OWNER]"),"Real LP primary rank was not automatic: "+permissions.metadata(player.getUuid()).group());
+            user.data().add(net.luckperms.api.node.types.InheritanceNode.builder("smoke_admin").build());
+            user.setPrimaryGroup("smoke_admin");
+            user.getCachedData().invalidate();
+            check(rankTitles.chatDefinitions(player.getUuid()).getFirst().display().equals("[SMOKE_ADMIN]"),"Real LP primary rank change not reflected in chat");
             var permission = PermissionNode.builder("shirokai.smoke.permission").build();
             var prefix = PrefixNode.builder("[INTEGRATION]", 900).build();
             user.data().add(permission); user.data().add(prefix);

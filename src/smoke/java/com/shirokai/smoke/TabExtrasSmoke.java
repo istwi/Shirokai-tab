@@ -19,7 +19,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public final class TabExtrasSmoke implements ModInitializer {
     public void onInitialize(){CommandRegistrationCallback.EVENT.register((dispatcher,registry,environment)->dispatcher.register(
         literal("shirokai-tab-extras-smoke").requires(s->s.hasPermissionLevel(4)).executes(c->{
-            try{test(c.getSource().getServer());c.getSource().sendFeedback(()->Text.literal("TAB_EXTRAS_SMOKE_PASS"),false);}
+            try{test(c.getSource().getServer());testRanks(c.getSource().getServer());c.getSource().sendFeedback(()->Text.literal("TAB_EXTRAS_SMOKE_PASS"),false);}
             catch(Throwable error){org.slf4j.LoggerFactory.getLogger("tab-extras-smoke").error("TAB_EXTRAS_SMOKE_FAIL",error);c.getSource().sendError(Text.literal("TAB_EXTRAS_SMOKE_FAIL"));}
             return 1;
         })));}
@@ -52,6 +52,26 @@ public final class TabExtrasSmoke implements ModInitializer {
             new TabExtrasConfig.Nametags(tags,"<red>%shirokai:player% </red>","","ALWAYS"),
             new TabExtrasConfig.BelowName(below,"<gray>Points</gray>","%test:score%"),
             new TabExtrasConfig.Bossbar(boss,"Boss %shirokai:player%","%test:progress%","YELLOW","PROGRESS",TabConfig.Condition.any()));
+    }
+    private static void testRanks(net.minecraft.server.MinecraftServer server){
+        var packets=new ArrayList<Packet<?>>();var a=ProfileSmoke.player(server,"RankAlice",packets::add);
+        var group=new String[]{"owner"};
+        var permissions=new PermissionService(){public boolean allowed(UUID id,String node){return true;}public String provider(){return "test";}public Metadata metadata(UUID id){return new Metadata(group[0],"","",100);}};
+        var titles=new com.shirokai.core.titles.TitleService(null,com.shirokai.core.titles.TitleCatalog.defaults(),permissions::allowed,server,id->true,java.time.Clock.systemUTC(),(m,e)->{throw new AssertionError(m,e);});
+        titles.bindRanks(permissions::metadata);var engine=new StyleEngine(StyleConfig.defaults());
+        var tab=new TabRuntime(server,new TabPlan(TabConfig.defaults(),engine),permissions,null,titles,null,null,()->"N/D",org.slf4j.LoggerFactory.getLogger("rank-smoke"),()->List.of(a));
+        tab.configureExtras(new TabExtrasPlan(TabExtrasConfig.defaults(),engine));
+        try{
+            tab.update();
+            var team=server.getScoreboard().getScoreHolderTeam("RankAlice");
+            check(team!=null&&team.getPrefix().getString().equals("[OWNER] "),"Automatic primary rank missing from nametag");
+            check(packets.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).anyMatch(e->e.displayName()!=null&&e.displayName().getString().equals("[OWNER] RankAlice")),"Automatic rank missing from TAB");
+            check(titles.chatDefinitions(a.getUuid()).getFirst().display().equals("[OWNER]"),"Automatic chat rank missing before profile load");
+            packets.clear();group[0]="admin";tab.update();
+            check(server.getScoreboard().getScoreHolderTeam("RankAlice").getPrefix().getString().equals("[ADMIN] "),"Rank change did not update nametag");
+            check(packets.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).anyMatch(e->e.displayName()!=null&&e.displayName().getString().equals("[ADMIN] RankAlice")),"Rank change did not update TAB");
+        }finally{tab.close();}
+        check(server.getScoreboard().getScoreHolderTeam("RankAlice")==null,"Rank nametag leaked on stop");
     }
     private static void test(net.minecraft.server.MinecraftServer server){
         var pa=new ArrayList<Packet<?>>();var pb=new ArrayList<Packet<?>>();

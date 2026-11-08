@@ -1,3 +1,6 @@
+> 0.14.0 substitui ROLE selecionável por cargo principal fixo. Não reaplicar
+> a regra antiga de título visual opcional. Consulte RANKS.md para migração.
+
 # Próximos passos
 
 ## Estado atual

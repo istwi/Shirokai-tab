@@ -1,3 +1,6 @@
+> 0.14.0: schema2 habilita nametags por padrão e promove o padrão schema1 antigo
+> em memória. Demais extras continuam opcionais. Veja [RANKS.md](RANKS.md).
+
 # Extras de TAB — 0.12.0-dev
 
 Quatro recursos opcionais do módulo tab, desligados por padrão. Não alteram schemas

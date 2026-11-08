@@ -82,6 +82,7 @@ public final class CoreRuntime implements AutoCloseable {
             titles = new TitleService(storage, catalog, permissions::allowed, server,
                     id -> server.getPlayerManager().getPlayer(id) != null, java.time.Clock.systemUTC(),
                     (message, error) -> logger.warn("[titles] " + message, error));
+            titles.bindRanks(permissions::metadata);
             if (placeholders != null) {
                 for (String key : java.util.List.of("shirokai:selected_title", "shirokai:chat_tag_1", "shirokai:chat_tag_2"))
                     placeholders.register(key, context -> titles.placeholder(context.playerId(), key));

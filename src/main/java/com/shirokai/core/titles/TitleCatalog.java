@@ -12,7 +12,7 @@ public record TitleCatalog(int schemaVersion, Map<String, TitleDefinition> defin
     public TitleCatalog { definitions = Map.copyOf(definitions); }
     public static TitleCatalog defaults() {
         var traveler = new TitleDefinition("traveler", "Viajante", "[VIAJANTE]", "Explore o mundo Shirokai.",
-                TitleDefinition.Category.SPECIAL, 0, null, true, true, true, true);
+                TitleDefinition.Category.SPECIAL, 0, null, true, false, false, true);
         return new TitleCatalog(1, Map.of(traveler.id(), traveler));
     }
     public static TitleCatalog load(Path file) throws IOException {

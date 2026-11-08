@@ -1,3 +1,7 @@
+> Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
+> SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
+> As regras antigas de seleção visual abaixo são históricas e foram substituídas.
+
 # Personalização persistida — 0.11.0-dev
 
 O catálogo administrativo `config/shirokai-core/presets.json` define presets com

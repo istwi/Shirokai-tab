@@ -10,18 +10,27 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TabExtrasPlanTest {
     @TempDir Path directory;
-    @Test void defaultsAreDisabledAndExistingConfigurationIsNeverOverwritten()throws Exception{
+    @Test void nametagsAreEnabledAndExistingConfigurationIsNeverOverwritten()throws Exception{
         var file=directory.resolve("tab-extras.json");var config=TabExtrasConfig.load(file);
-        assertEquals(TabExtrasConfig.defaults(),config);assertFalse(config.listed().enabled());assertFalse(config.nametags().enabled());assertFalse(config.belowName().enabled());assertFalse(config.bossbar().enabled());
+        assertEquals(TabExtrasConfig.defaults(),config);assertFalse(config.listed().enabled());assertTrue(config.nametags().enabled());assertFalse(config.belowName().enabled());assertFalse(config.bossbar().enabled());
         String original=Files.readString(file);TabExtrasConfig.load(file);assertEquals(original,Files.readString(file));
         Files.writeString(file,"invalid");assertThrows(Exception.class,()->TabExtrasConfig.load(file));assertEquals("invalid",Files.readString(file));
+    }
+    @Test void legacyDefaultNametagsUpgradeButExplicitModernOptOutSurvives()throws Exception{
+        var root=new Gson().toJsonTree(TabExtrasConfig.defaults()).getAsJsonObject();
+        root.addProperty("schemaVersion",1);root.getAsJsonObject("nametags").addProperty("enabled",false);
+        assertTrue(TabExtrasConfig.parse(root.toString()).nametags().enabled());
+        root.addProperty("schemaVersion",2);
+        assertFalse(TabExtrasConfig.parse(root.toString()).nametags().enabled());
+        root.addProperty("schemaVersion",1);root.getAsJsonObject("nametags").addProperty("prefix","Custom ");
+        assertFalse(TabExtrasConfig.parse(root.toString()).nametags().enabled());
     }
     @Test void unknownFieldsEnumsTypesAndNumericMarkupFailBeforePublishing()throws Exception{
         var engine=new StyleEngine(StyleConfig.defaults());String valid=new Gson().toJson(TabExtrasConfig.defaults());
         new TabExtrasPlan(TabExtrasConfig.parse(valid),engine);
-        for(String bad:List.of(valid.replace("\"enabled\":false","\"enabled\":\"false\""),valid.replace("\"schemaVersion\":1","\"schemaVersion\":2"),
+        for(String bad:List.of(valid.replace("\"enabled\":false","\"enabled\":\"false\""),valid.replace("\"schemaVersion\":2","\"schemaVersion\":3"),
             valid.replace("\"visibility\":\"ALWAYS\"","\"visibility\":\"MAYBE\""),valid.replace("\"color\":\"YELLOW\"","\"color\":\"GOLD\""),
-            valid.replace("\"schemaVersion\":1","\"schemaVersion\":1,\"unknown\":true")))
+            valid.replace("\"schemaVersion\":2","\"schemaVersion\":2,\"unknown\":true")))
             assertThrows(Exception.class,()->new TabExtrasPlan(TabExtrasConfig.parse(bad),engine));
         var root=JsonParser.parseString(valid).getAsJsonObject();root.getAsJsonObject("bossbar").addProperty("progress","<red>1</red>");
         assertThrows(Exception.class,()->new TabExtrasPlan(TabExtrasConfig.parse(root.toString()),engine));
@@ -32,7 +41,7 @@ class TabExtrasPlanTest {
     @Test void ownershipFlagsRequireRestartButTemplatesAndConditionsReload()throws Exception{
         var base=TabExtrasConfig.defaults();var root=new Gson().toJsonTree(base).getAsJsonObject();
         for(String feature:List.of("listed","nametags","belowName","bossbar")){
-            var changed=root.deepCopy();changed.getAsJsonObject(feature).addProperty("enabled",true);
+            var changed=root.deepCopy();changed.getAsJsonObject(feature).addProperty("enabled",!root.getAsJsonObject(feature).get("enabled").getAsBoolean());
             assertTrue(TabExtrasConfig.parse(changed.toString()).requiresRestartComparedTo(base));
         }
         root.getAsJsonObject("bossbar").addProperty("title","<red>New</red>");

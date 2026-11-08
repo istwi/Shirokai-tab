@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         checks.append('console clan administration list with permission and module gating')
         send('shirokai-integrations-smoke', 'INTEGRATIONS_SMOKE_PASS')
         checks += ['actual PAPI import arguments and literal native export', 'native gym objective without display takeover',
-                   'StyleEngine consumes external PAPI arguments', 'actual LuckPerms grant revoke and prefix',
+                   'StyleEngine consumes external PAPI arguments', 'actual LuckPerms grant revoke prefix and automatic primary rank changes',
                    'persisted style with actual LuckPerms permission loss fallback and recovery',
                    'actual Impactor separate-currency balances without primary fallback',
                    'actual Cobblemon species registry and official acquisition updates Pokedex snapshot',

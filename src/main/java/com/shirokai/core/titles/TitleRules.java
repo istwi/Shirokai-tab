@@ -19,11 +19,9 @@ public final class TitleRules {
         return title.unlockedByDefault() ? Availability.UNLOCKED : Availability.LOCKED;
     }
     public TitleState normalize(TitleState state, TitleCatalog catalog, long now) {
-        String selected = state.selectedVisual();
-        var visual = catalog.definitions().get(selected == null ? "" : selected);
-        if (visual == null || !visual.tab() || !visual.scoreboard() || availability(visual, state, now) != Availability.UNLOCKED) selected = null;
+        String selected = null; // Visual rank belongs to LuckPerms, never to a saved player choice.
         var chat = state.chatIds().stream().distinct().map(catalog.definitions()::get)
-                .filter(Objects::nonNull).filter(t -> t.chat() && availability(t, state, now) == Availability.UNLOCKED)
+                .filter(Objects::nonNull).filter(t -> t.category() != TitleDefinition.Category.ROLE && t.chat() && availability(t, state, now) == Availability.UNLOCKED)
                 .sorted(Comparator.comparing(TitleDefinition::category).thenComparing(Comparator.comparingInt(TitleDefinition::priority).reversed()).thenComparing(TitleDefinition::id))
                 .limit(2).map(TitleDefinition::id).toList();
         return new TitleState(state.player(), state.revision(), state.grants(), selected, chat);
@@ -32,6 +30,8 @@ public final class TitleRules {
         var state = normalize(current, catalog, now);
         TitleDefinition title = catalog.definitions().get(id);
         if (title == null || availability(title, state, now) != Availability.UNLOCKED) throw new IllegalArgumentException("Título indisponível: " + id);
+        if (title.category() == TitleDefinition.Category.ROLE) throw new IllegalArgumentException("Cargo é automático pelo LuckPerms e não pode ser escolhido");
+        if (!chat) throw new IllegalArgumentException("Tags opcionais são exclusivas do chat; use /perfil chat <id>");
         if (chat) {
             if (!title.chat()) throw new IllegalArgumentException("Título não disponível no chat");
             var tags = new ArrayList<>(state.chatIds());
@@ -39,7 +39,6 @@ public final class TitleRules {
             else { if (tags.size() >= 2) throw new IllegalArgumentException("Máximo de duas identificações no total"); tags.add(id); }
             return normalize(new TitleState(state.player(), state.revision(), state.grants(), state.selectedVisual(), tags), catalog, now);
         }
-        if (!title.tab() || !title.scoreboard()) throw new IllegalArgumentException("Título deve estar disponível em TAB e scoreboard");
-        return new TitleState(state.player(), state.revision(), state.grants(), id, state.chatIds());
+        throw new IllegalArgumentException("Seleção visual indisponível");
     }
 }

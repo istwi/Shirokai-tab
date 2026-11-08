@@ -35,8 +35,11 @@ public final class ProfileCommands {
     }
     private CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggest(ServerCommandSource source, com.mojang.brigadier.suggestion.SuggestionsBuilder builder) {
         var core = runtime.get();
-        if (core != null && core.running("titles")) for (String id : (source.getPlayer()==null?core.titles().catalog():core.titles().catalog(source.getPlayer().getUuid())).definitions().keySet())
-            if (id.startsWith(builder.getRemainingLowerCase())) builder.suggest(id);
+        if (core != null && core.running("titles")) {
+            var catalog=source.getPlayer()==null?core.titles().catalog():core.titles().catalog(source.getPlayer().getUuid());
+            for(var title:catalog.definitions().values())
+                if(title.category()!=com.shirokai.core.titles.TitleDefinition.Category.ROLE && title.chat() && title.id().startsWith(builder.getRemainingLowerCase())) builder.suggest(title.id());
+        }
         return builder.buildFuture();
     }
     private boolean available(ServerCommandSource source) {
@@ -56,9 +59,9 @@ public final class ProfileCommands {
                 var titles=runtime.get().titles();var id=source.getPlayer().getUuid();
                 var card=Messages.info("Perfil atualizado.");
                 var visual=titles.visualPresentation(id);
-                card.append(Text.literal("\n")).append(Messages.field("Título no TAB e scoreboard",visual.getString().isEmpty()?Text.literal("Nenhum"):visual));
+                card.append(Text.literal("\n")).append(Messages.field("Cargo fixo no TAB e scoreboard",visual.getString().isEmpty()?Text.literal("Nenhum"):visual));
                 var tags=Text.empty();for(var tag:titles.chatPresentation(id)){if(!tags.getString().isEmpty())tags.append(Text.literal(" "));tags.append(tag);}
-                card.append(Text.literal("\n")).append(Messages.field("Tags no chat ("+state.chatIds().size()+"/2)",tags.getString().isEmpty()?Text.literal("Nenhuma"):tags));
+                card.append(Text.literal("\n")).append(Messages.field("Identificações no chat ("+titles.chatDefinitions(id).size()+"/2)",tags.getString().isEmpty()?Text.literal("Nenhuma"):tags));
                 return card;
             }, false);
         }, source.getServer()); return 1;

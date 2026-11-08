@@ -1,3 +1,8 @@
+> Revisão autorizada pelo usuário em 0.14.0: grupos principais LuckPerms são
+> cargos fixos automáticos em TAB/chat/scoreboard/nametag, sem escolha no perfil.
+> Tags de evento e clã são opcionais exclusivamente no chat. Esta regra substitui
+> os requisitos anteriores de ROLE selecionável/título visual opcional; RANKS.md.
+
 # PROMPT MESTRE — SHIROKAI CORE
 
 ## 1. OBJETIVO DO PROJETO

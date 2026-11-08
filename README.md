@@ -1,3 +1,5 @@
+> 0.14.0-dev: [cargos automáticos LuckPerms e nametags](docs/RANKS.md).
+
 # Shirokai Core
 
 Mod server-side Fabric para Minecraft 1.21.1 / Java 21, em desenvolvimento.

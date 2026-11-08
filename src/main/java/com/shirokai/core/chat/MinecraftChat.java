@@ -27,7 +27,7 @@ public final class MinecraftChat {
             ()->online.get().stream().filter(player->!player.isDisconnected()).map(player->{
                 UUID clan=clans==null?null:clans.cached(player.getUuid()).map(snapshot->snapshot.id()).orElse(null);
                 return new ChatService.Participant(player.getUuid(),player.getGameProfile().getName(),player.getWorld().getRegistryKey().getValue().toString(),player.getX(),player.getY(),player.getZ(),clan);
-            }).toList(),id->titles==null?List.of():titles.cached(id).map(state->state.chatIds().stream().map(key->titles.catalog(id).definitions().get(key)).filter(Objects::nonNull).map(def->def.display()).toList()).orElse(List.of()),
+            }).toList(),id->titles==null?List.of():titles.chatDefinitions(id).stream().map(def->def.display()).toList(),
             Clock.systemUTC(),config,(id,reason)->logger.warn("[chat] Mensagem rejeitada de {}: {}",id,reason));
     }
     private com.shirokai.core.presentation.PresentationRuntime presentation;

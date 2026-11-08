@@ -1,3 +1,7 @@
+> Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
+> SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
+> As regras antigas de seleção visual abaixo são históricas e foram substituídas.
+
 # Apresentação de chat, menus e identificações — 0.11.0-dev
 
 O módulo styles agora compila presentation.json junto dos demais snapshots. Esse

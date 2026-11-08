@@ -7,7 +7,7 @@ Não invente integrações: confirme artefatos e assinaturas da versão exata an
 Não marque esqueletos como funcionalidades entregues. Atualize documentação e resultados dos testes.
 Não publique releases ou configuração de ambiente sem solicitação.
 Não acesse APIs Minecraft fora da thread do servidor. Persistência deve usar executor próprio.
-Título visual único compartilhado entre TAB e scoreboard; no máximo duas identificações totais no chat.
+Cargo visual fixo pelo grupo principal LuckPerms em TAB/scoreboard/nametag; no máximo duas identificações totais no chat (cargo + opcional). Leia docs/RANKS.md.
 Clãs gratuitos; sigla manual; cooldowns independentes; redução de limite nunca expulsa membros.
 Transferência exige aceitação; exclusão exige confirmação; toda ação revalidada no servidor.
 Build: `bash ./gradlew --no-daemon build`; na nuvem: `python3 tools/gradle_cloud.py build`.
@@ -17,7 +17,7 @@ foi autorizada explicitamente pelo usuário. Não alterar online-mode para conto
 Configuração de runtime: docs/CONFIGURATION.md; novos schemas precisam de testes
 transacionais e de restart. Ao atualizar artefatos, atualizar SHA/versão em PROJECT_STATUS.
 
-Título/perfil: docs/TITLES.md. Usar uma única selected_visual persistente para TAB/scoreboard.
+Título/perfil: docs/TITLES.md e RANKS.md. selected_visual legado é normalizado para null online; ROLE automático não é selecionável.
 Concessão/revogação e auditoria são transacionais. Revisão otimista deve impedir perda
 em ações concorrentes. Nunca limpar permissões de perfil offline em consulta diagnóstica.
 Source set smoke só com -PprofileSmoke; não incluir mod de teste no artefato de produção.
@@ -37,7 +37,7 @@ comandos system não devem ser apresentados como mensagens assinadas. Não inter
 markup do jogador. A árvore de aliases privados deve continuar moderada após datapack reload.
 
 TAB/estilos: docs/TAB.md e STYLES.md. Dados dinâmicos nunca são reanalisados como tags.
-Text do cache é read-only. Ordenação teams é opt-in, não adotar team por prefixo de nome.
+Text do cache é read-only. Teams de nametag são padrão schema2; ordenação isolada continua opt-in. Não adotar team por prefixo de nome.
 Liberar próprios teams em SERVER_STOPPING antes do save; não remover integrantes externos.
 Accessor de PlayerList exige manter versão/refmap; não inventar packet list-order1.21.1.
 
@@ -54,7 +54,7 @@ Teste com JARs fixados: prepare_integration_mods.py e integration_smoke.py --acc
 Não confundir o jogador sintético registrado na fixture com login/autenticação real.
 
 Apresentação: docs/PRESENTATION.md. Dado dinâmico nunca vira template. Rich slots
-removem ações e não alteram Text do cache. Cabeçalho usa no máximo duas tags selecionadas.
+removem ações e não alteram Text do cache. Cabeçalho usa no máximo duas identificações totais: cargo fixo + opcional.
 signedBody/assinatura/máscara permanecem intactos; notificação de menção só após roteamento
 e nunca para destinatário sujeito a filtragem. Regras de presentation.json são políticas
 administrativas; escolhas persistidas por ID são definidas em CUSTOMIZATION.md.
@@ -69,7 +69,7 @@ Identidade exige snapshot do campo mostrado e cargo/config atuais. Administraç�
 de identidade tem permissão própria, auditoria/CAS e preserva cooldowns/membros.
 
 Extras0.12: leia docs/TAB_EXTRAS.md antes de mudar listagem/nametags/BELOW_NAME/bossbar.
-Todos são opt-in em tab-extras.json e enabled exige reinício. UPDATE_LISTED não é
+Nametags são padrão schema2; demais extras opt-in em tab-extras.json. enabled exige reinício. UPDATE_LISTED não é
 vanish de entidades; nunca reexibir baseline falso/roster removido por terceiros.
 Alteração externa revoga ownership da listagem nessa conexão. Nametags usam teams
 globais próprios, com efeitos/ordenação documentados; mutação externa revoga ownership.

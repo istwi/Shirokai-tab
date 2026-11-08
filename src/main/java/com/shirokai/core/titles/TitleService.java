@@ -23,8 +23,30 @@ public final class TitleService {
     public boolean menuPresentationEnabled(){return presentation.menusEnabled();}
     public net.minecraft.text.Text present(UUID player,com.shirokai.core.presentation.Surface surface,String value){return presentation.render(player,surface,value);}
     public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return presentation.renderTitle(player,definition);}
-    public net.minecraft.text.Text visualPresentation(UUID player){return cached(player).map(TitleState::selectedVisual).map(catalog(player).definitions()::get).map(def->display(player,def)).orElseGet(net.minecraft.text.Text::empty);}
-    public List<net.minecraft.text.Text> chatPresentation(UUID player){return cached(player).map(state->state.chatIds().stream().limit(2).map(catalog(player).definitions()::get).filter(Objects::nonNull).map(def->display(player,def)).toList()).orElse(List.of());}
+    private Function<UUID,com.shirokai.core.permissions.PermissionService.Metadata> metadata = id -> com.shirokai.core.permissions.PermissionService.Metadata.unavailable();
+    public void bindRanks(Function<UUID,com.shirokai.core.permissions.PermissionService.Metadata> provider){metadata=Objects.requireNonNull(provider);}
+    /** Live context-aware metadata: no saved rank, SQL query or player selection. */
+    public Optional<TitleDefinition> rank(UUID player){
+        var group=metadata.apply(player).group();
+        if(group==null || group.isBlank())return Optional.empty();
+        // Exact primary group wins over inherited permissions (including wildcard permissions).
+        var configured=catalog.definitions().values().stream()
+            .filter(t->t.category()==TitleDefinition.Category.ROLE)
+            .filter(t->t.id().equalsIgnoreCase(group) || ("group."+group).equalsIgnoreCase(t.permission()))
+            .sorted(Comparator.comparingInt(TitleDefinition::priority).reversed().thenComparing(TitleDefinition::id)).findFirst();
+        if(configured.isPresent())return configured;
+        String normalized=group.toLowerCase(Locale.ROOT);
+        String safeId=normalized.matches("[a-z0-9][a-z0-9_-]{0,63}") && !normalized.startsWith("clan_")?normalized:"rank_"+Integer.toUnsignedString(group.hashCode(),36);
+        String label=group.codePoints().filter(c->!Character.isISOControl(c)).limit(32).collect(StringBuilder::new,StringBuilder::appendCodePoint,StringBuilder::append).toString();
+        return Optional.of(new TitleDefinition(safeId,label,"["+label.toUpperCase(Locale.ROOT)+"]","Cargo fixo LuckPerms",TitleDefinition.Category.ROLE,0,"group."+safeId,false,true,true,true));
+    }
+    public net.minecraft.text.Text visualPresentation(UUID player){return rank(player).map(def->display(player,def)).orElseGet(net.minecraft.text.Text::empty);}
+    public List<TitleDefinition> chatDefinitions(UUID player){
+        var result=new ArrayList<TitleDefinition>();rank(player).ifPresent(result::add);
+        cached(player).ifPresent(state->state.chatIds().stream().limit(2-result.size()).map(catalog(player).definitions()::get).filter(Objects::nonNull).forEach(result::add));
+        return List.copyOf(result);
+    }
+    public List<net.minecraft.text.Text> chatPresentation(UUID player){return chatDefinitions(player).stream().map(def->display(player,def)).toList();}
     private TitleCatalog catalog;
     private Consumer<UUID> changed = id -> {};
     public void onChange(Consumer<UUID> listener) { changed = changed.andThen(listener); }
@@ -70,8 +92,12 @@ public final class TitleService {
         }, serverExecutor).thenApplyAsync(this::remember, serverExecutor);
     }
     public CompletableFuture<TitleState> equip(UUID player, String id, boolean chat) {
-        return refresh.apply(player).thenComposeAsync(v->storage.titleState(player),serverExecutor).thenComposeAsync(state ->
-                storage.saveTitles(rules.equip(state, catalog(player), id, chat, now())), serverExecutor)
+        return refresh.apply(player).thenComposeAsync(v->storage.titleState(player),serverExecutor).thenComposeAsync(state -> {
+                var normalized=rules.normalize(state,catalog(player),now());
+                if(chat && rank(player).isPresent() && !normalized.chatIds().contains(id) && !normalized.chatIds().isEmpty())
+                    throw new IllegalArgumentException("O cargo ocupa uma identificação; remova a tag opcional antes de escolher outra");
+                return storage.saveTitles(rules.equip(state, catalog(player), id, chat, now()));
+            }, serverExecutor)
                 .thenApplyAsync(this::remember, serverExecutor);
     }
     public CompletableFuture<TitleState> clear(UUID player) {
@@ -107,14 +133,9 @@ public final class TitleService {
     public void revalidateCached() { for (UUID player : List.copyOf(cache.keySet())) cached(player); }
     public Optional<String> placeholder(UUID player, String key) {
         if (player == null) return Optional.empty();
-        return cached(player).flatMap(state -> {
-            String id = switch (key) {
-                case "shirokai:selected_title" -> state.selectedVisual();
-                case "shirokai:chat_tag_1" -> state.chatIds().size() > 0 ? state.chatIds().get(0) : null;
-                case "shirokai:chat_tag_2" -> state.chatIds().size() > 1 ? state.chatIds().get(1) : null;
-                default -> null;
-            };
-            return Optional.ofNullable(id).map(catalog(player).definitions()::get).map(TitleDefinition::display);
-        });
+        if(key.equals("shirokai:selected_title"))return rank(player).map(TitleDefinition::display);
+        int index=switch(key){case "shirokai:chat_tag_1"->0;case "shirokai:chat_tag_2"->1;default->-1;};
+        var tags=chatDefinitions(player);
+        return index>=0&&index<tags.size()?Optional.of(tags.get(index).display()):Optional.empty();
     }
 }

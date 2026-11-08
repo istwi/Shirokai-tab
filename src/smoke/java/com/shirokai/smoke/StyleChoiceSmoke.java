@@ -63,7 +63,7 @@ public final class StyleChoiceSmoke implements ModInitializer {
             .thenComposeAsync(c->clans.accept(b.getUuid(),"Styled"),server)
             .thenComposeAsync(c->choices.join(a.getUuid()),server).thenComposeAsync(v->choices.join(b.getUuid()),server)
             .thenComposeAsync(v->board.join(a.getUuid()),server)
-            .thenComposeAsync(v->titles.equip(a.getUuid(),"traveler",false),server)
+            .thenComposeAsync(v->titles.equip(a.getUuid(),"traveler",true),server)
             .thenComposeAsync(v->{
                 StyleChoiceMenu.open(a,choices,Surface.TITLE,null);return until.apply(()->a.currentScreenHandler instanceof StyleChoiceMenu);
             },server).thenComposeAsync(v->{
@@ -77,7 +77,7 @@ public final class StyleChoiceSmoke implements ModInitializer {
                 premium.set(true);menu[0].onSlotClick(10,0,SlotActionType.PICKUP,a);
                 return until.apply(()->"gold".equals(choices.resolution(a.getUuid(),Surface.TITLE).saved()));
             },server).thenComposeAsync(v->{
-                var visual=titles.visualPresentation(a.getUuid());
+                var visual=titles.chatPresentation(a.getUuid()).getFirst();
                 check(color(visual,0xffaa00),"Equipped title did not use saved preset");
                 var base=PresentationConfig.defaults();
                 var fixedConfig=new PresentationConfig(1,true,true,true,"",base.templates(),List.of(),Map.of(
@@ -88,23 +88,24 @@ public final class StyleChoiceSmoke implements ModInitializer {
                 var admin=new TitleDefinition("admin","Admin","[ADMIN]","",TitleDefinition.Category.ROLE,99,"title.admin",false,true,true,true);
                 check(color(titles.display(a.getUuid(),owner),0xff3333),"Owner fixed gradient overridden by personal preset");
                 check(color(titles.display(a.getUuid(),admin),0x3355ff),"Admin inherited owner gradient");
-                check(color(titles.visualPresentation(a.getUuid()),0xffaa00),"Unconfigured special title lost personal preset");
+                check(color(titles.chatPresentation(a.getUuid()).getFirst(),0xffaa00),"Unconfigured special title lost personal preset");
                 presentation.replacePlan(new PresentationPlan(base,styles,ChatConfig.defaults()));
 
                 packetsA.clear();packetsB.clear();tab.update();
                 var name=packetsB.stream().filter(net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.class::isInstance)
                     .map(net.minecraft.network.packet.s2c.play.PlayerListS2CPacket.class::cast).flatMap(packet->packet.getEntries().stream())
                     .filter(entry->entry.profileId().equals(a.getUuid())).findFirst().orElseThrow().displayName();
-                check(color(name,0xffaa00),"TAB did not render saved title style");
+                check(!name.getString().contains("VIAJANTE"),"Optional tag leaked into TAB");
                 var boardConfig=new com.shirokai.core.scoreboard.ScoreboardConfig(1,20,List.of(new com.shirokai.core.scoreboard.ScoreboardConfig.Layout("default",0,com.shirokai.core.tab.TabConfig.Condition.any(),"Styles",List.of(new com.shirokai.core.scoreboard.ScoreboardConfig.Line("title",com.shirokai.core.tab.TabConfig.Condition.any(),"%shirokai:selected_title%")))));
                 board.replacePlan(new com.shirokai.core.scoreboard.ScoreboardPlan(boardConfig,styles));
                 check(packetsA.stream().filter(net.minecraft.network.packet.s2c.play.ScoreboardScoreUpdateS2CPacket.class::isInstance)
-                    .map(net.minecraft.network.packet.s2c.play.ScoreboardScoreUpdateS2CPacket.class::cast).anyMatch(packet->packet.display().map(text->color(text,0xffaa00)).orElse(false)),"Sidebar did not render same saved title style");
+                    .map(net.minecraft.network.packet.s2c.play.ScoreboardScoreUpdateS2CPacket.class::cast).anyMatch(packet->packet.display().map(text->text.getString().isEmpty()).orElse(false)),"Optional tag leaked into sidebar rank");
                 premium.set(false);
+                check(color(titles.display(a.getUuid(),owner),0xffaa00),"Personal fallback changed the fixed default role style");
                 check(choices.resolution(a.getUuid(),Surface.TITLE).status()==PresetCatalog.Status.UNAVAILABLE,"Permission loss not detected");
-                check(color(titles.visualPresentation(a.getUuid()),0x55ffff),"Fallback not rendered");
+                check(color(titles.chatPresentation(a.getUuid()).getFirst(),0x55ffff),"Fallback not rendered");
                 check("gold".equals(choices.resolution(a.getUuid(),Surface.TITLE).saved()),"Permission loss erased ID");
-                premium.set(true);check(color(titles.visualPresentation(a.getUuid()),0xffaa00),"Recovery did not restore preset");
+                premium.set(true);check(color(titles.chatPresentation(a.getUuid()).getFirst(),0xffaa00),"Recovery did not restore preset");
                 a.closeHandledScreen();menu[0].onSlotClick(9,0,SlotActionType.PICKUP,a);
                 check("gold".equals(choices.resolution(a.getUuid(),Surface.TITLE).saved()),"Closed menu changed selection");
                 return choices.view(a.getUuid(),Surface.CLAN_NAME,clanId[0]);
@@ -114,19 +115,19 @@ public final class StyleChoiceSmoke implements ModInitializer {
             .thenComposeAsync(v->{
                 check(color(presentation.render(b.getUuid(),Surface.CLAN_NAME,"Styled"),0xffaa00),"Member did not see clan name choice");
                 check(color(presentation.render(b.getUuid(),Surface.CLAN_TAG,"STY"),0x55ffff),"Clan tag not independent");
-                return titles.equip(b.getUuid(),"clan_"+clanId[0],false);
+                return titles.equip(b.getUuid(),"clan_"+clanId[0],true);
             },server).thenComposeAsync(v->{
-                check(color(titles.visualPresentation(b.getUuid()),0x55ffff),"Clan title path lost clan style");
+                check(color(titles.chatPresentation(b.getUuid()).getFirst(),0x55ffff),"Clan title path lost clan style");
                 return choices.view(a.getUuid(),Surface.TITLE,null);
             },server).thenComposeAsync(view->{
                 choices.replaceCatalog(catalog);
                 var replacement=new PresetCatalog("basic",Map.of("basic",catalog.presets().get("basic").definition()),styles);
                 choices.replaceCatalog(replacement);
                 check(choices.resolution(a.getUuid(),Surface.TITLE).status()==PresetCatalog.Status.REMOVED,"Removed preset not explicit");
-                check(color(titles.visualPresentation(a.getUuid()),0x55ffff),"Removed preset did not fallback");
+                check(color(titles.chatPresentation(a.getUuid()).getFirst(),0x55ffff),"Removed preset did not fallback");
                 try{choices.choose(a.getUuid(),view,"basic",()->true);throw new AssertionError("Stale catalog accepted");}catch(IllegalStateException expected){}
                 choices.replaceCatalog(catalog);
-                check(color(titles.visualPresentation(a.getUuid()),0xffaa00),"Restored catalog did not restore ID");
+                check(color(titles.chatPresentation(a.getUuid()).getFirst(),0xffaa00),"Restored catalog did not restore ID");
                 return clans.transfer(a.getUuid(),b.getUuid());
             },server).thenComposeAsync(c->clans.answerTransfer(b.getUuid(),true),server)
             .thenComposeAsync(c->choices.choose(a.getUuid(),stale[0],"basic",()->true).handleAsync((v,error)->{

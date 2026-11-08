@@ -1,3 +1,19 @@
+## Regressão 0.14.0 — cargos fixos
+
+- JUnit: seleção ROLE recusada, limpeza de escolhas legadas online, leitura offline
+  preservada, cargo principal muda sem equipar, clear não remove cargo, fallback
+  para grupo não configurado, wildcard não escolhe outro cargo.
+- Migração de tab-extras schema1 default para nametag ligada; schema2 false e
+  prefixo antigo personalizado preservados. enabled mantém exigência de restart.
+- Fabric: perfil não lista ROLE e ambos os cliques atuam só no chat; proteção de
+  inventário/cliques e limite de slots mantidos. TAG especial/clã não vaza ao TAB/sidebar.
+- Fabric: teams/packets confirmam [OWNER] -> [ADMIN] automaticamente em TAB/nametag,
+  cleanup preserva ownership. Estilos pessoais não mudam ROLE.
+- Integração opcional: trocar primary group usando API LuckPerms5.4.140 e verificar
+  cargo visual/chat antes de equipar qualquer coisa.
+- Cliente real continua necessário: aparência acima da cabeça, grupos/contextos,
+  autenticação/assinaturas, múltiplos jogadores e conflitos com mods reais.
+
 # Plano de testes
 
 ## Infraestrutura

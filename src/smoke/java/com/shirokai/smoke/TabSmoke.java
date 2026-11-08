@@ -33,17 +33,18 @@ public final class TabSmoke implements ModInitializer{
         var metadata=new HashMap<UUID,PermissionService.Metadata>();metadata.put(a.getUuid(),new PermissionService.Metadata("vip","[VIP] ","",100));metadata.put(b.getUuid(),new PermissionService.Metadata("member","","",0));
         var permissions=new PermissionService(){public boolean allowed(UUID player,String node){return player.equals(a.getUuid())&&metadata.get(player).group().equals("vip");}public String provider(){return "test-only";}public Metadata metadata(UUID player){return metadata.get(player);}};
         var titles=new TitleService(storage,TitleCatalog.defaults(),permissions::allowed,server,id->true,Clock.systemUTC(),(message,error)->{});
+        titles.bindRanks(permissions::metadata);
         var base=TabConfig.defaults();var condition=new TabConfig.Condition("layout.vip","vip",Set.of("minecraft:overworld"));var layouts=new ArrayList<>(base.layouts());layouts.add(new TabConfig.Layout("vip",100,condition,List.of("<gradient:#ff0000:#0000ff>VIP %shirokai:player%</gradient>"),List.of("Online: %shirokai:online%")));
         var config=new TabConfig(1,20,true,true,base.nameTemplate(),layouts,List.of(new TabConfig.NameRule("vip",100,condition,"<gold>%shirokai:title_prefix%%shirokai:player%</gold>")));
         var endpoint=new TabRuntime(server,new TabPlan(config,new StyleEngine(StyleConfig.defaults())),permissions,new PlaceholderService((key,error)->{}),titles,null,storage,()->"N/D",org.slf4j.LoggerFactory.getLogger("shirokai-tab-smoke"),()->players);
         var board=server.getScoreboard();String foreignName="smoke_external";
         var result=storage.ready().thenComposeAsync(v->storage.setAnimations(a.getUuid(),false),server).thenComposeAsync(v->storage.setAnimations(b.getUuid(),false),server)
-            .thenComposeAsync(v->titles.equip(a.getUuid(),"traveler",false),server).thenRunAsync(()->{
+            .thenComposeAsync(v->titles.view(a.getUuid()),server).thenRunAsync(()->{
                 endpoint.join(a.getUuid());endpoint.join(b.getUuid());pa.clear();pb.clear();endpoint.update();
                 var header=pa.stream().filter(PlayerListHeaderS2CPacket.class::isInstance).map(PlayerListHeaderS2CPacket.class::cast).findFirst().orElseThrow();check(header.header().getString().equals("VIP TabAlice"),"Viewer layout not selected");
                 var packet=pb.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).findFirst().orElseThrow();
                 check(packet.getActions().equals(EnumSet.of(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME)),"Unexpected list action");
-                var entry=packet.getEntries().stream().filter(e->e.profileId().equals(a.getUuid())).findFirst().orElseThrow();check(entry.displayName().getString().equals("[VIAJANTE] TabAlice"),"Selected title missing from TAB");
+                var entry=packet.getEntries().stream().filter(e->e.profileId().equals(a.getUuid())).findFirst().orElseThrow();check(entry.displayName().getString().equals("[VIP] TabAlice"),"Selected title missing from TAB");
                 check(entry.latency()==a.networkHandler.getLatency(),"Latency was fabricated");check(board.getScoreHolderTeam(a.getGameProfile().getName()).getName().equals(TeamOwnership.teamName(100)),"Team priority wrong");
                 pa.clear();pb.clear();endpoint.update();check(pa.isEmpty()&&pb.isEmpty(),"Unchanged view sent duplicate packets");
                 metadata.put(a.getUuid(),new PermissionService.Metadata("member","","",5));endpoint.update();

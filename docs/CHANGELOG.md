@@ -1,3 +1,13 @@
+## 0.14.0-dev
+
+- Cargo fixo pelo grupo principal LuckPerms, aplicado sem equipar e atualizado
+  dinamicamente no chat/TAB/sidebar/nametag; rótulo automático e ROLE configurável.
+- ROLE fora do perfil/sugestões; eventos e clãs somente no chat. Limpar perfil
+  preserva cargo e estilos pessoais não alteram ROLE.
+- Nametags habilitadas por padrão schema2; migração em memória do padrão schema1,
+  opt-out explícito e preservação dos arquivos/teams externos.
+- Seleções antigas normalizadas online sem alterar concessões ou schema SQLite6.
+
 # 0.13.1-dev
 
 - Somente cor do nick: branco explícito no chat global/local/clã/staff/privado e

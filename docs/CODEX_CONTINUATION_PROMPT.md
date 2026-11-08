@@ -1,3 +1,6 @@
+> 0.14.0: cargo principal LuckPerms é fixo em TAB/sidebar/chat/nametag; ROLE não
+> é selecionável. Eventos/clã apenas no chat. RANKS.md substitui a política antiga.
+
 # Prompt para continuar Shirokai Core
 
 Continue no checkout existente de istwi/Shirokai-tab, branch main mais recente.

@@ -35,6 +35,10 @@ public final class PresentationRuntime implements SurfaceRenderer {
             var fixed=plan.titleTemplate(definition.id());
             if(fixed.isPresent())return plan.styles().render(fixed.get(),key->definition.display(),0,false);
         }
+        if(definition.category()==com.shirokai.core.titles.TitleDefinition.Category.ROLE){
+            var p=player(subject);var template=plan.template(Surface.TITLE,permissions.metadata(subject),p==null?"":p.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(subject,node));
+            return plan.styles().render(template,key->definition.display(),0,false);
+        }
         return SurfaceRenderer.super.renderTitle(subject,definition);
     }
     @Override public Text render(UUID subject,Surface surface,String value){

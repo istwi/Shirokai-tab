@@ -1,3 +1,6 @@
+> 0.14.0: ROLE é cargo principal automático e fixo (TAB/sidebar/chat/nametag);
+> eventos/clã são opcionais apenas no chat. Nametags padrão schema2. RANKS.md.
+
 # Matriz de funcionalidades
 
 | Área | Estado | Limitação |

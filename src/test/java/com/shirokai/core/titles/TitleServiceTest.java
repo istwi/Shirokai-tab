@@ -12,22 +12,28 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TitleServiceTest {
     @TempDir Path directory;
-    @Test void actionsRevalidatePermissionsAndPersistRemovalOnServerExecutor() throws Exception {
-        var server=Executors.newSingleThreadExecutor(r->new Thread(r,"test-server"));
-        try(var storage=new SqliteStorage(directory.resolve("data.db"))) {
-            UUID player=UUID.randomUUID();var permission=new AtomicBoolean(true);
-            var role=TitleRulesTest.definition("vip",TitleDefinition.Category.ROLE,1,"group.vip");
-            var service=new TitleService(storage,TitleRulesTest.catalog(role),(id,node)->{
-                assertEquals("test-server",Thread.currentThread().getName());return permission.get();
-            },server,id->true,Clock.systemUTC(),(message,error)->fail(error));
-            server.submit(()->service.equip(player,"vip",false)).get().get();
+    @Test void primaryRankUpdatesWithoutEquippingAndSurvivesClear() throws Exception {
+        var server=Executors.newSingleThreadExecutor();
+        try(var storage=new SqliteStorage(directory.resolve("data.db"))){
+            UUID player=UUID.randomUUID();
+            var group=new java.util.concurrent.atomic.AtomicReference<String>("vip");
+            var vip=TitleRulesTest.definition("vip",TitleDefinition.Category.ROLE,1,"group.vip");
+            var owner=TitleRulesTest.definition("owner",TitleDefinition.Category.ROLE,100,"group.owner");
+            var event=TitleRulesTest.definition("event",TitleDefinition.Category.SPECIAL,0,null);
+            var service=new TitleService(storage,TitleRulesTest.catalog(vip,owner,event),(id,node)->true,server,id->true,Clock.systemUTC(),(m,e)->fail(e));
+            service.bindRanks(id->new com.shirokai.core.permissions.PermissionService.Metadata(group.get(),"","",0));
             assertEquals(Optional.of("[vip]"),server.submit(()->service.placeholder(player,"shirokai:selected_title")).get());
-            permission.set(false);
+            server.submit(()->service.grant(null,player,"event",0)).get().get();
+            server.submit(()->service.equip(player,"event",true)).get().get();
+            assertEquals(List.of("vip","event"),server.submit(()->service.chatDefinitions(player).stream().map(TitleDefinition::id).toList()).get());
+            group.set("owner");
+            assertEquals(Optional.of("[owner]"),server.submit(()->service.placeholder(player,"shirokai:selected_title")).get());
+            server.submit(()->service.clear(player)).get().get();
+            assertEquals(List.of("owner"),server.submit(()->service.chatDefinitions(player).stream().map(TitleDefinition::id).toList()).get());
             assertThrows(ExecutionException.class,()->server.submit(()->service.equip(player,"vip",true)).get().get());
-            var state=server.submit(()->service.view(player)).get().get();
-            assertNull(state.selectedVisual());assertNull(storage.titleState(player).get().selectedVisual());
-            assertTrue(server.submit(()->service.placeholder(player,"shirokai:selected_title")).get().isEmpty());
-        } finally { server.shutdown();assertTrue(server.awaitTermination(10,TimeUnit.SECONDS)); }
+            group.set("builder");assertEquals("[BUILDER]",server.submit(()->service.visualPresentation(player).getString()).get());
+            group.set(null);assertTrue(server.submit(()->service.chatDefinitions(player)).get().isEmpty());
+        }finally{server.shutdown();assertTrue(server.awaitTermination(10,TimeUnit.SECONDS));}
     }
     @Test void offlineDiagnosticNeverErasesSelectionsBecauseLuckPermsUserIsUnloaded() throws Exception {
         var server=Executors.newSingleThreadExecutor();
@@ -49,7 +55,7 @@ class TitleServiceTest {
             assertThrows(ExecutionException.class,()->server.submit(()->service.equip(player,"event",false)).get().get());
             assertThrows(IllegalArgumentException.class,()->service.grant(null,player,"event",99));
             server.submit(()->service.grant(null,player,"event",0)).get().get();
-            server.submit(()->service.equip(player,"event",false)).get().get();
+            assertThrows(ExecutionException.class,()->server.submit(()->service.equip(player,"event",false)).get().get());
             server.submit(()->service.equip(player,"event",true)).get().get();
             var cleared=server.submit(()->service.clear(player)).get().get();
             assertNull(cleared.selectedVisual());assertTrue(cleared.chatIds().isEmpty());assertTrue(cleared.grants().containsKey("event"));
