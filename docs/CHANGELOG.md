@@ -1,3 +1,15 @@
+# 0.13.0-dev
+
+- Chat compacto [G] cinza/[L] amarelo, formato Nick: mensagem sem < > via tipos de
+  chat sincronizados e corpo padrão por canal preservando conteúdo assinado.
+- /g e /l com os mesmos gates e seleção/envio opcional de /global e /local.
+- Cores &0..f/&r com permissão configurável, escape && e filtro/duplicação canônicos;
+  decoração visual opcional só sem filtragem, com original/assinatura/máscara intactos.
+- Avisos vanilla [+] verde/[-] vermelho sem duplicação, com configuração para desativar.
+- chat-appearance.json com reload atômico; formatos antigos exatos promovidos em
+  memória sem sobrescrever arquivos. SQLite6 e dependências preservados.
+- Testes de parser/moderação, registries/cores/assinatura/filtro e callbacks dos mixins.
+
 # 0.12.0-dev
 
 - Extras opt-in em tab-extras.json: UPDATE_LISTED por viewer respeitando baseline

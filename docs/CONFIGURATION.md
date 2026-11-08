@@ -125,3 +125,11 @@ Estrutura completa em TAB_EXTRAS.md. listed/nametags/belowName/bossbar.enabled c
 false e exigem reinício para mudar ownership. Demais campos aceitam reload, inclusive
 condições/permissões/templates. Dado numérico indisponível não é convertido em0.
 Não há nova migração SQLite: schema6 permanece.
+
+## Chat0.13
+
+chat-appearance.json/schema1 participa do reload atômico; cores por canal, interpretação
+& e avisos de conexão. Defaults/JSON e semântica em CHAT_APPEARANCE.md. Não muda
+schema de chat.json/SQLite6. Arquivos existentes são preservados; somente os dois
+formatos exatamente iguais aos defaults antigos mudam em memória para [G]/[L].
+Primeira instalação exige reinício para carregar mixins e chat_type do datapack do mod.

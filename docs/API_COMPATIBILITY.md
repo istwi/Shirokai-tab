@@ -232,3 +232,21 @@ ServerPlayerEntity.setServerWorld foi conferido para fixture sintética de dimen
 Observer send existente cobre também roster/bossbar/bundles, sem novo mixin,
 cancelamento, reescrita de pacote ou mudança de dependências/protocolo. Refmap mantido.
 Detalhes/limites em TAB_EXTRAS.md; teste sintético não certifica cliente real/vanish.
+
+## Atualização0.13 — chat compacto
+
+Auditado com javap/bytecode MC1.21.1/Yarn1.21.1+build.3: MessageType.params,
+MessageType.Parameters.applyChatDecoration, Decoration(String,List<Parameter>,Style),
+SignedMessage.withUnsignedContent/withoutUnsigned e FilterMask.isPassThrough.
+Recursos data/shirokai-core/chat_type/chat/*.json seguem o schema oficial extraído
+de data/minecraft/chat_type/chat.json, com decoração %s: %s e16cores nomeadas.
+Registry dinâmico sincronizado permite cor/formato sem converter chat em system.
+
+PlayerManager.onPlayerConnect(ClientConnection,ServerPlayerEntity,ConnectedClientData)
+chama broadcast(Text,boolean) uma vez para joined/joined.renamed.
+ServerPlayNetworkHandler.cleanUp() chama o mesmo broadcast para left. Dois mixins
+locais ModifyArgs/ModifyArg trocam apenas o argumento Text nessa chamada, sem
+broadcast duplicado. Refmap inclui ambos; versão Minecraft continua fixa1.21.1.
+Callbacks transformados foram exercitados com Args/nomes sintéticos no smoke, sem
+executar login/autenticação. Não certifica um cliente ou coexistência universal
+com outro mod que substitua esses mesmos avisos. Nenhuma dependência foi alterada.

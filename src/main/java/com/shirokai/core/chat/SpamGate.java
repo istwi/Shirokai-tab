@@ -12,7 +12,9 @@ public final class SpamGate {
     public void admit(String body,ChatConfig config,long now,boolean cooldownBypass,boolean filterBypass){
         if(body.isBlank()||body.codePointCount(0,body.length())>config.maximumLength()||body.codePoints().anyMatch(Character::isISOControl)||body.indexOf('§')>=0)
             throw new IllegalArgumentException("Mensagem vazia, longa ou com caracteres proibidos");
-        String normalized=normalize(body);
+        String canonical=LegacyChatColors.plain(body);
+        if(canonical.isBlank())throw new IllegalArgumentException("Mensagem vazia após códigos de cor");
+        String normalized=normalize(canonical);
         if(!filterBypass&&config.blockedWords().stream().map(SpamGate::normalize).anyMatch(normalized::contains))throw new IllegalStateException("Mensagem bloqueada pelo filtro");
         while(!recent.isEmpty()&&now-recent.getFirst().at()>=config.duplicateWindowSeconds()*1000)recent.removeFirst();
         if(!cooldownBypass){

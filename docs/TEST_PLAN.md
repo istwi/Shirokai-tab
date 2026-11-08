@@ -194,3 +194,16 @@ Suíte sidebar mantém a asserção de ledger vazio após último consumidor fec
 registro compartilhado não é apagado enquanto outro recurso ainda precisa dele.
 Runner rejeita config numérica inválida e enabled que exige restart no reload real.
 São conexões sintéticas: não comprovam renderização cliente ou autenticação/carga.
+
+## Suítes0.13
+
+ChatAppearanceTest: migração em memória sem overwrite de [GLOBAL]/[LOCAL], defaults/
+tipos/cores estritos, &0..f/&r/escape/Unicode, texto literal sem ações, filtro com
+código no meio de palavra, duplicação por texto visível e mensagem vazia pós-código.
+ChatAppearanceSmoke: registry real e decoração [G]/[L] Nick: corpo, RGB cinza/amarelo,
+assinatura/body intactos, unsigned apenas para códigos permitidos, filtro sem
+decoração e máscara preservada, perda/retorno de permissão, caminho de comandos,
+alcance, callbacks transformados de join/quit e preservação de anúncio/alias externo.
+ChatAliasSmoke exige /g e /l antes/depois de reload de datapacks. Runner também
+rejeita cor de configuração inválida dentro do reload atômico real. Não houve
+login/logout autenticado nem comprovação de assinatura criptográfica válida.

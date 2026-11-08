@@ -11,7 +11,7 @@
 | Administração | Status/version/modules/permissions/reload/debug/backup/placeholders | Títulos e consulta/correção de identidade de clãs; reparos relacionais avançados pendentes |
 | Títulos e duas identificações | Implementados e testados | ROLE/SPECIAL/CLAN integrados; cliente autenticado pendente |
 | Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Presets, editor textual e convites enviados implementados; administração relacional avançada pendente |
-| Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real e assinaturas/login reais pendentes; presets das identificações implementados |
+| Chat e moderação | Canais [G]/[L], /g e /l, cores limitadas &, avisos [+]/[-], privado/ignore/mute/gates testados | Cliente real e assinaturas/login reais pendentes; presets das identificações implementados |
 | TAB | Header/footer, nomes, título, listed por viewer, nametags, BELOW_NAME e bossbar; ownership opt-in/diffs testados | Cliente real, vanish de entidades e compatibilidade universal pendentes; efeitos globais de teams explícitos |
 | Scoreboard visual | Sidebar privado por viewer, layouts/linhas condicionais, diffs e visibilidade persistida | Cliente real e compatibilidade universal não validados; cede a sidebar externo |
 | /perfil e menus de clãs | Handlers testados com jogadores sintéticos | Aparência/pacotes de cliente real não testados |

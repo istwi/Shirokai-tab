@@ -35,6 +35,7 @@ public final class ChatSmoke implements ModInitializer {
         }));
         dispatcher.register(literal("shirokai-chat-alias-smoke").requires(s->s.hasPermissionLevel(4)).executes(context->{
             var root=context.getSource().getServer().getCommandManager().getDispatcher().getRoot();var msg=root.getChild("msg");
+            check(root.getChild("g")!=null&&root.getChild("l")!=null,"Short chat aliases missing after reload");
             check(msg.getChild("targets").getChild("message").getCommand().getClass().getName().startsWith(ChatCommands.class.getName()),"Vanilla private moderation wrapper missing");
             check(root.getChild("tell").getRedirect()==msg&&root.getChild("w").getRedirect()==msg,"Private redirects do not share moderated handler");
             context.getSource().sendFeedback(()->Text.literal("CHAT_ALIAS_SMOKE_PASS"),false);return 1;

@@ -5,7 +5,9 @@
   "refmap": "shirokai-core-refmap.json",
   "server": [
     "PlayerListPacketAccessor",
-    "SidebarPacketObserver"
+    "SidebarPacketObserver",
+    "PlayerJoinAnnouncement",
+    "PlayerQuitAnnouncement"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -23,7 +23,7 @@ public final class ChatCommands {
         root.then(literal("reply").then(argument("message",StringArgumentType.greedyString()).executes(c->reply(c.getSource(),StringArgumentType.getString(c,"message")))));
         root.then(literal("ignore").then(argument("player",StringArgumentType.word()).executes(c->ignore(c.getSource(),StringArgumentType.getString(c,"player")))));
         dispatcher.register(root);
-        for(var entry:Map.of("local",Channel.LOCAL,"global",Channel.GLOBAL,"staffchat",Channel.STAFF).entrySet()){
+        for(var entry:Map.of("local",Channel.LOCAL,"l",Channel.LOCAL,"global",Channel.GLOBAL,"g",Channel.GLOBAL,"staffchat",Channel.STAFF).entrySet()){
             if(dispatcher.getRoot().getChild(entry.getKey())==null)dispatcher.register(literal(entry.getKey()).executes(c->channel(c.getSource(),entry.getValue(),null))
                 .then(argument("message",StringArgumentType.greedyString()).executes(c->channel(c.getSource(),entry.getValue(),StringArgumentType.getString(c,"message")))));
             else org.slf4j.LoggerFactory.getLogger("shirokai-core").warn("[chat] Alias /{} preservado por conflito; use /chat {}",entry.getKey(),entry.getValue());

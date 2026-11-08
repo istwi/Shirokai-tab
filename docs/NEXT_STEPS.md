@@ -2,11 +2,12 @@
 
 ## Estado atual
 
-0.12.0-dev entrega listed por viewer, nametags de prefixo/sufixo/visibilidade,
+0.13.0-dev acrescenta chat compacto [G]/[L], cores &, /g e /l e avisos [+]/[-].
+CHAT_APPEARANCE.md define configuração, assinatura e filtragem. Os extras0.12 já entregam listed por viewer, nametags de prefixo/sufixo/visibilidade,
 BELOW_NAME privado e bossbar pessoal, opt-in em tab-extras.json. APIs1.21.1 e
 ownership foram auditados/testados. Não reaplicar esses recursos nem a personalização,
 editor textual, convites e administração inicial0.11. SQLite continua6.
-TAB_EXTRAS.md documenta configurações/efeitos/limites; PROJECT_STATUS contém testes/SHA.
+TAB_EXTRAS.md documenta os extras, CHAT_APPEARANCE.md o novo layout; PROJECT_STATUS contém testes/SHA.
 
 ## Próximas etapas de implementação
 
@@ -27,6 +28,15 @@ TAB_EXTRAS.md documenta configurações/efeitos/limites; PROJECT_STATUS contém 
    Pokédex mantém provider/coleção explícitos; dollars/tokens são moedas distintas.
 
 ## Regras de continuidade
+
+Pedido visual0.13 autoriza cores &0..f/&r limitadas: não usar parser de markup ou
+formatos com ações. unsignedContent visual só para códigos autorizados e não filtrados/
+máscara pass-through; original/signature/mask não mudam. Cor padrão usa chat_type.
+Moderar texto canônico sem códigos; /g e /l não podem ignorar os gates dos canais.
+Join/quit reusam broadcast vanilla, não duplicar avisos. Teste dos callbacks merged
+não equivale a login/logout de cliente. Atualização do JAR exige reinício para tipos
+sincronizados de chat e mixins; não sobrescrever arquivos personalizados.
+
 
 Preservar título único TAB/sidebar e até duas identificações, associação clan_ real,
 perda de permissão visual sem apagar IDs, CAS/geração de catálogo e UUID de clã da tela.

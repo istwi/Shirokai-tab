@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.12.0-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.13.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -100,6 +100,8 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-presentation-smoke', 'PRESENTATION_SMOKE_PASS')
         checks.append('rich chat menu title clan presentation permission fallback and filtered mention routing')
         server.command('shirokai-chat-smoke', 'CHAT_SMOKE_PASS')
+        server.command('shirokai-chat-appearance-smoke', 'CHAT_APPEARANCE_SMOKE_PASS')
+        checks.append('gray global yellow local legacy colors filtering aliases and transformed join quit announcements')
         checks.append('chat transport channels private moderation ignore and literal payloads')
         server.command('shirokai-chat-alias-smoke', 'CHAT_ALIAS_SMOKE_PASS')
         server.command('reload', 'DATAPACK_RELOAD_SMOKE_READY')
@@ -240,6 +242,15 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         extras_file.write_text(original_extras)
         server.command('shirokaicore reload', 'Configuração recarregada')
         checks.append('invalid extra numeric config and ownership reload rejected atomically')
+        appearance_file = runtime / 'config/shirokai-core/chat-appearance.json'
+        original_appearance = appearance_file.read_text()
+        bad_appearance = json.loads(original_appearance)
+        bad_appearance['bodyColors']['GLOBAL'] = 'rainbow'
+        appearance_file.write_text(json.dumps(bad_appearance))
+        server.command('shirokaicore reload', 'Cor inválida para GLOBAL')
+        appearance_file.write_text(original_appearance)
+        server.command('shirokaicore reload', 'Configuração recarregada')
+        checks.append('invalid chat appearance rejected atomically and corrected appearance reloads')
         config['modules']['storage'] = False
         config_file.write_text(json.dumps(config))
         server.command('shirokaicore reload', 'exige reinício; configuração ativa preservada')

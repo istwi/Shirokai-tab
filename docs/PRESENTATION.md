@@ -150,3 +150,13 @@ Preset ativo envolve o dado literal; sem escolha usa esta política; escolha blo
 ou removida usa fallback básico sem apagar ID. Templates de presets compilam no mesmo
 candidato de reload. Corpo/assinatura/máscara/gates/limite de duas identificações
 continuam intactos. Não confundir animações de layout com animação de preset pessoal.
+
+## Atualização0.13 solicitada pelo usuário
+
+O formato externo do chat passa a Nick: mensagem via MessageType.Decoration
+sincronizado; o cabeçalho continua composto pelas duas identificações autorizadas.
+Cor padrão por canal não altera signedBody/signature/filterMask/unsignedContent.
+Códigos & válidos/autorizados agora permitem unsignedContent visual somente para
+não filtrados/máscara pass-through, preservando dados originais e possível indicador
+cliente de modificação. Isto é distinto da reanálise de markup/tags, que segue proibida.
+Detalhes e opções em CHAT_APPEARANCE.md.

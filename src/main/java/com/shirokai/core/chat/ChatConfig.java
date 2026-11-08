@@ -26,7 +26,7 @@ public record ChatConfig(int schemaVersion, Channel defaultChannel, double local
     public static ChatConfig defaults(){
         return new ChatConfig(1,Channel.GLOBAL,100,256,1000,30,Set.of(),
             Map.of(Channel.GLOBAL,"",Channel.LOCAL,"",Channel.CLAN,"",Channel.STAFF,"shirokaicore.chat.staff",Channel.PRIVATE,""),
-            Map.of(Channel.GLOBAL,"[GLOBAL] {tags}{name}",Channel.LOCAL,"[LOCAL] {tags}{name}",Channel.CLAN,"[CLÃ] {tags}{name}",Channel.STAFF,"[STAFF] {tags}{name}",Channel.PRIVATE,"[PRIVADO] {tags}{name} → {target}"),true);
+            Map.of(Channel.GLOBAL,"[G] {tags}{name}",Channel.LOCAL,"[L] {tags}{name}",Channel.CLAN,"[CLÃ] {tags}{name}",Channel.STAFF,"[STAFF] {tags}{name}",Channel.PRIVATE,"[PRIVADO] {tags}{name} → {target}"),true);
     }
     public static ChatConfig load(Path file)throws IOException{
         Files.createDirectories(file.getParent());if(!Files.exists(file))try{Files.writeString(file,GSON.toJson(defaults())+"\n",StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
@@ -50,6 +50,10 @@ public record ChatConfig(int schemaVersion, Channel defaultChannel, double local
             if(!defaults.get(key).isJsonObject())throw new IllegalArgumentException(key+" deve ser objeto");
             for(var entry:defaults.getAsJsonObject(key).entrySet()){Channel.valueOf(entry.getKey());if(!entry.getValue().isJsonPrimitive()||!entry.getValue().getAsJsonPrimitive().isString())throw new IllegalArgumentException("Texto esperado em "+key);}
         }
+        // Upgrade only the exact two old defaults in memory; preserve the file and all customized formats.
+        var formats=defaults.getAsJsonObject("nameFormats");
+        if(formats.has("GLOBAL")&&formats.get("GLOBAL").getAsString().equals("[GLOBAL] {tags}{name}"))formats.addProperty("GLOBAL","[G] {tags}{name}");
+        if(formats.has("LOCAL")&&formats.get("LOCAL").getAsString().equals("[LOCAL] {tags}{name}"))formats.addProperty("LOCAL","[L] {tags}{name}");
         return GSON.fromJson(defaults,ChatConfig.class);
     }
 }

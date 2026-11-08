@@ -55,7 +55,7 @@ Não confundir o jogador sintético registrado na fixture com login/autenticaç�
 
 Apresentação: docs/PRESENTATION.md. Dado dinâmico nunca vira template. Rich slots
 removem ações e não alteram Text do cache. Cabeçalho usa no máximo duas tags selecionadas.
-Corpo assinado/máscara permanecem intactos; notificação de menção só após roteamento
+signedBody/assinatura/máscara permanecem intactos; notificação de menção só após roteamento
 e nunca para destinatário sujeito a filtragem. Regras de presentation.json são políticas
 administrativas; escolhas persistidas por ID são definidas em CUSTOMIZATION.md.
 
@@ -77,3 +77,13 @@ BELOW_NAME é objetivo privado, cede ao slot externo e colisão exata suspende a
 reconectar. Bossbars têm UUID por viewer: coexistem com outras, não removem replacement.
 SidebarPackets tem retain/release por consumidor: não apagar evidência antes da última
 liberação. Hooks observam somente, sem jogo/IO; ações/caches na thread do servidor.
+
+Chat0.13 (pedido visual do usuário): leia docs/CHAT_APPEARANCE.md. [G] cinza/[L]
+amarelo e formato Nick: mensagem usam chat_type sincronizado, preservando signedBody.
+Códigos &0..f/&r são interpretação limitada solicitada, sem tags/ações/§; só quando
+autorizados e sem filtragem adicionam unsignedContent visual. Cliente pode marcar
+modificação; não afirmar assinatura do texto decorado. Nunca enviar essa decoração
+para destinatário filtrado ou máscara não-pass-through. Moderar também texto sem
+códigos para impedir bypass de filtro/duplicação. /g e /l compartilham o mesmo gate.
+Join/quit substituem apenas o broadcast vanilla existente, [+] verde/[-] vermelho;
+não duplicar avisos e liberar bridge no stop. Não confundir callback sintético com login real.

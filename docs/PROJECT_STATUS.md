@@ -1,84 +1,79 @@
-# Estado real do projeto — 0.12.0-dev
+# Estado real do projeto — 0.13.0-dev
 
 ## Entrega atual
 
-Quatro extras de TAB implementados em tab-extras.json, todos opt-in/desligados por
-default. Documentação completa, JSON, efeitos e limites em TAB_EXTRAS.md.
+Chat ajustado ao exemplo visual do usuário. Configuração/semântica completas em
+CHAT_APPEARANCE.md, sem alterar SQLite6 ou dependências externas.
 
-- UPDATE_LISTED por observador: sujeito hidden e viewer seehidden revalidados,
-  opção de mesma dimensão, self preservado e baseline falso/roster removido externo
-  nunca reexibido. UPDATE_LISTED externo posterior revoga controle naquela conexão.
-  Não oculta entidades/chat/contagem online e não é vanish completo.
-- Nametags de prefixo/sufixo/visibilidade via teams próprios individuais globais.
-  Rank por prioridade/nome/UUID; um team por jogador permite estilos independentes.
-  Templates ricos preservam dados literais e título compartilhado. Teams externos,
-  nomes ocupados, integrantes externos e mutações de atributos são preservados.
-  Friendly fire/colisão/invisíveis têm os efeitos explícitos documentados.
-- BELOW_NAME privado por viewer, fora do scoreboard salvo; label e valores int32
-  disponíveis, default ping real. Diffs, remoção de linhas e reenvio após reset.
-  Não cria jogadores fictícios nem converte dado indisponível em0. Cede a slot externo
-  global/pacote/bundle; colisão do nome exato suspende até reconectar, sem deletar replacement.
-- Bossbar pessoal com UUID independente, templates/animações/condições por LP/mundo,
-  progresso decimal0..1 e diffs de nome/progresso/cor/estilo. Coexiste com outras barras,
-  sem registro no bossbarManager salvo ou música/névoa/escurecimento. Colisão de UUID
-  cede ao sistema externo até reconectar, inclusive durante limpeza.
-- Configs/templates compilam juntos no reload atômico; enabled altera ownership e
-  exige reinício. Não sobrescreve configurações personalizadas. Diagnóstico de extras
-  está no comando tab existente. Nenhum SQLite por frame/tick; APIs na thread do servidor.
-- Observer de send existente cobre roster/bossbar/bundles, sem cancelar ou reescrever
-  pacotes. Ledger de objetivos agora tem revisão de BELOW_NAME e retain/release por
-  consumidor, preservando evidência de conflito até o último fechar.
+- [G] cinza e [L] amarelo; formato [canal] [identificações] Nick: mensagem, sem < >
+  vanilla. Tags selecionadas preservam seus estilos e continuam limitadas a duas.
+  Cor padrão alcança o corpo por MessageType.Decoration sincronizado, sem substituir
+  signedBody/signature/filterMask ou adicionar unsignedContent para texto normal.
+- /g e /l selecionam/enviam como /global e /local, com mensagem opcional e os mesmos
+  gates. Aliases externos são preservados e os atalhos persistem no registro após
+  reload de datapacks. Alcance/dimensão do local permanecem os mesmos.
+- Cores &0..f/&r solicitadas, escape &&, sem tags/ações/§. Permissão configurável,
+  pública por default. Código válido/autorizado adiciona Text colorido unsigned
+  somente para destinatários não filtrados e máscara pass-through. Original e
+  assinatura permanecem intactos; cliente pode indicar modificação visual.
+  Filtrados recebem conteúdo original/códigos literais, sem bypass da máscara.
+- Filtro e duplicação usam texto sem códigos válidos, impedindo palavra bloqueada
+  ou mensagem repetida disfarçada por cores. Limite de tamanho inclui código bruto;
+  mensagem vazia após remoção é recusada. Mute/ignore/staff/clã não são alterados.
+- [+] verde na entrada e [-] vermelho na saída, com nome literal cinza. Dois mixins
+  locais substituem o Text do broadcast vanilla existente, sem mensagem duplicada.
+  Variante joined.renamed também usa nome atual. Flag desativa o override; bridge
+  é liberada ao encerrar o módulo. Anúncios externos com outro conteúdo são preservados.
+- chat-appearance.json/schema1 é criado somente se ausente e participa do reload
+  atômico. Os dois formatos antigos exatamente iguais aos defaults são promovidos
+  em memória para [G]/[L], sem reescrever arquivos ou formatos/regras personalizados.
+  Primeira instalação precisa reiniciar para carregar chat_type e novos mixins.
 
-Schema SQLite permanece6, tab.json/schema1 e dependências externas permanecem.
-Sem novos mixins; o observer existente foi estendido e o refmap mantido.
-Personalização/clãs/chat/sidebar e demais recursos0.11 foram preservados.
-Nenhuma release ou alteração/publicação de configuração de ambiente nesta tarefa.
+Personalização/clãs/TAB/sidebar/integrações0.12 preservados. Sem alteração ou publicação de configuração de ambiente; a entrega de desenvolvimento
+será disponibilizada pelo workflow de pré-release já solicitado pelo usuário.
 
-## Validação executada
+## Verificação executada
 
-- Build/JUnit: **100 testes,0falhas,0erros,0ignorados** na rodada final.
-- Smoke básico: **46 verificações em3boots Fabric**. Inclui os quatro extras, diffs,
-  baseline/roster externos, permissão/dimensão sintéticas, BELOW_NAME externo e colisão,
-  bossbar alheia/colisão/condição/reload, nametag externa/mutada e limpeza.
-  Suítes de títulos/clãs/editor/presets/chat/TAB/sidebar continuam passando.
-- Teste antigo de sidebar inicialmente detectou limpeza prematura/compartilhada do
-  ledger; retain/release corrigiu o ciclo de vida. A asserção de limpeza foi mantida
-  e passou junto da preservação de evidência para consumidores ainda ativos.
-- Smoke com mods reais0.12: **14 verificações aprovadas**, incluindo LP real com
-  escolha persistida/fallback/recuperação, PAPI, Cobblemon, Impactor, Dex e shutdown.
-- Preparação verificou os cinco mods oficiais e53dependências aninhadas fixadas.
-- JAR inspecionado: versão0.12 e refmap presentes, sem classes smoke.
+- Build/JUnit: **104 testes,0falhas,0erros,0ignorados**.
+- Smoke básico: **48 verificações em3boots Fabric**, incluindo registry/decoração
+  [G]/[L]/cores reais dos componentes, body/signature/mask originais, unsigned
+  opcional/autorização revogada, filtragem/alcance, comandos e callbacks transformados
+  de entrada/saída. Reload de configuração inválida preserva o estado ativo.
+  Regressões de clãs/presets/editor/chat/TAB/nametags/BELOW_NAME/bossbar/sidebar passam.
+- Smoke com mods opcionais reais: **14 verificações aprovadas**.
+- Preparação revalidou cinco mods/53dependências aninhadas fixadas sem mudar bytes/hashes/TLS.
+- JAR inspecionado: versão0.13, refmap e quatro mixins de produção,16chat_types,
+  somente SQLite aninhado e nenhuma fixture/classe smoke.
 
 Evidências: build/reports/tests/test/index.html, build/server-smoke/result.json,
-build/integration-smoke/result.json e logs dos runners. Resultados0.11 são históricos
-(95JUnit/44básicos/14opcionais); não substituem os checks após estas mudanças.
+build/integration-smoke/result.json e logs dos runners. O workflow de pré-release executa novamente build/JUnit no GitHub antes de anexar
+o artefato e publicá-lo. O workflow0.12 anteriormente passou e publicou pré-release.
+A pré-release0.12 não contém os ajustes0.13.
 
 ## Artefato
 
-build/libs/shirokai-core-0.12.0-dev.jar — desenvolvimento, não release estável.
-SHA-256: 73b3542e531f9ea44d22d8bad976ce9ec326930a8a6bff578dce2670cd630fe3.
-Base antes desta etapa:422db579bb560489681fdac8019111701dc4d4a8.
-Commit final é informado na entrega, sem hash autorreferente neste documento.
+build/libs/shirokai-core-0.13.0-dev.jar — desenvolvimento, não release estável.
+SHA-256: 58a79e39661257289ee3b4c207b93c5a5928bb906d314ae704038985b3659882.
+Base antes desta etapa:899c3342f87a0e7be4fdbcdbc12c5155545eb49f (workflow de release).
+Commit final é informado na entrega, sem hash autorreferente aqui.
 
-## Limitações e próxima etapa
+## Limites e continuidade
 
-Projeto completo NÃO está entregue. Faltam integração de vanish de entidades,
-administração relacional avançada de clãs, animação de presets pessoais/clã e
-personalização de outros campos além dos títulos/identidades de clã.
+Projeto completo NÃO está entregue. Presets animados/administração relacional
+avançada/vanish de entidades e validação real continuam em NEXT_STEPS.md.
+Não há resource pack obrigatório para o formato de chat, mas renderização/indicador
+visual, login/logout/autenticação/assinatura criptográfica e contextos de clientes
+reais não foram certificados. Testes usam jogadores/conexões sintéticos; callbacks
+merged dos mixins são chamados isoladamente, sem efetuar login autenticado.
+Não confundir preservação de signature field com verificação criptográfica real.
 
-Testes usam jogadores/conexões sintéticos. Não validam login autenticado, assinatura
-criptográfica real, renderização/escala/actionbar/nametags/bossbars/BELOW_NAME do
-cliente, contextos LP de jogadores conectados, carga ou compatibilidade universal.
-A fixture altera a referência de dimensão do jogador sintético; não equivale ao
-protocolo completo de transferência de um cliente real. Authlib ainda pode registrar
-UnknownHostException para publickeys; online-mode não foi desativado.
-
-Observer não captura mods que contornam send ou reescrevem pacotes depois dele.
-Ownership/efeitos globais/overflow e escolha de responsável estão em TAB_EXTRAS.md.
-Integrações continuam fixadas/isoladas, moedas distintas e provider/coleção explícitos.
-Não há transação distribuída SQLite/LP/providers externos. CI remoto não verificado.
+Authlib ainda pode falhar por DNS/publickeys; online-mode foi preservado. Outros
+mods que substituem avisos/chat precisam de decisão de ownership. Chat do Core
+não cria vanish global. Não há transação distribuída SQLite/LP/providers externos.
+Código/JAR mantêm Minecraft1.21.1/Fabric/Java21 e APIs externas fixadas.
 
 ## GitHub
 
-Commit/push autorizados para istwi/Shirokai-tab/main após checks/revisão, preservando
-histórico. Releases e publicação de ambiente continuam fora deste trabalho.
+Commit/push de código/testes/docs autorizados para main sem reescrever histórico.
+Publicação de pré-release de desenvolvimento segue a solicitação do usuário;
+não publicar release estável nem configuração de ambiente.

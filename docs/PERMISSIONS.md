@@ -126,3 +126,11 @@ Isto não autoriza esconder entidades ou contornar mod de vanish. Nametags/BELOW
 são políticas administrativas globais/por conexão, sem comando de autoelevação.
 Bossbar usa condição permission/grupo/mundos de TAB; nenhuma permissão é concedida
 pelo Core. Diagnóstico continua em shirokaicore.command.tab.inspect.
+
+## Chat visual0.13
+
+/g e /l usam as mesmas permissões de GLOBAL/LOCAL e não ignoram moderação.
+chat-appearance.json.colorPermission vazio permite cores &0..f/&r para todos. Para
+restringir, configure shirokaicore.chat.color ou outro nó e conceda via LuckPerms.
+A permissão é revalidada por envio; não é bypass de filtro/cooldown/mute/ignore.
+Cor padrão do canal e avisos [+]/[-] são política do servidor, sem elevar autoridade.

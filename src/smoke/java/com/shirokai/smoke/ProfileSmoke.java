@@ -32,6 +32,7 @@ public final class ProfileSmoke implements ModInitializer {
     @Override public void onInitialize() {
         new ClanSmoke().onInitialize();
         new ChatSmoke().onInitialize();
+        new ChatAppearanceSmoke().onInitialize();
         new TabSmoke().onInitialize();
         new TabExtrasSmoke().onInitialize();
         new ScoreboardSmoke().onInitialize();

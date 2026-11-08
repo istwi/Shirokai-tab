@@ -1,8 +1,8 @@
-# Chat e moderação — 0.10.0-dev
+# Chat e moderação — 0.13.0-dev
 
 ## Canais e comandos
 
-- /global [mensagem], /local [mensagem], /staffchat [mensagem].
+- /global ou /g [mensagem], /local ou /l [mensagem], /staffchat [mensagem].
 - /clan chat [mensagem] ou /chat clan [mensagem].
 - /chat global|local|staff [mensagem]; /chat mostra canal atual.
 - Sem mensagem, seleciona canal persistente. Com mensagem, envia uma vez sem trocar seleção.
@@ -37,14 +37,14 @@ GLOBAL, LOCAL, CLAN, STAFF e PRIVATE quando personalizados.
 | duplicateWindowSeconds | 30 |
 | blockedWords | lista vazia; comparação literal case-insensitive com normalização NFKC |
 | channelPermissions | GLOBAL/LOCAL/CLAN/PRIVATE: vazio; STAFF: shirokaicore.chat.staff |
-| nameFormats | [GLOBAL]/[LOCAL]/[CLÃ]/[STAFF] {tags}{name}; privado: [PRIVADO] {tags}{name} → {target} |
+| nameFormats | [G]/[L]/[CLÃ]/[STAFF] {tags}{name}; privado: [PRIVADO] {tags}{name} → {target} |
 | takeVanillaPrivateCommands | true; alteração exige reinício |
 
 Variáveis permitidas nos formatos de nome: {channel}, {tags}, {name}, {target}.
 Substituição é literal e não recursiva. {tags} contém no máximo as duas identificações
 escolhidas, validadas pelo serviço de títulos; não adiciona cargo automaticamente.
 Com styles ativo, templates administrativos aceitam cores/HEX/gradientes via StyleEngine (PRESENTATION.md). Mensagem do jogador é sempre
-literal, sem eventos clicáveis ou interpretação de tags, JSON ou comandos.
+literal quanto a tags/JSON/comandos. A interpretação limitada de cores & da0.13 está documentada em CHAT_APPEARANCE.md.
 
 O cabeçalho do remetente tem hover com nome e clique SUGGEST_COMMAND para /chat msg;
 nunca RUN_COMMAND. O corpo não herda esse clique. Não há animação de histórico.
@@ -52,11 +52,12 @@ Regras por grupo/permissão/dimensão e menções seguras são fornecidas por pr
 
 ## Assinaturas e entrega
 
-Chat normal é interceptado em ServerMessageEvents.ALLOW_CHAT_MESSAGE. O Core envia
-o mesmo SignedMessage, sem decoração unsigned de terceiros, preservando corpo,
-assinatura e máscara de filtro, via SentMessage e MessageType.CHAT por destinatário.
-Só o nome de apresentação é decorado pelo servidor. A decoração externa usa o formato
-CHAT vanilla do cliente (por exemplo <nome> mensagem), não um template de corpo arbitrário.
+Chat normal é interceptado em ServerMessageEvents.ALLOW_CHAT_MESSAGE. signedBody,
+assinatura e máscara de filtro são preservados. Tipos de chat sincronizados da0.13
+aplicam formato Nick: mensagem e cores padrão de canal sem unsignedContent extra.
+Somente códigos & válidos/autorizados adicionam apresentação unsigned opcional;
+filtrados/máscara não-pass-through nunca recebem essa decoração. O cliente pode
+marcar mensagem modificada. Regras completas e opções em CHAT_APPEARANCE.md.
 
 Mensagens de comandos do Core são GameMessage/system, com cabeçalho estilizado e corpo de caracteres literais (menções podem ganhar cor);
 não são apresentadas como mensagens assinadas/reportáveis de jogador. /say e /me
@@ -149,3 +150,11 @@ Detalhes, permissões de menção, formatos e testes atuais em PRESENTATION.md.
 Identificações ROLE/SPECIAL usam o preset pessoal TITLE; CLAN usa CLAN_TAG do clã.
 Não há identificação extra, alteração de corpo/assinatura/máscara ou reanálise de
 markup. Permissão visual é independente de entitlement e dos gates de roteamento.
+
+## Layout0.13
+
+[G] cinza e [L] amarelo, sem < > vanilla. /g e /l são aliases moderados, com mensagem
+opcional como /global e /local. Config nova chat-appearance.json controla cores dos
+canais, códigos & e avisos [+]/[-]. Os templates antigos exatamente iguais aos
+defaults [GLOBAL]/[LOCAL] são atualizados em memória sem sobrescrever arquivo.
+Leia CHAT_APPEARANCE.md para assinatura/filtragem, permissões e atualização de servidor.
