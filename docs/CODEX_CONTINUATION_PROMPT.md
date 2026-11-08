@@ -25,36 +25,37 @@ atualize este documento. Não reaplique etapas já concluídas.
 
 ## Ponto de partida atualizado
 
-Versão0.9.0-dev preserva TAB/scoreboard e adiciona integrações opcionais reais de
-Cobblemon1.8.3, Impactor5.3.5, Text Placeholder API2.4.2, Shirokai Dex via PAPI e
-leitura de ginásios vanilla. LuckPerms Fabric5.4.140 foi exercitado com grants/revokes
-e prefixos reais. Configuração/limitações em INTEGRATIONS.md; evidências e SHA em
-PROJECT_STATUS.md. Não reaplique essas etapas nem a configuração de ambiente publicada.
+Versão0.10.0-dev adiciona presentation.json e composição de estilos em cabeçalhos de
+chat, menus de perfil/clã e identificações. TAB/sidebar usam o mesmo título formatado.
+Menções do chat normal são notificações separadas; corpo/assinatura/máscara não mudam.
+Mensagens system podem colorir menções sem reanalisar markup. Regras condicionais são
+configuração administrativa, NÃO escolhas individuais persistidas. Ver PRESENTATION.md.
 
-Validação0.9:80JUnit sem falhas/erros/ignorados,40checks de regressão e12checks com os mods reais.
-Schema permanece5. Módulos anteriores0.8 preservados. O projeto completo continua
-pendente. Testes usam jogadores/conexões sintéticos: cliente real/autenticação/carga
-e contextos de jogadores autenticados não validados.
+Integrações0.9 e demais módulos preservados. Schema permanece5. Testes/evidências/SHA
+atuais em PROJECT_STATUS.md. Validação atual:84JUnit sem falhas/erros/ignorados e42checks
+em3boots Fabric; resultado dos providers em PROJECT_STATUS. Não reaplicar fases anteriores nem setup de ambiente.
 
 ## Próxima entrega
 
-Siga NEXT_STEPS.md: integrar estilos a cabeçalhos de chat/menus/títulos/clãs com
-permissões e preservação de assinaturas/filtros/corpo literal; depois ferramentas
-administrativas/editor de clãs e recursos adicionais de TAB. Não chamar essas
-pendências de concluídas por existir StyleEngine.
+Siga NEXT_STEPS.md: escolhas persistidas de presets por jogador/clã, nome/sigla
+independentes, comandos/GUI/autorização com escopo e CAS. Preservar o ID escolhido
+quando permissão expira, mostrando fallback sem apagar preferências. Exige migração
+transacional/restart se mudar schema; dados do jogador nunca viram templates/markup.
+Depois administração/editor de clãs e recursos adicionais de TAB.
 
-Preserve as integrações: classes opcionais isoladas, fonte/coleção da Pokédex explícita,
-moedas impactor:dollars e impactor:tokens independentes, sem fallback primário.
-Não escrever Pokédex nem ler banco/arquivos privados dos mods. PAPI exporta somente
-shirokai, preserva handlers externos e mantém valores literais/sem recursão.
-Core inicia em SERVER_STARTED após enable do LP. Testes reais adicionais:
+Preserve apresentação: rich slots removem click/hover/insertion, não alteram Text do
+cache, e cabeçalho não duplica as duas identificações. Corpo assinado continua no
+mesmo SentMessage; notificações só após roteamento e nunca revelam menção filtrada.
+HoverEvent precisa de registries reais: seus testes rodam no smoke Fabric.
+
+Preserve integrações opcionais/isoladas, moeda explícita, fonte/coleção consistente
+e handlers PAPI próprios sem substituir terceiros. Comandos de testes adicionais:
 python3 tools/prepare_integration_mods.py e python3 tools/integration_smoke.py --accept-eula.
-O manifesto fixa URLs/hashes; não alterar JARs, checksums ou TLS para fazer testes passarem.
+Não alterar JARs/checksums/TLS para passar. Core inicia em SERVER_STARTED após LP.
 
-Objetivos da scoreboard continuam privados, fora do board salvo do mundo. Observer de
-send é somente leitura: não cancela/reescreve pacotes externos. Ceder a SIDEBAR/TEAM_*
-externo; colisão exata revoga ownership até reconectar. Limpar só recursos próprios e
-preservar /scoreboard vanilla/aliases de outros mods.
+Objetivos da scoreboard continuam privados, fora do board salvo do mundo. Observer
+respeita SIDEBAR/TEAM_* externo; colisão exata revoga ownership até reconectar.
+Não cancelar/reescrever pacotes externos, preservar /scoreboard vanilla/aliases.
 
 ## Regras que devem permanecer verdadeiras
 
@@ -109,7 +110,7 @@ O source set smoke é habilitado por -PprofileSmoke e não pode entrar no JAR fi
 Testes que dependem das transformações Fabric devem rodar no smoke apropriado,
 sem desabilitar cenários para fazer a suíte passar.
 
-Artefato atual: build/libs/shirokai-core-0.9.0-dev.jar. Relatórios ficam em
+Artefato atual: build/libs/shirokai-core-0.10.0-dev.jar. Relatórios ficam em
 build/reports/tests/test/index.html e build/server-smoke/result.json.
 CI de build/upload de JAR está configurado em .github/workflows/build.yml;
 não afirme que a execução remota passou sem verificá-la.

@@ -1,5 +1,6 @@
 package com.shirokai.core.clans;
 
+import com.shirokai.core.presentation.Surface;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.*;
@@ -41,12 +42,12 @@ public final class ClanMenu extends GenericContainerScreenHandler {
         load(player.getUuid(),service,player.getServer()).whenCompleteAsync((data,error)->{
             if(player.isDisconnected()||player.currentScreenHandler!=previous)return;
             if(error!=null){player.sendMessage(Text.literal("Não foi possível carregar o clã; tente novamente."),false);return;}
-            player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId,inventory,ignored)->new ClanMenu(syncId,inventory,player,service,data),Text.literal("✦ CLÃ SHIROKAI")));
+            player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId,inventory,ignored)->new ClanMenu(syncId,inventory,player,service,data),service.present(player.getUuid(),Surface.MENU_TITLE,"✦ CLÃ SHIROKAI")));
         },player.getServer());
     }
     private void item(int slot,Item type,String name,String...lore){
-        var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,Text.literal(name).formatted(Formatting.AQUA));
-        stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(line->(Text)Text.literal(line).formatted(Formatting.GRAY)).toList()));display.setStack(slot,stack);
+        var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,clans.present(owner.getUuid(),Surface.MENU_NAME,name).copy().formatted(Formatting.AQUA));
+        stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(line->(Text)clans.present(owner.getUuid(),Surface.MENU_LORE,line).copy().formatted(Formatting.GRAY)).toList()));display.setStack(slot,stack);
     }
     private String name(UUID player){var online=owner.getServer().getPlayerManager().getPlayer(player);return online==null?player.toString():online.getGameProfile().getName();}
     private ClanSnapshot own(){return data.clan().orElseThrow(()->new IllegalStateException("Você não pertence a um clã"));}
@@ -62,6 +63,12 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                 item(4,Items.BOOK,data.clan().map(ClanSnapshot::name).orElse("Sem clã"),data.clan().map(clan->"Sigla: "+Objects.toString(clan.tag(),"Não definida")).orElse("Criação gratuita: /clan create <nome>"),
                     data.clan().map(clan->"Membros: "+clan.members().size()+"/"+data.limit()).orElse("Você pode aceitar um convite abaixo."),
                     data.clan().map(clan->"Seu cargo: "+clan.members().get(owner.getUuid())).orElse(""));
+                if(clans.menuPresentationEnabled())data.clan().ifPresent(clan->{
+                    var card=display.getStack(4);card.set(DataComponentTypes.CUSTOM_NAME,clans.present(clan.leader(),Surface.CLAN_NAME,clan.name()));
+                    var lore=new ArrayList<Text>(card.get(DataComponentTypes.LORE).lines());
+                    lore.set(0,Text.literal("Sigla: ").formatted(Formatting.GRAY).append(clans.present(clan.leader(),Surface.CLAN_TAG,Objects.toString(clan.tag(),"Não definida"))));
+                    card.set(DataComponentTypes.LORE,new LoreComponent(lore));
+                });
                 item(22,Items.PAPER,"Convites recebidos",Integer.toString(data.invitations().size()));
                 if(data.clan().isPresent()){
                     item(20,Items.PLAYER_HEAD,"Membros e cargos");item(24,Items.WRITABLE_BOOK,"Convidar jogador");

@@ -34,6 +34,7 @@ public final class ProfileSmoke implements ModInitializer {
         new ChatSmoke().onInitialize();
         new TabSmoke().onInitialize();
         new ScoreboardSmoke().onInitialize();
+        new PresentationSmoke(this::until).onInitialize();
         if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("cobblemon") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("impactor") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("shirokaidex") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("luckperms")) new IntegrationSmoke(this::until).onInitialize();
         new TeamOwnershipSmoke().onInitialize();
         new ClanMenuSmoke(this::until).onInitialize();

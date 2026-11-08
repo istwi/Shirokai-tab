@@ -1,4 +1,4 @@
-# Permissões 0.9.0-dev
+# Permissões 0.10.0-dev
 
 LuckPerms é a fonte de verdade quando presente e inicializado. O adaptador usa API 5.4,
 usuário carregado e dados de permissão com contextos atuais. Não retém resultado de
@@ -91,3 +91,12 @@ shirokaicore.command.integrations.inspect permite `/shirokaicore integrations`.
 Handlers do Shirokai Dex continuam exigindo a permissão da coleção do próprio Dex.
 A ponte não contorna essa autorização nem modifica grupos/permissões por aparência.
 O teste de integração concede nós só ao usuário sintético no mundo descartável.
+
+
+## Apresentação0.10
+
+Regras de presentation.json consultam sua permission/grupo/mundo em cada render.
+Não concedem entitlement de título nem permissões de clã. mentionPermission controla
+destaque/notificação de menções; vazio é público. Não ignora mute, ignore ou alcance.
+Perda de permissão visual usa fallback sem apagar regra ou seleção de título existente.
+Nós de personalização individual de clã continuam sem editor/persistência nesta entrega.

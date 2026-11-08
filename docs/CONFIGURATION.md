@@ -1,4 +1,4 @@
-# Configuração 0.9.0-dev
+# Configuração 0.10.0-dev
 
 Arquivo real: `config/shirokai-core/core.json`, relativo ao diretório do servidor.
 Criado somente se ausente. Arquivos existentes, inclusive inválidos, não são sobrescritos.
@@ -102,3 +102,9 @@ ativação exigem reinício; moedas/objetivo/coleção/provider/intervalo aceita
 descartando caches e respostas antigas. Defaults/campos e semântica em INTEGRATIONS.md.
 O runtime agora inicia em SERVER_STARTED para respeitar o enable do LuckPerms Fabric;
 SQLite continua assíncrono e seu status separado precisa atingir READY.
+
+
+presentation.json participa de styles e do reload atômico, sem novo módulo ou migração.
+Templates de chat/menus/títulos/clãs e regras de condição em PRESENTATION.md. Chat
+nameFormats agora compila tags seguras quando styles ativo; texto dinâmico segue literal.
+Configuração candidata inválida preserva todos os snapshots, inclusive presentation.

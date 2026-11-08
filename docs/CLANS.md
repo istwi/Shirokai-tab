@@ -155,3 +155,11 @@ Títulos CLAN continuam proibidos em titles.json: somente pertencimento nativo o
 /clan chat [mensagem] usa o mesmo gate de mute/ignore/spam do restante do Core;
 sem mensagem, seleciona CLAN. Sair do clã bloqueia envio, sem fallback público.
 Só membros do mesmo UUID de clã recebem. Ver CHAT.md para configurações e limitações.
+
+
+## Apresentação0.10
+
+Templates administrativos CLAN_NAME e CLAN_TAG são independentes e envolvem valores
+literais, com regras de grupo/permissão/mundo. Cartão do menu usa contexto do líder;
+identificação equipada usa contexto do jogador. Não há editor/escolha persistida de
+estilo do próprio clã ainda. Escopo, autorização e confirmações anteriores permanecem.

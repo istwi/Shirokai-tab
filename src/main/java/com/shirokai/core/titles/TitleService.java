@@ -16,6 +16,13 @@ public final class TitleService {
     private final TitleRules rules;
     private final Map<UUID, TitleState> cache = new HashMap<>();
     private final Set<UUID> refreshing = new HashSet<>();
+    private com.shirokai.core.presentation.SurfaceRenderer presentation=com.shirokai.core.presentation.SurfaceRenderer.literal();
+    public void presentation(com.shirokai.core.presentation.SurfaceRenderer renderer){presentation=renderer;}
+    public boolean menuPresentationEnabled(){return presentation.menusEnabled();}
+    public net.minecraft.text.Text present(UUID player,com.shirokai.core.presentation.Surface surface,String value){return presentation.render(player,surface,value);}
+    public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return present(player,definition.category()==TitleDefinition.Category.CLAN?com.shirokai.core.presentation.Surface.CLAN_TAG:com.shirokai.core.presentation.Surface.TITLE,definition.display());}
+    public net.minecraft.text.Text visualPresentation(UUID player){return cached(player).map(TitleState::selectedVisual).map(catalog(player).definitions()::get).map(def->display(player,def)).orElseGet(net.minecraft.text.Text::empty);}
+    public List<net.minecraft.text.Text> chatPresentation(UUID player){return cached(player).map(state->state.chatIds().stream().limit(2).map(catalog(player).definitions()::get).filter(Objects::nonNull).map(def->display(player,def)).toList()).orElse(List.of());}
     private TitleCatalog catalog;
     private Consumer<UUID> changed = id -> {};
     public void onChange(Consumer<UUID> listener) { changed = changed.andThen(listener); }

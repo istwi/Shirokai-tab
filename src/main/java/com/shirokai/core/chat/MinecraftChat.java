@@ -27,14 +27,20 @@ public final class MinecraftChat {
             }).toList(),id->titles==null?List.of():titles.cached(id).map(state->state.chatIds().stream().map(key->titles.catalog(id).definitions().get(key)).filter(Objects::nonNull).map(def->def.display()).toList()).orElse(List.of()),
             Clock.systemUTC(),config,(id,reason)->logger.warn("[chat] Mensagem rejeitada de {}: {}",id,reason));
     }
+    private com.shirokai.core.presentation.PresentationRuntime presentation;
+    public void presentation(com.shirokai.core.presentation.PresentationRuntime value){presentation=value;}
     public ChatService service(){return service;}
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(player->player.getUuid().equals(id)&&!player.isDisconnected()).findFirst().orElse(null);}
     private Text label(ChatService.Envelope message){
         var author=player(message.author());String name=author==null?message.author().toString():author.getGameProfile().getName();
-        return Text.literal(message.label()).styled(style->style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal("Jogador: "+name)))
+        return (presentation==null?Text.literal(message.label()):presentation.header(message)).copy().styled(style->style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal("Jogador: "+name)))
                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,"/chat msg "+name+" ")));
     }
-    public void system(UUID target,ChatService.Envelope message){var recipient=player(target);if(recipient!=null)recipient.sendMessage(Text.empty().append(label(message)).append(Text.literal(": "+message.body())),false);}
+    public void system(UUID target,ChatService.Envelope message){var recipient=player(target);if(recipient!=null){
+        var name=label(message);var body=presentation==null?Text.literal(message.body()):presentation.body(message.author(),message.body());
+        recipient.sendMessage(Text.empty().append(name).append(Text.empty().append(Text.literal(": ")).append(body)),false);
+        if(presentation!=null)presentation.notifyMention(message,recipient);
+    }}
     public boolean signed(ServerPlayerEntity sender,SignedMessage incoming){
         try{
             if(!server.isOnThread())throw new IllegalStateException("Roteamento de chat exige thread do servidor");
@@ -42,7 +48,11 @@ public final class MinecraftChat {
             // Keep body/signature/filter mask; only server-side sender decoration changes.
             var sent=SentMessage.of(incoming.withoutUnsigned());
             service.send(sender.getUuid(),service.selected(sender.getUuid()),incoming.getSignedContent(),(target,envelope)->{
-                var recipient=player(target);if(recipient!=null)recipient.sendChatMessage(sent,sender.shouldFilterMessagesSentTo(recipient),MessageType.params(MessageType.CHAT,server.getRegistryManager(),label(envelope)));
+                var recipient=player(target);if(recipient!=null){boolean filtered=sender.shouldFilterMessagesSentTo(recipient);
+                    recipient.sendChatMessage(sent,filtered,MessageType.params(MessageType.CHAT,server.getRegistryManager(),label(envelope)));
+                    // Do not reveal a mention hidden by filtering. Notification is a separate overlay, never unsigned chat decoration.
+                    if(presentation!=null&&!filtered)presentation.notifyMention(envelope,recipient);
+                }
             });
         }catch(RuntimeException error){sender.sendMessage(Text.literal("Chat: "+error.getMessage()),false);}
         // Suppress only this vanilla broadcast; recipient sends do not re-enter the broadcast event.

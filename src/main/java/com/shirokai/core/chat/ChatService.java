@@ -10,7 +10,7 @@ import java.util.regex.*;
 /** All methods run on the server executor. Persistence never reads Minecraft objects. */
 public final class ChatService {
     public record Participant(UUID id,String name,String world,double x,double y,double z,UUID clan){}
-    public record Envelope(UUID author,String label,String body,Channel channel){}
+    public record Envelope(UUID author,String label,String body,Channel channel,String target){public Envelope(UUID author,String label,String body,Channel channel){this(author,label,body,channel,"");}}
     public interface Audience { Collection<Participant> online(); }
     @FunctionalInterface public interface Sink { void deliver(UUID target,Envelope envelope); }
     private static final class Session {
@@ -82,7 +82,7 @@ public final class ChatService {
             if(!permitted(sender,Channel.PRIVATE)||!permitted(target,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
             var author=participant(sender);var recipient=participant(target);
             if(source.profile.ignored().contains(target)||!accepts(recipient,author,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
-            gate(sender,body);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE);
+            gate(sender,body);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE,recipient.name());
             sink.deliver(target,envelope);sink.deliver(sender,envelope);source.reply=target;session(target).reply=sender;
         }catch(RuntimeException error){rejected(sender,error);throw error;}
     }

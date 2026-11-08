@@ -5,6 +5,7 @@ import com.shirokai.core.titles.*;
 import com.shirokai.core.clans.*;
 import com.shirokai.core.chat.*;
 import com.shirokai.core.styles.*;
+import com.shirokai.core.presentation.*;
 import com.shirokai.core.tab.*;
 import com.shirokai.core.scoreboard.*;
 import com.shirokai.core.integrations.*;
@@ -37,6 +38,7 @@ public final class CoreRuntime implements AutoCloseable {
     private ClanService clans;
     private MinecraftChat chat;
     private StyleEngine styles;
+    private PresentationRuntime presentation;
     private TabRuntime tab;
     private ScoreboardRuntime scoreboard;
     private IntegrationRuntime integrations;
@@ -104,7 +106,12 @@ public final class CoreRuntime implements AutoCloseable {
             var integrationConfig = IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
             integrations = new IntegrationRuntime(server, integrationConfig, placeholders, permissions, () -> running("clans") ? clans : null, () -> config.unavailablePlaceholder(), logger);
         }, () -> { if (integrations != null) integrations.close(); }));
-        modules.register(module("styles",Set.of(),()->styles=new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json"))),()->{}));
+        modules.register(module("styles",Set.of(),()->{
+            styles=new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json")));
+            var visual=PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json"));
+            presentation=new PresentationRuntime(server,new PresentationPlan(visual,styles,chat==null?ChatConfig.defaults():chat.service().config()),permissions,titles);
+            if(titles!=null)titles.presentation(presentation);if(clans!=null)clans.presentation(presentation);if(chat!=null)chat.presentation(presentation);
+        },()->{}));
         modules.register(module("tab",Set.of("styles","permissions"),()->{
             var tabConfig=TabConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab.json"));
             tab=new TabRuntime(server,new TabPlan(tabConfig,styles),permissions,placeholders,running("titles")?titles:null,running("clans")?clans:null,running("storage")?storage:null,()->config.unavailablePlaceholder(),logger);
@@ -196,8 +203,9 @@ public final class CoreRuntime implements AutoCloseable {
                 StyleEngine candidateStyles=styles==null?null:new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json")));
                 TabPlan tabPlan=tab==null?null:new TabPlan(TabConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab.json")),candidateStyles);
                 var scoreboardPlan=scoreboard==null?null:new ScoreboardPlan(ScoreboardConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/scoreboard.json")),candidateStyles);
+                var presentationPlan=presentation==null?null:new PresentationPlan(PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json")),candidateStyles,chatConfig==null?ChatConfig.defaults():chatConfig);
                 var integrationConfig=integrations==null?null:IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
-                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig);
+                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan);
             } catch (Exception failure) { throw new CompletionException(failure); }
         }, io).whenComplete((candidate, error) -> {
             if (closed) { reloading.set(false); result.completeExceptionally(new IllegalStateException("Servidor encerrando")); return; }
@@ -216,6 +224,7 @@ public final class CoreRuntime implements AutoCloseable {
                     if (clans != null) clans.replaceConfig(candidate.clans());
                     if(chat!=null)chat.service().replaceConfig(candidate.chat());
                     if(integrations!=null)integrations.replaceConfig(candidate.integrations());
+                    if(presentation!=null)presentation.replacePlan(candidate.presentation());
                     styles=candidate.styles();if(tab!=null)tab.replacePlan(candidate.tab());if(scoreboard!=null)scoreboard.replacePlan(candidate.scoreboard());
                     logger.info("[core] Configuração recarregada com segurança");
                     result.complete(null);
@@ -225,7 +234,7 @@ public final class CoreRuntime implements AutoCloseable {
         });
         return result;
     }
-    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations) {}
+    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation) {}
     public void prepareStop(){try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;

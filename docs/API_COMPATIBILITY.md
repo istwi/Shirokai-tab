@@ -164,3 +164,24 @@ Kotlin plugin2.2.20 habilita remapeamento de metadata; Gradle8.12.1/Loom1.10.5/Y
 exigido por Cobblemon/Dex, ICU71.1 e JARs aninhados extraídos sem alterar bytes.
 A checagem inicial detectou dependências aninhadas ausentes e o ciclo de enable do LP;
 ambos foram corrigidos, sem desativar testes/APIs/TLS. Resultados finais em PROJECT_STATUS.md.
+
+
+## Atualização0.10 — composição de apresentação
+
+Yarn1.21.1+build.3 auditado com javap: Text.visit(StyledVisitor,Style),
+Style.withParent/withClickEvent/withHoverEvent/withInsertion; SignedMessage.withFilterMask
+e filterMask; ChatMessageS2CPacket.signature/filterMask/unsignedContent;
+GameMessageS2CPacket.overlay; ServerPlayerEntity.setClientOptions e SyncedClientOptions
+(language,int,ChatVisibility,boolean,int,Arm,boolean,boolean). Mesmas APIs de menu/lore
+anteriores; callbacks de ações não foram modificados.
+
+Cabeçalho só altera MessageType.Parameters.name; corpo/assinatura/máscara seguem o
+mesmo caminho SentMessage, sem unsigned decoration. Menção normal é overlay separado
+e é suprimida para destinatário sujeito a filtragem. Comandos continuam system.
+Rich slots são percorridos como componentes; ações são removidas e markup nunca é
+reanalisado. HoverEvent requer registries inicializados: checagem de hover foi mantida
+no smoke Fabric após Not bootstrapped no JUnit cru; não foi desativada.
+
+Sem mudança de versão externa, protocolo, schema SQLite ou novos mixins. Testes usam
+conexões sintéticas: preservação dos campos não valida assinatura criptográfica nem
+renderização no cliente. Contratos e limitações em PRESENTATION.md.

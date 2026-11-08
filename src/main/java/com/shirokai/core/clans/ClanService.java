@@ -9,6 +9,7 @@ import java.util.function.*;
 public final class ClanService {
     private static final class State {
         ClanConfig config;
+        com.shirokai.core.presentation.SurfaceRenderer presentation=com.shirokai.core.presentation.SurfaceRenderer.literal();
         Predicate<UUID> cacheable=id->false;
         final Map<UUID,Optional<ClanSnapshot>> cache=new HashMap<>();
         final List<Consumer<Set<UUID>>> listeners=new ArrayList<>();
@@ -21,6 +22,9 @@ public final class ClanService {
     public ClanService(ClanRepository repository,PermissionService permissions,Executor server,ClanConfig config){this(repository,permissions,server,new State(config));}
     private ClanService(ClanRepository repository,PermissionService permissions,Executor server,State state){this.repository=repository;this.permissions=permissions;this.server=server;this.state=state;}
     public ClanService scoped(UUID expectedClan){return new ClanService(repository.scoped(expectedClan),permissions,server,state);}
+    public void presentation(com.shirokai.core.presentation.SurfaceRenderer renderer){state.presentation=renderer;}
+    public boolean menuPresentationEnabled(){return state.presentation.menusEnabled();}
+    public net.minecraft.text.Text present(UUID subject,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.render(subject,surface,value);}
     public ClanConfig config(){return state.config;}
     public void replaceConfig(ClanConfig value){state.config=value;}
     public void cacheOnline(Predicate<UUID> predicate){state.cacheable=predicate;}

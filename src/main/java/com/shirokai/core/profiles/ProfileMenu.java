@@ -1,6 +1,7 @@
 package com.shirokai.core.profiles;
 
 import com.shirokai.core.titles.*;
+import com.shirokai.core.presentation.Surface;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,13 +40,13 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
             if (player.isDisconnected() || player.currentScreenHandler != previous) return;
             if (error != null) { player.sendMessage(Text.literal("Não foi possível carregar o perfil; tente novamente."), false); return; }
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inventory, ignored) ->
-                    new ProfileMenu(syncId, inventory, player, titles, state), Text.literal("✦ PERFIL SHIROKAI")));
+                    new ProfileMenu(syncId, inventory, player, titles, state), titles.present(player.getUuid(),Surface.MENU_TITLE,"✦ PERFIL SHIROKAI")));
         }, player.getServer());
     }
-    private static ItemStack icon(Item item, String name, String... lore) {
+    private ItemStack icon(Item item, String name, String... lore) {
         var stack = new ItemStack(item);
-        stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(name).formatted(Formatting.AQUA));
-        stack.set(DataComponentTypes.LORE, new LoreComponent(Arrays.stream(lore).map(line -> (Text) Text.literal(line).formatted(Formatting.GRAY)).toList()));
+        stack.set(DataComponentTypes.CUSTOM_NAME, titles.present(owner.getUuid(),Surface.MENU_NAME,name).copy().formatted(Formatting.AQUA));
+        stack.set(DataComponentTypes.LORE, new LoreComponent(Arrays.stream(lore).map(line -> (Text) titles.present(owner.getUuid(),Surface.MENU_LORE,line).copy().formatted(Formatting.GRAY)).toList()));
         return stack;
     }
     private void render() {
@@ -60,10 +61,12 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
         for (int i = 0; i < 36 && page * 36 + i < entries.size(); i++) {
             var title = entries.get(page * 36 + i);
             var availability = titles.rules().availability(title, state, titles.now());
-            display.setStack(9 + i, icon(availability == TitleRules.Availability.UNLOCKED ? Items.NAME_TAG : Items.BARRIER,
+            var stack=icon(availability == TitleRules.Availability.UNLOCKED ? Items.NAME_TAG : Items.BARRIER,
                     title.display(), title.description(), "Estado: " + availability,
                     "Categoria: " + title.category(), "TAB: " + title.id().equals(state.selectedVisual()),
-                    "Chat: " + state.chatIds().contains(title.id())));
+                    "Chat: " + state.chatIds().contains(title.id()));
+            if(titles.menuPresentationEnabled())stack.set(DataComponentTypes.CUSTOM_NAME,titles.display(owner.getUuid(),title).copy().formatted(Formatting.AQUA));
+            display.setStack(9+i,stack);
         }
         display.setStack(45, icon(Items.ARROW, "Página anterior"));
         display.setStack(48, icon(Items.MILK_BUCKET, "Remover todas as seleções"));

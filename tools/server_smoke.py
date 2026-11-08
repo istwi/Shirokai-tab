@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.9.0-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.10.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -93,6 +93,8 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-scoreboard-smoke', 'SCOREBOARD_SMOKE_PASS')
         checks.append('native scoreboard packets diff shared title visibility and foreign sidebar ownership')
         server.command('shirokaicore scoreboard', 'viewers=')
+        server.command('shirokai-presentation-smoke', 'PRESENTATION_SMOKE_PASS')
+        checks.append('rich chat menu title clan presentation permission fallback and filtered mention routing')
         server.command('shirokai-chat-smoke', 'CHAT_SMOKE_PASS')
         checks.append('chat transport channels private moderation ignore and literal payloads')
         server.command('shirokai-chat-alias-smoke', 'CHAT_ALIAS_SMOKE_PASS')
@@ -172,6 +174,19 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         scoreboard_file.write_text(original_scoreboard)
         config_file.write_text(customized)
         checks.append('invalid scoreboard candidate rejects complete reload atomically')
+        presentation_file = runtime / 'config/shirokai-core/presentation.json'
+        original_presentation = presentation_file.read_text()
+        presentation = json.loads(original_presentation)
+        presentation['templates']['TITLE'] = '<click:run_command:/op>%visual:value%</click>'
+        presentation_file.write_text(json.dumps(presentation))
+        rejected_visual = dict(config)
+        rejected_visual['unavailablePlaceholder'] = 'MUST_NOT_APPLY_PRESENTATION'
+        config_file.write_text(json.dumps(rejected_visual))
+        server.command('shirokaicore reload', 'Tag não permitida')
+        server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
+        presentation_file.write_text(original_presentation)
+        config_file.write_text(customized)
+        checks.append('invalid presentation rejects all reload snapshots atomically')
         integrations_file = runtime / 'config/shirokai-core/integrations.json'
         original_integrations = integrations_file.read_text()
         integrations = json.loads(original_integrations)
@@ -247,6 +262,6 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         assert connection.execute('SELECT count(*) FROM admin_audit').fetchone()[0] >= 2
     checks += ['storage failure isolated from server and placeholders', 'future schema preserved']
 
-result = {'passed': checks, 'count': len(checks), 'not_tested': ['player connections', 'LuckPerms runtime', 'Cobblemon', 'Impactor', 'visual GUI and packets from a real client', 'visual TAB order and scoreboard rendering', 'clan styles, advanced formatting and mention styling']}
+result = {'passed': checks, 'count': len(checks), 'not_tested': ['player connections', 'LuckPerms runtime', 'Cobblemon', 'Impactor', 'visual GUI and packets from a real client', 'visual TAB order and scoreboard rendering', 'persistent personal/clan style choices and graphical style editor']}
 (reports / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps(result, indent=2))

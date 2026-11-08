@@ -54,8 +54,14 @@ public final class TabRuntime implements AutoCloseable{
             default->placeholders==null?fallback.get():placeholders.render("%"+key+"%",new PlaceholderService.Context(subject.getUuid(),subject.getGameProfile().getName(),count),fallback.get());
         };
     }
-    private Text lines(List<StyleEngine.Compiled> templates,Function<String,String> resolver,boolean animate){
-        var output=Text.empty();int length=0;for(int i=0;i<templates.size();i++){var line=plan.styles().render(templates.get(i),resolver,tick,animate);length+=line.getString().codePointCount(0,line.getString().length());if(length>2048)throw new IllegalArgumentException("Header/footer excede2048 caracteres");if(i>0)output.append(Text.literal("\n"));output.append(line);}return output;
+    private Text resolveRich(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count){
+        if(titles!=null&&(key.equals("shirokai:selected_title")||key.equals("shirokai:title_prefix"))){
+            Text title=titles.visualPresentation(subject.getUuid());return key.equals("shirokai:title_prefix")&&!title.getString().isEmpty()?Text.empty().append(title).append(Text.literal(" ")):title;
+        }
+        return Text.literal(resolve(key,subject,viewer,metadata,count));
+    }
+    private Text lines(List<StyleEngine.Compiled> templates,Function<String,Text> resolver,boolean animate){
+        var output=Text.empty();int length=0;for(int i=0;i<templates.size();i++){var line=plan.styles().renderRich(templates.get(i),resolver,tick,animate);length+=line.getString().codePointCount(0,line.getString().length());if(length>2048)throw new IllegalArgumentException("Header/footer excede2048 caracteres");if(i>0)output.append(Text.literal("\n"));output.append(line);}return output;
     }
     private static PlayerListS2CPacket.Entry entry(ServerPlayerEntity subject,Text name){
         var base=new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME,subject).getEntries().getFirst();
@@ -71,11 +77,11 @@ public final class TabRuntime implements AutoCloseable{
         var rules=new HashMap<UUID,Optional<TabPlan.Name>>();
         for(var subject:players)rules.put(subject.getUuid(),plan.name(metadata.get(subject.getUuid()),subject.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(subject.getUuid(),node)));
         if(plan.config().manageTeams())teams.reconcile(players.stream().map(p->{int priority=rules.get(p.getUuid()).map(n->n.definition().priority()).orElse(metadata.get(p.getUuid()).weight());return new TeamOwnership.Player(p.getUuid(),p.getGameProfile().getName(),priority);}).toList());
-        var values=new HashMap<UUID,Map<String,String>>();var commonNames=new HashMap<UUID,Text[]>();
+        var values=new HashMap<UUID,Map<String,Text>>();var commonNames=new HashMap<UUID,Text[]>();
         for(var subject:players)values.put(subject.getUuid(),new HashMap<>());
         for(var viewer:players)try{
             var view=views.computeIfAbsent(viewer.getUuid(),id->new View());var meta=metadata.get(viewer.getUuid());boolean animate=animations.getOrDefault(viewer.getUuid(),false);
-            var header=plan.header(meta,viewer.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(viewer.getUuid(),node));Function<String,String> resolver=key->key.equals("shirokai:viewer")?viewer.getGameProfile().getName():values.get(viewer.getUuid()).computeIfAbsent(key,k->resolve(k,viewer,viewer,meta,players.size()));
+            var header=plan.header(meta,viewer.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(viewer.getUuid(),node));Function<String,Text> resolver=key->key.equals("shirokai:viewer")?Text.literal(viewer.getGameProfile().getName()):values.get(viewer.getUuid()).computeIfAbsent(key,k->resolveRich(k,viewer,viewer,meta,players.size()));
             Text top=lines(header.header(),resolver,animate),bottom=lines(header.footer(),resolver,animate);
             var changed=new ArrayList<PlayerListS2CPacket.Entry>();var desired=new HashMap<UUID,Text>();
             if(plan.config().managePlayerNames())for(var subject:players){
@@ -83,9 +89,9 @@ public final class TabRuntime implements AutoCloseable{
                 if(foreign){if(view.names.containsKey(subject.getUuid()))changed.add(entry(subject,subject.getPlayerListName()));continue;}
                 var subjectMeta=metadata.get(subject.getUuid());var template=rules.get(subject.getUuid()).map(TabPlan.Name::template).orElse(plan.defaultName());
                 boolean moving=animate&&animations.getOrDefault(subject.getUuid(),false);Text[] shared=commonNames.computeIfAbsent(subject.getUuid(),id->new Text[2]);int variant=moving?1:0;
-                Function<String,String> nameResolver=key->key.equals("shirokai:viewer")?viewer.getGameProfile().getName():values.get(subject.getUuid()).computeIfAbsent(key,k->resolve(k,subject,viewer,subjectMeta,players.size()));
-                Text name=template.variables().contains("shirokai:viewer")?plan.styles().render(template,nameResolver,tick,moving):shared[variant];
-                if(name==null){name=plan.styles().render(template,nameResolver,tick,moving);shared[variant]=name;}
+                Function<String,Text> nameResolver=key->key.equals("shirokai:viewer")?Text.literal(viewer.getGameProfile().getName()):values.get(subject.getUuid()).computeIfAbsent(key,k->resolveRich(k,subject,viewer,subjectMeta,players.size()));
+                Text name=template.variables().contains("shirokai:viewer")?plan.styles().renderRich(template,nameResolver,tick,moving):shared[variant];
+                if(name==null){name=plan.styles().renderRich(template,nameResolver,tick,moving);shared[variant]=name;}
                 if(name.getString().codePointCount(0,name.getString().length())>256)throw new IllegalArgumentException("Nome no TAB excede256 caracteres");desired.put(subject.getUuid(),name);
                 if(!Objects.equals(view.names.get(subject.getUuid()),name))changed.add(entry(subject,name));
             }

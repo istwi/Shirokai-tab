@@ -55,8 +55,7 @@ resulta em EXPIRED; o registro permanece para distinguir expiração de bloqueio
 Estados expostos: UNLOCKED, LOCKED, EXPIRED e UNAVAILABLE (permissão ausente).
 
 Há apenas um selected_visual persistente, destinado simultaneamente a TAB e scoreboard.
-Somente títulos disponíveis nas duas superfícies podem ocupá-lo. Os renderizadores
-TAB/scoreboard ainda não foram implementados; não há duas seleções independentes.
+Somente títulos disponíveis nas duas superfícies podem ocupá-lo. Os renderizadores TAB/scoreboard compartilham o mesmo título; não há duas seleções independentes.
 
 Chat permite no máximo duas identificações totais, inclusive ROLE. Ordem:
 ROLE antes de SPECIAL, depois prioridade decrescente e ID para desempate.
@@ -146,3 +145,12 @@ clan_<UUID> de outro clã ou sem sigla; leave/kick/disband removem seleção ato
 Mudanças do serviço de clãs atualizam o cache online; view/equip carregam pertencimento
 antes de validar, para não aceitar uma permissão fictícia ou apagar escolha no join
 antes de carregar dados. Diagnóstico offline segue sem limpeza baseada em permissão ausente.
+
+
+## Apresentação0.10
+
+Display/descrição do catálogo continuam literais. presentation.json aplica estilo
+TITLE/CLAN_TAG fora do dado, com condições dinâmicas. TAB/sidebar e preview do perfil
+compõem esse mesmo título sem alterar a seleção. Revogar permissão visual troca o
+estilo por fallback; não revoga título nem apaga a regra configurada. Entitlement do
+título continua independente. Escolha pessoal persistida de estilo ainda não existe.

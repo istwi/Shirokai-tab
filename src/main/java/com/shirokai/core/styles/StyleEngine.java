@@ -73,14 +73,28 @@ public final class StyleEngine {
         var values=new HashMap<String,String>();for(String key:template.variables()){String value=Objects.requireNonNullElse(resolver.apply(key),"");if(value.codePoints().anyMatch(Character::isISOControl)||value.codePointCount(0,value.length())>512)throw new IllegalArgumentException("Placeholder excede512 caracteres: "+key);values.put(key,value);}
         var frames=new HashMap<String,Integer>();for(String id:template.animations()){var animation=config.animations().get(id);frames.put(id,animate?(int)Math.floorMod(Math.floorDiv(tick,animation.frameTicks()),animation.frames().size()):0);}
         var key=new Key(template.source(),Map.copyOf(values),Map.copyOf(frames));var previous=rendered.get(key);if(previous!=null)return previous;
-        var spans=new ArrayList<Span>();int[] remaining={2048};evaluate(template.nodes(),Style.EMPTY,values,frames,spans,remaining);
+        var spans=new ArrayList<Span>();int[] remaining={2048};var richValues=new HashMap<String,List<Span>>();values.forEach((name,value)->richValues.put(name,List.of(new Span(value,Style.EMPTY))));evaluate(template.nodes(),Style.EMPTY,richValues,frames,spans,remaining);
         var output=Text.empty();for(var span:spans)output.append(Text.literal(span.text()).setStyle(span.style()));rendered.put(key,output);return output;
     }
+    /** Compose trusted formatted slots without reparsing data. Strip actions from slots; caller-owned Text is never mutated. */
+    public Text renderRich(Compiled template,Function<String,Text> resolver,long tick,boolean animate){
+        var values=new HashMap<String,List<Span>>();
+        for(String name:template.variables()){
+            Text value=Objects.requireNonNullElseGet(resolver.apply(name),Text::empty);String plain=value.getString();
+            if(plain.codePoints().anyMatch(Character::isISOControl)||plain.codePointCount(0,plain.length())>512)throw new IllegalArgumentException("Placeholder excede512 caracteres: "+name);
+            var parts=new ArrayList<Span>();
+            value.visit((style,content)->{parts.add(new Span(content,style.withClickEvent(null).withHoverEvent(null).withInsertion(null)));return Optional.empty();},Style.EMPTY);
+            values.put(name,List.copyOf(parts));
+        }
+        var frames=new HashMap<String,Integer>();for(String id:template.animations()){var animation=config.animations().get(id);frames.put(id,animate?(int)Math.floorMod(Math.floorDiv(tick,animation.frameTicks()),animation.frames().size()):0);}
+        var spans=new ArrayList<Span>();evaluate(template.nodes(),Style.EMPTY,values,frames,spans,new int[]{2048});
+        var output=Text.empty();for(var span:spans)output.append(Text.literal(span.text()).setStyle(span.style()));return output;
+    }
     private static void append(List<Span> spans,String text,Style style,int[] remaining){int length=text.codePointCount(0,text.length());remaining[0]-=length;if(remaining[0]<0)throw new IllegalArgumentException("Texto expandido excede2048 caracteres");if(!text.isEmpty())spans.add(new Span(text,style));}
-    private void evaluate(List<Node> nodes,Style style,Map<String,String> values,Map<String,Integer> frames,List<Span> output,int[] remaining){
+    private void evaluate(List<Node> nodes,Style style,Map<String,List<Span>> values,Map<String,Integer> frames,List<Span> output,int[] remaining){
         for(Node node:nodes){
             if(node instanceof Literal value)append(output,value.text(),style,remaining);
-            else if(node instanceof Variable value)append(output,values.get(value.name()),style,remaining);
+            else if(node instanceof Variable value)for(var span:values.get(value.name()))append(output,span.text(),span.style().withParent(style),remaining);
             else if(node instanceof Animated value)evaluate(animations.get(value.name()).get(frames.get(value.name())).nodes(),style,values,frames,output,remaining);
             else if(node instanceof Group group){
                 if(group.from()==null)evaluate(group.children(),modify(style,group.name()),values,frames,output,remaining);

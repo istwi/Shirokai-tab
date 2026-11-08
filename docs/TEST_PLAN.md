@@ -144,3 +144,16 @@ limpa cache. Fixture altera somente mundo/contas/perfis descartáveis, sem login
 como autenticado. Runner tools/integration_smoke.py mantém online-mode e para o servidor.
 Relatório build/integration-smoke/result.json inclui SHA256 dos mods efetivamente usados.
 Resultados finais e limitações atuais em PROJECT_STATUS.md.
+
+
+## Suítes0.10
+
+PresentationPlanTest: arquivo preservado, tipos/schema, regras/condições/fallback,
+candidatos inválidos, proibição de corpo/animações/tags duplicadas e rich slots com
+cores/Unicode/remoção de ações/imutabilidade. Hover com registries roda em Fabric.
+PresentationSmoke: cabeçalho com duas identificações formatadas, corpo/signature field/
+unsignedContent/máscara preservados, menções filtradas/fora da rota/mute, corpo privado
+literal sem clique herdado, perda/retorno de permissão sem apagar título/regra, estilo
+base compartilhado em TAB/sidebar e preview real dos menus de perfil/clã.
+Runner também rejeita presentation inválida dentro de um reload atômico completo.
+Não equivale a cliente autenticado, assinatura criptográfica válida ou aparência real.

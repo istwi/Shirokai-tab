@@ -1,3 +1,14 @@
+# 0.10.0-dev — apresentação segura
+
+Cabeçalhos de chat, menus de perfil/clã e títulos recebem templates condicionais
+com cores/HEX/gradientes. Mesmo título formatado em TAB/sidebar; composição de Text
+sem reanalisar valores, sem ações importadas e sem mutar cache. Corpo/assinatura/
+máscara do chat normal preservados; menções notificam separadamente e respeitam
+filtragem/roteamento. Comandos system podem destacar menções literais.
+Configuração presentation.json entra no reload atômico; perda de permissão visual
+usa fallback sem apagar seleção/regra. Escolhas pessoais/editor continuam pendentes.
+Sem nova dependência, protocolo, mixin ou migração SQLite. Evidências em PROJECT_STATUS.md.
+
 # 0.9.0-dev — integrações opcionais reais
 
 Cobblemon1.8.3: registro/Pokédex oficial e eventos; Impactor5.3.5: moedas distintas e

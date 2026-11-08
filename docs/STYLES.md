@@ -1,4 +1,4 @@
-# Motor de estilos — 0.7.0-dev
+# Motor de estilos — 0.10.0-dev
 
 StyleEngine compila templates administrativos em árvore imutável. Valores de placeholders
 são inseridos depois, como texto literal: tags contidas em nomes, prefixos, siglas ou
@@ -61,11 +61,12 @@ precisem alterar devem copiar antes. TAB monta novos roots sem modificar spans d
 
 ## Integração atual
 
-O TAB e a scoreboard já usam o motor. Chat continua com corpo/cabeçalho literal por segurança e
-compatibilidade de assinatura nesta etapa; migração de estilos de cabeçalho de chat,
-menus e personalização individual de títulos/clãs continua pendente.
-Dados dinâmicos não ganham estilo por conter tags. Para colorir prefixo, configure
-<gold>%luckperms:prefix%</gold> no template, não dependa de interpretar markup no valor.
+TAB/sidebar e a camada de apresentação de chat/perfil/clãs usam o motor.
+Templates de presentation.json e chat.json são compilados junto do candidato de reload.
+Corpo normal assinado permanece inalterado; comandos system podem destacar menções
+sem interpretar markup. Ver PRESENTATION.md para condições, limites e compatibilidade.
+Dados dinâmicos não ganham estilo por conter tags; os templates envolvem valores literais.
+Escolhas pessoais de estilo e editor de clã continuam pendentes.
 
 styles.json, tab.json e scoreboard.json entram no mesmo reload atômico dos demais módulos. Animação
 desconhecida, tag inválida ou template estático grande impede publicar o candidato.
@@ -75,3 +76,9 @@ Dados dinâmicos que excedem limites preservam o último frame válido e geram d
 A partir0.9, variáveis podem incluir argumentos PAPI limitados, como
 `%player:objective gyms%` e `%shirokaidex:percent national%`. A ponte importa
 somente a String do resultado: eventos/estilos/markup dos dados não são reanalisados.
+
+
+renderRich compõe slots de Text sem reanalisar markup, mantendo cores/formatos e
+removendo click/hover/insertion. Não altera Text da origem/cache. Usado para inserir
+identificações já formatadas em cabeçalhos/HUDs. Rich slots não compartilham cache de
+strings: evitam colisões entre valores iguais com estilos diferentes.

@@ -149,15 +149,16 @@ public final class ScoreboardRuntime implements AutoCloseable {
         Predicate<String> allowed = node -> permissions.allowed(p.getUuid(), node);
         var layout = plan.layout(meta, world, allowed); var values = new HashMap<String, String>();
         Function<String, String> resolver = key -> values.computeIfAbsent(key, k -> resolve(k, p, meta, count));
+        Function<String,Text> richResolver = key -> key.equals("shirokai:selected_title") && titles != null ? titles.visualPresentation(p.getUuid()) : Text.literal(resolver.apply(key));
         boolean animate = animations == null ? view.animations : animations.apply(p.getUuid());
-        Text title = plan.styles().render(layout.title(), resolver, tick, animate);
+        Text title = plan.styles().renderRich(layout.title(), richResolver, tick, animate);
         if (title.getString().codePointCount(0, title.getString().length()) > 128) throw new IllegalArgumentException("Título de scoreboard excede 128 caracteres");
         // Validate the entire frame before sending its first packet; dynamic failures preserve the old view.
         var desired = new LinkedHashMap<String, Row>(); int visible = 0;
         for (int i = 0; i < layout.lines().size(); i++) {
             var line = layout.lines().get(i);
             if (!TabPlan.matches(line.definition().condition(), meta, world, allowed)) continue;
-            Text text = plan.styles().render(line.text(), resolver, tick, animate);
+            Text text = plan.styles().renderRich(line.text(), richResolver, tick, animate);
             if (text.getString().codePointCount(0, text.getString().length()) > 256) throw new IllegalArgumentException("Linha de scoreboard excede 256 caracteres");
             desired.put(Integer.toString(i), new Row(15 - visible++, text));
         }

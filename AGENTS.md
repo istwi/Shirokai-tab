@@ -52,3 +52,9 @@ PAPI exporta só shirokai, preserva handlers externos e trata resultados como te
 Pokédex é consulta oficial; dados Dex vêm de seus handlers, sem misturar coleções/providers.
 Teste com JARs fixados: prepare_integration_mods.py e integration_smoke.py --accept-eula.
 Não confundir o jogador sintético registrado na fixture com login/autenticação real.
+
+Apresentação: docs/PRESENTATION.md. Dado dinâmico nunca vira template. Rich slots
+removem ações e não alteram Text do cache. Cabeçalho usa no máximo duas tags selecionadas.
+Corpo assinado/máscara permanecem intactos; notificação de menção só após roteamento
+e nunca para destinatário sujeito a filtragem. Estilos configurados não são escolhas
+pessoais persistidas: não declarar editor/personalização por jogador/clã concluídos.

@@ -2,43 +2,42 @@
 
 ## Estado atual
 
-0.9.0-dev adiciona adapters opcionais reais de Cobblemon1.8.3, Impactor5.3.5,
-Text Placeholder API2.4.2 e Shirokai Dex via seus handlers públicos; LuckPerms
-Fabric5.4.140 foi exercitado. Ginásios usam scores vanilla existentes. Configuração,
-contratos e limites em INTEGRATIONS.md. TAB/sidebar recebem essas métricas pelo
-serviço nativo. Schema SQLite permanece5 e as funcionalidades anteriores continuam.
+0.10.0-dev adiciona apresentação configurável de chat/perfil/clãs/títulos, compondo
+cores/HEX/gradientes com valores literais, condições e fallback dinâmico. TAB/sidebar
+usam o mesmo título formatado. Chat normal preserva corpo/assinatura/máscara e
+menções notificam separadamente; comandos system podem colorir menções.
+Regras/configuração em PRESENTATION.md. Integrações0.9 e módulos anteriores preservados.
+Schema SQLite permanece5; não foram criadas escolhas pessoais de estilo.
 
-## Próxima implementação
+## Próxima entrega
 
-1. Integrar StyleEngine com segurança a cabeçalhos de chat/menus/títulos/clãs, incluindo
-   permissões, menções e preservação da personalização após expiração de VIP. Nunca
-   interpretar o corpo escrito pelo jogador nem quebrar assinatura/filtro do chat.
-2. Completar ferramentas administrativas/editor textual de clãs, convites enviados,
-   estilos independentes para nome/sigla e demais requisitos completos.
-3. Avaliar recursos adicionais de TAB: listed/vanish por viewer, nametags, objetivos
-   abaixo do nome e bossbar, sem substituir controle de outros mods.
-4. Validar com cliente real TAB/sidebar/GUI/gradientes, contexto LuckPerms, autenticação,
-   reconexão, mudanças de mundo, espectador, carga/multiclientes e mods de terceiros.
-5. Acompanhar novas versões do Shirokai Dex: o Core só usa o contrato público PAPI.
-   Certificar novas versões externas antes de ampliar a lista suportada. Dados mais
-   amplos de treinador, economias alternativas e integrações futuras exigem APIs reais.
+1. Personalização persistida por jogador/clã: presets permitidos, escolha por ID,
+   estilos independentes de nome/sigla do clã e preservação da escolha após expiração
+   da permissão. Exige autorização fresca, escopo/CAS, transações e testes de migração/
+   restart; não aceitar markup do jogador como configuração executável.
+2. Ferramentas administrativas/editor textual de clãs, convites enviados e demais
+   requisitos completos. Preservar escopo da tela, confirmações e cooldowns independentes.
+3. Recursos adicionais de TAB: listed/vanish por viewer, nametags, objetivos abaixo
+   do nome e bossbar, sem substituir controle de outros mods.
+4. Cliente real: aparência de menus/TAB/sidebar/gradientes/actionbar, autenticação,
+   contextos LuckPerms com conexão real, mudanças de mundo, espectador, carga e conflitos.
+5. Novas versões do Shirokai Dex e APIs externas: confirmar contrato público antes
+   de ampliar a lista de versões suportadas. Fonte da Pokédex deve continuar explícita.
 
 ## Limitações preservadas
 
-Os adapters estão implementados para as versões auditadas e exercitados com seus JARs,
-mas login/renderização/carga e contextos de jogadores autenticados não foram validados.
-O authlib no ambiente pode falhar ao buscar chaves Yggdrasil por DNS; não desabilitar
-online-mode para contornar isso. Testes usam jogadores/conexões sintéticos em mundo isolado.
+A apresentação atual é política administrativa. Não declarar escolha pessoal/editor
+concluídos nem confundir regras que permanecem no JSON com preferência de jogador no DB.
+Não há animação de menus/histórico de chat nem reescrita visual de corpo assinado.
+Campos de packets testados não comprovam assinatura criptográfica válida ou renderização.
 
-Fonte da Pokédex é explícita. Não misturar métricas de coleções/providers diferentes;
-sem handler/conta/moeda/objetivo, preservar fallback. Economia não tem fallback primário,
-transação distribuída ou leitura de arquivos internos. Impactor account é fetch-or-create;
-checagem de presença não é atômica contra exclusão concorrente de outro mod.
+Adapters externos foram exercitados com JARs reais em0.9, mas login/renderização/carga
+continuam pendentes. Authlib pode falhar por DNS; não desabilitar online-mode para mascarar.
+Economia não tem fallback primário nem transação distribuída; hasAccount/account não são
+atômicos contra exclusão concorrente externa. Não acessar arquivos internos dos providers.
 
-Sidebar cede a SIDEBAR/TEAM_* externo; colisão do objetivo exato suspende nessa conexão
-até reconectar. Mods que contornam ServerCommonNetworkHandler.send podem escapar do
-observador: escolha um dono. Teams TAB são opt-in e podem afetar mecânicas de equipe;
-nunca adotar/remover team externo. Preservar mixins/refmap e versão exata de Minecraft.
+Sidebar cede a SIDEBAR/TEAM_* externo; colisão exata suspende nessa conexão. Teams do TAB
+são opt-in. Preservar mixins/refmap e versão de Minecraft; nunca remover dados externos.
 
-Salvar progresso está autorizado em istwi/Shirokai-tab/main, sem reescrever histórico.
-Não publicar ambiente nem release automaticamente. Não reaplicar setup já publicado.
+Salvar progresso autorizado em istwi/Shirokai-tab/main, sem reescrever histórico.
+Não publicar ambiente ou release automaticamente. Não reaplicar setup publicado.

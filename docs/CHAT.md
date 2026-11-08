@@ -1,4 +1,4 @@
-# Chat e moderação — 0.6.0-dev
+# Chat e moderação — 0.10.0-dev
 
 ## Canais e comandos
 
@@ -43,12 +43,12 @@ GLOBAL, LOCAL, CLAN, STAFF e PRIVATE quando personalizados.
 Variáveis permitidas nos formatos de nome: {channel}, {tags}, {name}, {target}.
 Substituição é literal e não recursiva. {tags} contém no máximo as duas identificações
 escolhidas, validadas pelo serviço de títulos; não adiciona cargo automaticamente.
-Não há parser MiniMessage/HEX/gradientes nesta etapa. Mensagem do jogador é sempre
+Com styles ativo, templates administrativos aceitam cores/HEX/gradientes via StyleEngine (PRESENTATION.md). Mensagem do jogador é sempre
 literal, sem eventos clicáveis ou interpretação de tags, JSON ou comandos.
 
 O cabeçalho do remetente tem hover com nome e clique SUGGEST_COMMAND para /chat msg;
 nunca RUN_COMMAND. O corpo não herda esse clique. Não há animação de histórico.
-Menções e estilos avançados por grupo/permissão ainda aguardam o motor de estilos.
+Regras por grupo/permissão/dimensão e menções seguras são fornecidas por presentation.json (PRESENTATION.md).
 
 ## Assinaturas e entrega
 
@@ -58,7 +58,7 @@ assinatura e máscara de filtro, via SentMessage e MessageType.CHAT por destinat
 Só o nome de apresentação é decorado pelo servidor. A decoração externa usa o formato
 CHAT vanilla do cliente (por exemplo <nome> mensagem), não um template de corpo arbitrário.
 
-Mensagens de comandos do Core são GameMessage/system, com cabeçalho e corpo literal;
+Mensagens de comandos do Core são GameMessage/system, com cabeçalho estilizado e corpo de caracteres literais (menções podem ganhar cor);
 não são apresentadas como mensagens assinadas/reportáveis de jogador. /say e /me
 executados por jogadores passam pelo mesmo roteamento/moderação por ALLOW_COMMAND_MESSAGE;
 podem ter aparência de chat normal, não a ação vanilla. Console mantém anúncios vanilla.
@@ -133,3 +133,13 @@ spam, texto literal, regressão de default reload e migração/auditoria. ChatSm
 Fabric real usa jogadores sintéticos e captura ChatMessage/GameMessage packets.
 Teste de aliases roda antes e após END_DATA_PACK_RELOAD com a nova árvore pronta.
 Validação com cliente conectado, assinaturas criptográficas e LuckPerms real ainda pendentes.
+
+
+## Apresentação0.10
+
+Cabeçalhos usam slots de identificação formatados sem duplicar os dois slots selecionados.
+Sem animação de histórico e sem acrescentar metadados de cargo fora dessas escolhas.
+Chat assinado mantém seu corpo/unsignedContent/máscara; menção usa overlay separado,
+somente após entrega autorizada e sem notificar destinatário que usa filtragem.
+Mensagens system destacam @Nome conhecido sem interpretar tags nem mudar caracteres.
+Detalhes, permissões de menção, formatos e testes atuais em PRESENTATION.md.

@@ -11,11 +11,11 @@
 | Administração | Status/version/modules/permissions/reload/debug/backup/placeholders | Gestão de clãs/títulos pendente |
 | Títulos e duas identificações | Implementados e testados | ROLE/SPECIAL; integração com renderizadores e clãs pendente |
 | Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Estilos, editor textual GUI e administração avançada pendentes |
-| Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real, estilos por grupo e menções avançadas pendentes |
+| Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real, assinaturas/login reais e personalização individual pendentes |
 | TAB | Header/footer, nomes, título e teams opt-in implementados/testados | Cliente real, listed/vanish, nametags, bossbar e objetivos abaixo do nome pendentes |
 | Scoreboard visual | Sidebar privado por viewer, layouts/linhas condicionais, diffs e visibilidade persistida | Cliente real e compatibilidade universal não validados; cede a sidebar externo |
 | /perfil e menus de clãs | Handlers testados com jogadores sintéticos | Aparência/pacotes de cliente real não testados |
-| Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/scoreboard | Integração a chat/menus/títulos/clãs e transições pendentes |
+| Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/sidebar e apresentação de chat/menus/títulos/clãs | Escolhas pessoais/editor de clã, animação de menus e transições pendentes |
 | Cobblemon/Impactor/Dex/PAPI | Adaptadores opcionais implementados: Pokédex oficial, moedas separadas e Dex via PAPI | Versões/semântica em INTEGRATIONS.md; cliente real e versões futuras não certificados |
 | CI | Workflow de build criado | Execução no GitHub não realizada |
 | Release estável | Não disponível | Critérios completos não cumpridos |
