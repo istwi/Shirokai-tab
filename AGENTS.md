@@ -45,3 +45,10 @@ Scoreboard: docs/SCOREBOARD.md. Objetivos privados por conexão, sem salvar no m
 Ceder a SIDEBAR/TEAM_* externo; colisão do nome exato revoga ownership até reconectar.
 Observer de send não cancela/reinterpreta pacotes. Limpar somente recursos próprios,
 preservar /scoreboard vanilla e aliases externos. Visibilidade e animação são independentes.
+
+Integrações: docs/INTEGRATIONS.md. O runtime começa em SERVER_STARTED para respeitar LP.
+Adapters opcionais são isolados; nunca usar moeda primária como fallback de dollars/tokens.
+PAPI exporta só shirokai, preserva handlers externos e trata resultados como texto literal.
+Pokédex é consulta oficial; dados Dex vêm de seus handlers, sem misturar coleções/providers.
+Teste com JARs fixados: prepare_integration_mods.py e integration_smoke.py --accept-eula.
+Não confundir o jogador sintético registrado na fixture com login/autenticação real.

@@ -51,13 +51,14 @@ public final class AdminCommands {
                 return feedback(source, core.placeholders().render(StringArgumentType.getString(c, "template"), context, core.config().unavailablePlaceholder()));
             })));
         root.then(literal("tab").requires(s->allowed(s,"tab.inspect")).executes(c->feedback(c.getSource(),runtime.get().tab().status())));
+        root.then(literal("integrations").requires(s->allowed(s,"integrations.inspect")).executes(c->feedback(c.getSource(),runtime.get().integrations().status())));
         root.then(literal("scoreboard").requires(s->allowed(s,"scoreboard.inspect")).executes(c->feedback(c.getSource(),runtime.get().scoreboard().status())));
         root.then(new ChatAdminCommands(runtime,this::allowed).node());
         root.then(new TitleAdminCommands(runtime, this::allowed).node());
         dispatcher.register(root);
     }
     private boolean canSeeAny(ServerCommandSource source) {
-        for (String node : new String[]{"status", "version", "modules", "permissions", "reload", "debug", "backup", "placeholders", "titles.inspect", "titles.grant", "titles.revoke", "chat.mute", "chat.unmute", "chat.inspect", "tab.inspect", "scoreboard.inspect"})
+        for (String node : new String[]{"status", "version", "modules", "permissions", "reload", "debug", "backup", "placeholders", "titles.inspect", "titles.grant", "titles.revoke", "chat.mute", "chat.unmute", "chat.inspect", "tab.inspect", "scoreboard.inspect", "integrations.inspect"})
             if (allowed(source, node)) return true;
         return false;
     }
@@ -71,6 +72,7 @@ public final class AdminCommands {
         if(action.startsWith("chat.")&&!core.running("chat"))return false;
         if(action.startsWith("tab.")&&!core.running("tab"))return false;
         if(action.startsWith("scoreboard.")&&!core.running("scoreboard"))return false;
+        if(action.startsWith("integrations.")&&!core.running("integrations"))return false;
         if (console) return true;
         if (core.permissions().provider().startsWith("vanilla-op4")) return source.hasPermissionLevel(4);
         return core.permissions().allowed(source.getPlayer().getUuid(), "shirokaicore.command." + action);

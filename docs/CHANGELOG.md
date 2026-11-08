@@ -1,3 +1,13 @@
+# 0.9.0-dev — integrações opcionais reais
+
+Cobblemon1.8.3: registro/Pokédex oficial e eventos; Impactor5.3.5: moedas distintas e
+contas existentes assíncronas; PAPI2.4.2: importação com argumentos e exportação literal;
+Shirokai Dex: delegação aos seus handlers públicos; ginásios: objetivo vanilla existente.
+LuckPerms Fabric5.4.140 exercitado; runtime passa a SERVER_STARTED para respeitar enable.
+Configuração integrations.json/reload atômico, snapshots e diagnóstico adicionados.
+Sem novas migrações SQLite ou mods opcionais embutidos. Manifesto de JARs verificáveis
+e teste em servidor real adicionados; cliente autenticado/visual/carga continuam pendentes.
+
 # 0.8.0-dev — scoreboard visual
 
 Sidebar privado por viewer com layouts/condições, linhas ordenadas e repetidas,

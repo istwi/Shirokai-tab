@@ -34,6 +34,7 @@ public final class ProfileSmoke implements ModInitializer {
         new ChatSmoke().onInitialize();
         new TabSmoke().onInitialize();
         new ScoreboardSmoke().onInitialize();
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("cobblemon") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("impactor") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("shirokaidex") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("luckperms")) new IntegrationSmoke(this::until).onInitialize();
         new TeamOwnershipSmoke().onInitialize();
         new ClanMenuSmoke(this::until).onInitialize();
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -72,6 +73,7 @@ public final class ProfileSmoke implements ModInitializer {
             @Override public void send(Packet<?> packet) { capture.accept(packet); }
             @Override public void send(Packet<?> packet, PacketCallbacks callbacks) { capture.accept(packet); }
             @Override public void send(Packet<?> packet, PacketCallbacks callbacks, boolean flush) { capture.accept(packet); }
+            @Override public void flush() { }
             @Override public boolean isOpen() { return true; }
             @Override public SocketAddress getAddress() { return new InetSocketAddress("127.0.0.1", 0); }
         };

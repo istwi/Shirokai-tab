@@ -25,28 +25,36 @@ atualize este documento. Não reaplique etapas já concluídas.
 
 ## Ponto de partida atualizado
 
-Versão0.8.0-dev adiciona a fase7: scoreboard/sidebar real privado por viewer, layouts
-e condições, linhas incrementais, título único compartilhado com TAB, animações e
-visibilidade persistida independente. Leia SCOREBOARD.md e PROJECT_STATUS.md para
-semântica, limites, testes e SHA atuais. Schema permanece5. Não reaplique a fase7.
+Versão0.9.0-dev preserva TAB/scoreboard e adiciona integrações opcionais reais de
+Cobblemon1.8.3, Impactor5.3.5, Text Placeholder API2.4.2, Shirokai Dex via PAPI e
+leitura de ginásios vanilla. LuckPerms Fabric5.4.140 foi exercitado com grants/revokes
+e prefixos reais. Configuração/limitações em INTEGRATIONS.md; evidências e SHA em
+PROJECT_STATUS.md. Não reaplique essas etapas nem a configuração de ambiente publicada.
 
-Módulos anteriores0.7 preservados: infraestrutura, perfil/títulos, clãs/menus, chat,
-motor de estilos e TAB. O projeto completo continua pendente. Validação0.8 executada:76JUnit sem falhas/erros/ignorados e39checks em3boots reais.
-Resultados atuais em PROJECT_STATUS.md; históricos73JUnit/37checks da0.7 não substituem execução atual.
-Smokes usam jogadores/conexões sintéticas: cliente real/autenticação/carga não validados.
+Validação0.9:80JUnit sem falhas/erros/ignorados,40checks de regressão e12checks com os mods reais.
+Schema permanece5. Módulos anteriores0.8 preservados. O projeto completo continua
+pendente. Testes usam jogadores/conexões sintéticos: cliente real/autenticação/carga
+e contextos de jogadores autenticados não validados.
 
 ## Próxima entrega
 
-Siga NEXT_STEPS.md: auditar artefatos/versões e implementar adapters opcionais reais
-para Cobblemon1.8.3, Impactor, Shirokai Dex e Fabric Placeholder API, além de validar
-a distribuição LuckPerms Fabric. Não simule dados nem chame placeholders nativos de PAPI.
-Depois integrar estilos a chat/menus/títulos/clãs e completar ferramentas de clãs/TAB.
+Siga NEXT_STEPS.md: integrar estilos a cabeçalhos de chat/menus/títulos/clãs com
+permissões e preservação de assinaturas/filtros/corpo literal; depois ferramentas
+administrativas/editor de clãs e recursos adicionais de TAB. Não chamar essas
+pendências de concluídas por existir StyleEngine.
 
-Preserve os objetivos privados da scoreboard fora do scoreboard salvo do mundo.
-O observer de send é somente leitura: não cancela/reescreve pacotes externos.
-Ceder a SIDEBAR/TEAM_* externo; colisão do nome exato revoga ownership até reconectar.
-Limpar somente recursos próprios, preservar /scoreboard vanilla e aliases externos.
-modules.scoreboard usa defaults em memória para arquivos antigos.
+Preserve as integrações: classes opcionais isoladas, fonte/coleção da Pokédex explícita,
+moedas impactor:dollars e impactor:tokens independentes, sem fallback primário.
+Não escrever Pokédex nem ler banco/arquivos privados dos mods. PAPI exporta somente
+shirokai, preserva handlers externos e mantém valores literais/sem recursão.
+Core inicia em SERVER_STARTED após enable do LP. Testes reais adicionais:
+python3 tools/prepare_integration_mods.py e python3 tools/integration_smoke.py --accept-eula.
+O manifesto fixa URLs/hashes; não alterar JARs, checksums ou TLS para fazer testes passarem.
+
+Objetivos da scoreboard continuam privados, fora do board salvo do mundo. Observer de
+send é somente leitura: não cancela/reescreve pacotes externos. Ceder a SIDEBAR/TEAM_*
+externo; colisão exata revoga ownership até reconectar. Limpar só recursos próprios e
+preservar /scoreboard vanilla/aliases de outros mods.
 
 ## Regras que devem permanecer verdadeiras
 
@@ -101,7 +109,7 @@ O source set smoke é habilitado por -PprofileSmoke e não pode entrar no JAR fi
 Testes que dependem das transformações Fabric devem rodar no smoke apropriado,
 sem desabilitar cenários para fazer a suíte passar.
 
-Artefato atual: build/libs/shirokai-core-0.8.0-dev.jar. Relatórios ficam em
+Artefato atual: build/libs/shirokai-core-0.9.0-dev.jar. Relatórios ficam em
 build/reports/tests/test/index.html e build/server-smoke/result.json.
 CI de build/upload de JAR está configurado em .github/workflows/build.yml;
 não afirme que a execução remota passou sem verificá-la.

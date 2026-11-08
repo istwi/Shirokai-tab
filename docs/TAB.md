@@ -55,7 +55,7 @@ quando casa; sem regra, usa peso do grupo primário LuckPerms. Mesma prioridade 
 - shirokai:clan e clan_tag: snapshot de associação real, com fallback quando ausente.
 - shirokai:group: grupo real ou fallback; luckperms:prefix e suffix: metadados atuais ou vazio.
 - Demais chaves válidas %namespace:chave% são encaminhadas ao serviço nativo de placeholders.
-  Sem provider real, usam unavailablePlaceholder de core.json; não inventa saldo/pokédex/ginásios.
+  Com integrations ativo, moedas/Pokédex/ginásios/PAPI têm providers reais opcionais (INTEGRATIONS.md); ausência usa unavailablePlaceholder.
 
 Valores são literais. Prefixo LuckPerms com markup/legacy não é interpretado; aplique
 estilo fora do placeholder. O serviço revalida título antes de renderizar, mantendo

@@ -69,9 +69,10 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
     server = Server(runtime, 'first-boot', profile=True)
     try:
         server.wait('Done (')
+        server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.8.0-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.9.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -171,6 +172,19 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         scoreboard_file.write_text(original_scoreboard)
         config_file.write_text(customized)
         checks.append('invalid scoreboard candidate rejects complete reload atomically')
+        integrations_file = runtime / 'config/shirokai-core/integrations.json'
+        original_integrations = integrations_file.read_text()
+        integrations = json.loads(original_integrations)
+        integrations['tokensCurrency'] = integrations['dollarsCurrency']
+        integrations_file.write_text(json.dumps(integrations))
+        server.command('shirokaicore reload', 'Configuração de integrações inválida')
+        server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
+        integrations = json.loads(original_integrations)
+        integrations['impactor'] = False
+        integrations_file.write_text(json.dumps(integrations))
+        server.command('shirokaicore reload', 'Ativação de integrações exige reinício')
+        integrations_file.write_text(original_integrations)
+        checks.append('invalid integration mappings and enablement changes preserve complete reload')
         chat_file = runtime / 'config/shirokai-core/chat.json'
         original_chat = chat_file.read_text()
         chat_file.write_text('{broken')
@@ -205,6 +219,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
     server = Server(runtime, 'restart')
     try:
         server.wait('Done (')
+        server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -221,6 +236,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
     server = Server(runtime, 'storage-failure')
     try:
         server.wait('Done (')
+        server.wait('SQLite indisponível; demais módulos independentes continuam')
         server.command('shirokaicore status', 'SQLite=FAILED')
         server.command('shirokaicore placeholders %shirokai:online%', ') 0')
         server.command('shirokaicore debug', 'Banco mais recente que o mod: schema 42')

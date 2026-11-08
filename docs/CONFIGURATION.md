@@ -1,4 +1,4 @@
-# Configuração 0.8.0-dev
+# Configuração 0.9.0-dev
 
 Arquivo real: `config/shirokai-core/core.json`, relativo ao diretório do servidor.
 Criado somente se ausente. Arquivos existentes, inclusive inválidos, não são sobrescritos.
@@ -17,7 +17,8 @@ Criado somente se ausente. Arquivos existentes, inclusive inválidos, não são 
     "chat": true,
     "styles": true,
     "tab": true,
-    "scoreboard": true
+    "scoreboard": true,
+    "integrations": true
   },
   "databaseFile": "shirokai.db",
   "unavailablePlaceholder": "N/D"
@@ -58,8 +59,7 @@ STARTING/READY/FAILED. Uma falha de banco não interrompe módulos independentes
 - `/shirokaicore placeholders [template]`: lista ou resolve placeholders nativos.
 
 Ações administrativas bem-sucedidas reload/backup são auditadas no SQLite quando
-storage está ativo. Falhas de auditoria são registradas no log. Não há integração
-Fabric Placeholder API ainda. Placeholders implementados: `%shirokai:online%`,
+storage está ativo. Falhas de auditoria são registradas no log. A ponte opcional Text Placeholder API2.4.2 está documentada em INTEGRATIONS.md. Placeholders implementados: `%shirokai:online%`,
 `%shirokai:player%`, `%shirokai:uuid%`. Tokens indisponíveis usam fallback; substituição
 é literal e não recursiva, sem interpretar markup, click events ou comandos.
 
@@ -95,3 +95,10 @@ são compilados antes de publicar qualquer snapshot. modules.scoreboard exige re
 demais opções de scoreboard aceitam reload. Schema SQLite continua5: a visibilidade
 usa scoreboard_enabled existente, independente de animations_enabled. Sem leitura
 da preferência, sidebar fica oculto. Ownership por conexão e comandos em SCOREBOARD.md.
+
+
+integrações0.9: integrations.json participa do mesmo candidato atômico. Flags de
+ativação exigem reinício; moedas/objetivo/coleção/provider/intervalo aceitam reload,
+descartando caches e respostas antigas. Defaults/campos e semântica em INTEGRATIONS.md.
+O runtime agora inicia em SERVER_STARTED para respeitar o enable do LuckPerms Fabric;
+SQLite continua assíncrono e seu status separado precisa atingir READY.

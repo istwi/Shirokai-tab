@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "package": "com.shirokai.smoke.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "shirokai-smoke-refmap.json",
+  "server": ["SmokePlayers"],
+  "injectors": {"defaultRequire": 1}
+}

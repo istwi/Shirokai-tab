@@ -6,8 +6,8 @@
 | Lifecycle modular | Implementado e testado | Dependências em ordem de registro |
 | core.json | Defaults, validação e reload testados | Outros JSONs ainda pendentes |
 | SQLite | Schema5, upgrade com backup, perfis/concessões/clãs, CAS e auditoria | Schema3 clãs presente; restauração automática pendente |
-| Permissões | Adaptador LuckPerms API5.4 e fallback admin | Runtime LuckPerms Fabric não testado |
-| Placeholders | Online/nome/UUID/título/tags, fallback literal | Adaptador PAPI e demais dados pendentes |
+| Permissões | Adaptador API5.4 e runtime Fabric5.4.140: grant/revoke/prefixo reais | Contextos com cliente autenticado e outras versões pendentes |
+| Placeholders | Nativos e ponte PAPI2.4.2 real, argumentos e exportação literal | Depende de handlers instalados; conflitos preservados |
 | Administração | Status/version/modules/permissions/reload/debug/backup/placeholders | Gestão de clãs/títulos pendente |
 | Títulos e duas identificações | Implementados e testados | ROLE/SPECIAL; integração com renderizadores e clãs pendente |
 | Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Estilos, editor textual GUI e administração avançada pendentes |
@@ -16,7 +16,7 @@
 | Scoreboard visual | Sidebar privado por viewer, layouts/linhas condicionais, diffs e visibilidade persistida | Cliente real e compatibilidade universal não validados; cede a sidebar externo |
 | /perfil e menus de clãs | Handlers testados com jogadores sintéticos | Aparência/pacotes de cliente real não testados |
 | Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/scoreboard | Integração a chat/menus/títulos/clãs e transições pendentes |
-| Cobblemon/Impactor/Dex/PAPI | Pendente | Auditoria de versões e APIs |
+| Cobblemon/Impactor/Dex/PAPI | Adaptadores opcionais implementados: Pokédex oficial, moedas separadas e Dex via PAPI | Versões/semântica em INTEGRATIONS.md; cliente real e versões futuras não certificados |
 | CI | Workflow de build criado | Execução no GitHub não realizada |
 | Release estável | Não disponível | Critérios completos não cumpridos |
 

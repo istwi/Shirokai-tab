@@ -28,7 +28,8 @@ public final class ShirokaiCore implements ModInitializer {
             new com.shirokai.core.tab.TabCommands(()->runtime).register(dispatcher);
             new com.shirokai.core.scoreboard.ScoreboardCommands(()->runtime).register(dispatcher);
         });
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+        // Optional providers (notably LuckPerms Fabric) finish enabling during SERVER_STARTING.
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             try { runtime = new CoreRuntime(server, LOGGER); }
             catch (Exception | LinkageError failure) { LOGGER.error("[core] Inicialização falhou; nenhum arquivo personalizado foi substituído", failure); }
         });

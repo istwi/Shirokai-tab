@@ -4,6 +4,16 @@
   "version": "1.0.0",
   "name": "Shirokai isolated profile tests",
   "environment": "server",
-  "entrypoints": {"main": ["com.shirokai.smoke.ProfileSmoke"]},
-  "depends": {"shirokai-core": "*", "fabric-api": "*"}
+  "entrypoints": {
+    "main": [
+      "com.shirokai.smoke.ProfileSmoke"
+    ]
+  },
+  "depends": {
+    "shirokai-core": "*",
+    "fabric-api": "*"
+  },
+  "mixins": [
+    "shirokai-smoke.mixins.json"
+  ]
 }

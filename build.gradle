@@ -1,11 +1,22 @@
 plugins {
     id 'fabric-loom' version '1.10.5'
     id 'maven-publish'
+    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
 }
-version = '0.8.0-dev'
+version = '0.9.0-dev'
 group = 'com.shirokai'
 base { archivesName = 'shirokai-core' }
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    maven { url = 'https://artefacts.cobblemon.com/releases/'; content { includeGroup 'com.cobblemon' } }
+    maven { url = 'https://maven.impactdev.net/repository/development/'; content { includeGroup 'net.impactdev.impactor.api'; includeGroup 'net.impactdev' } }
+    ivy {
+        url = 'https://github.com/Patbox/TextPlaceholderAPI/releases/download'
+        patternLayout { artifact '[revision]/[artifact]-[revision].[ext]' }
+        metadataSources { artifact() }
+        content { includeModule('eu.pb4', 'placeholder-api') }
+    }
+}
 dependencies {
     minecraft 'com.mojang:minecraft:1.21.1'
     mappings 'net.fabricmc:yarn:1.21.1+build.3:v2'
@@ -15,6 +26,19 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
     include 'org.xerial:sqlite-jdbc:3.49.1.0'
     compileOnly 'net.luckperms:api:5.4'
+    modCompileOnly('eu.pb4:placeholder-api:2.4.2+1.21') { transitive = false }
+    modCompileOnly('com.cobblemon:fabric:1.8.3+1.21.1') { transitive = false }
+    compileOnly('net.impactdev.impactor.api:economy:5.3.5') { exclude group: 'net.kyori', module: 'event-api' }
+    if (project.hasProperty('integrationSmoke')) {
+        modLocalRuntime 'net.fabricmc:fabric-loader:0.17.2'
+        modLocalRuntime fileTree(dir: 'build/integration-mods', include: '*.jar')
+        def dependencyManifest = file('build/integration-dependencies.json')
+        if (!dependencyManifest.exists()) throw new GradleException('Run python3 tools/prepare_integration_mods.py before integrationSmoke')
+        def nestedDependencies = new groovy.json.JsonSlurper().parse(dependencyManifest)
+        modLocalRuntime files(nestedDependencies.findAll { it.selected && it.mod_id }.collect { file("build/${it.directory}/${it.file}") })
+        runtimeOnly files(nestedDependencies.findAll { it.selected && !it.mod_id }.collect { file("build/${it.directory}/${it.file}") })
+        minecraftServerLibraries 'com.ibm.icu:icu4j:71.1'
+    }
     testImplementation 'net.luckperms:api:5.4'
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -38,7 +62,7 @@ tasks.named('runServer') {
     }
 }
 loom {
-    mixin { defaultRefmapName = "shirokai-core-refmap.json" }
+    mixin { add sourceSets.main, "shirokai-core-refmap.json"; add sourceSets.smoke, "shirokai-smoke-refmap.json" }
     mods {
         'shirokai-core' { sourceSet sourceSets.main }
         if (project.hasProperty('profileSmoke')) {
@@ -47,5 +71,15 @@ loom {
     }
     runs {
         server { runDir project.findProperty('shirokaiRunDir') ?: 'run' }
+    }
+}
+
+// Optional providers download runtime libraries; keep Cloud proxy and CA verification in the JavaExec child.
+if (project.hasProperty('integrationSmoke')) {
+    tasks.withType(JavaExec).configureEach {
+        ['http.proxyHost', 'http.proxyPort', 'https.proxyHost', 'https.proxyPort', 'http.nonProxyHosts', 'javax.net.ssl.trustStore'].each { key ->
+            def value = System.getProperty(key)
+            if (value != null) systemProperty(key, value)
+        }
     }
 }

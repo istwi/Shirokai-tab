@@ -53,7 +53,7 @@ public final class StyleEngine {
                 }
                 if(c=='%'){
                     int close=source.indexOf('%',position+1);
-                    if(close>position){String key=source.substring(position+1,close);if(key.matches("[a-z0-9_]+:[a-z0-9_]+")){
+                    if(close>position){String key=source.substring(position+1,close);if(key.matches(com.shirokai.core.placeholders.PlaceholderService.KEY_PATTERN)){
                         flush(text,result);if(key.startsWith("animation:")){if(!allowAnimation)throw new IllegalArgumentException("Frame não pode referenciar animação");result.add(new Animated(key.substring(10)));}else result.add(new Variable(key));position=close+1;continue;
                     }}
                 }

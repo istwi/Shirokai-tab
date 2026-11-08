@@ -43,8 +43,8 @@ teams opt-in independentemente.
 Templates usam StyleEngine/STYLES.md, inclusive HEX, gradientes e animações de
 styles.json. Dados dinâmicos são literais. Placeholders: player, viewer, uuid,
 online, world, ping, selected_title, clan, clan_tag, group, luckperms:prefix/suffix;
-demais tokens seguem o serviço nativo. Dados de dinheiro/Pokédex/ginásios ainda
-não têm integração real: exibem unavailablePlaceholder (padrãoN/D), sem números fictícios.
+demais tokens seguem o serviço nativo. Dados de dinheiro/Pokédex/ginásios usam os adaptadores opcionais0.9 descritos em
+INTEGRATIONS.md; sem provider/conta/objetivo carregado, exibem unavailablePlaceholder.
 `selected_title` usa exatamente o mesmo TitleService/selected_visual do TAB.
 Não há seleção separada de título nem mudança de grupo para aparência.
 

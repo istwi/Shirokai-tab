@@ -125,3 +125,22 @@ reset global de holder, colisão do nome exato e stop preservando replacement ex
 Runner real verifica candidato inválido scoreboard+core rejeitado atomicamente.
 TabPreferenceTest preserva restart/upgrade4→5 das duas preferências; schema não mudou.
 Resultados executados em PROJECT_STATUS.md; cliente real continua pendente.
+
+
+## Suítes0.9 — providers opcionais
+
+IntegrationConfigTest: arquivo preservado, schema/tipos, moedas distintas, provider
+explícito, intervalo, flags restart-only e cálculo percentual com denominador real.
+PlaceholderServiceTest: argumentos de PAPI, valor literal e proteção contra recursão.
+Smoke comum também rejeita mapeamento inválido/ativação de integração em reload,
+preservando snapshots; runtime sem nenhum mod opcional precisa continuar funcional.
+
+IntegrationSmoke com os JARs reais fixados: importar player:objective com argumento,
+exportar texto literal, preservar replacement externo, grants/revokes/prefixo LP,
+saldos de duas moedas distintas, ausência de moeda/conta sem fallback, registro de
+espécies real e progresso após givepokemonother oficial, atualização do Dex via seus
+handlers e troca consistente das quatro métricas para a mesma coleção. Disconnect
+limpa cache. Fixture altera somente mundo/contas/perfis descartáveis, sem login simulado
+como autenticado. Runner tools/integration_smoke.py mantém online-mode e para o servidor.
+Relatório build/integration-smoke/result.json inclui SHA256 dos mods efetivamente usados.
+Resultados finais e limitações atuais em PROJECT_STATUS.md.

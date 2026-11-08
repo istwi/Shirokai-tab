@@ -121,3 +121,46 @@ ScoreboardDisplaySlot inclui SIDEBAR e TEAM_*; Core cede conservadoramente a qua
 sidebar colorido externo. Objetivos privados não entram no scoreboard global.
 A detecção não cobre mods que contornam/reescrevem essa rota; ver SCOREBOARD.md.
 Testes Fabric usam conexão sintética; não afirmam renderização/autenticação real.
+
+
+## Atualização0.9 — integrações reais
+
+Auditoria e contratos atuais: INTEGRATIONS.md. As seções antigas acima são históricas.
+Artefatos/URLs/hashes fixados em tools/integration-mods.json, sem TLS/checksum desativados.
+
+- Cobblemon Fabric1.8.3+1.21.1: POM oficial commitffe005511dd0d3ba68377fa3f95906b3837d9a0e;
+  SHA2564bc3b09d25b93b74a5822dc35b06bd6f5fa8bae36ed43a8d2b3904156a61269c.
+  javap conferiu Cobblemon.INSTANCE.getPlayerDataManager().getPokedexData(ServerPlayerEntity),
+  PokemonSpecies.INSTANCE.getImplemented, Species.resourceIdentifier, SpeciesDexRecord.hasAtLeast,
+  PokedexEntryProgress.SEEN/OWNED, POKEDEX_DATA_CHANGED_POST, getPlayerUUID e
+  ObservableSubscription.unsubscribe. Somente consulta no adaptador; comando oficial
+  givepokemonother existe na versão auditada e é usado apenas pela fixture descartável.
+- Text Placeholder API2.4.2+1.21: fonte2427627df3e73ec00a2d3623c7e60e1d076bdb67.
+  Placeholders.parsePlaceholder/register/remove/getPlaceholders, PlaceholderContext.of,
+  PlaceholderResult.value(Text)/isValid/text e PlaceholderHandler compilados/exercitados.
+  Sintaxe de argumentos com espaço conferida no código real, inclusive player:objective.
+  Nunca usar value(String) para dados: essa sobrecarga interpreta formatação.
+- Impactor Fabric5.3.5+1.21.1: fonte da tagda9a2fd55cf6f0acb6e55fe157745f3bdc17ab84;
+  API5.3.5/submódulodbcce5b992bfb6f94e82f2f3b60e81f61ae4cc2e. EconomyService.instance,
+  currencies().currency(Key), hasAccount(currency,UUID), account(currency,UUID),
+  Account.owner/currency/virtual/balance auditados. account é fetch-or-create: há
+  checagem prévia de presença, sem transação atômica contra exclusão concorrente.
+  Sem chamadas deposit/withdraw/save, sem leitura dos arquivos internos do provider.
+- Shirokai Dex: release0.4.0-alpha.1, source78dfe72f8cef55f20c3645dc132ea6c3d97ad6f0,
+  SHA25666cd5128e06bd96e2e8d002a6d6daac13f680db418eabe6c781604c31827c4b4.
+  Metadados/proveniência verificados. Ponte pública shirokaidex:percent/total/registered/seen
+  com argumento de coleção, sem classes/banco internos nem algoritmos copiados.
+- LuckPerms Fabric5.4.140: artefato original/hash em manifesto. API5.4 existente exercitada
+  com grant/revoke e prefixo reais; Core agora inicializa em SERVER_STARTED, depois do
+  enable do mod em SERVER_STARTING. Nenhum fallback op é ativado se LP está presente e falha.
+
+Testes de API usam jogador/conexão sintéticos no servidor real, não autenticam cliente.
+PlayerManager.players/playerMap e ClientConnection.flush foram auditados para a fixture
+smoke, isolada do JAR de produção. Não declarar contextos de cliente/carga/renderização
+como verificados. Authlib/Yggdrasil do ambiente pode falhar por DNS; online-mode preservado.
+
+Kotlin plugin2.2.20 habilita remapeamento de metadata; Gradle8.12.1/Loom1.10.5/Yarn
+1.21.1+build.3/Fabric API0.116.17 permanecem. Runtime de teste opcional usa Loader0.17.2
+exigido por Cobblemon/Dex, ICU71.1 e JARs aninhados extraídos sem alterar bytes.
+A checagem inicial detectou dependências aninhadas ausentes e o ciclo de enable do LP;
+ambos foram corrigidos, sem desativar testes/APIs/TLS. Resultados finais em PROJECT_STATUS.md.

@@ -70,3 +70,8 @@ Dados dinâmicos não ganham estilo por conter tags. Para colorir prefixo, confi
 styles.json, tab.json e scoreboard.json entram no mesmo reload atômico dos demais módulos. Animação
 desconhecida, tag inválida ou template estático grande impede publicar o candidato.
 Dados dinâmicos que excedem limites preservam o último frame válido e geram diagnóstico.
+
+
+A partir0.9, variáveis podem incluir argumentos PAPI limitados, como
+`%player:objective gyms%` e `%shirokaidex:percent national%`. A ponte importa
+somente a String do resultado: eventos/estilos/markup dos dados não são reanalisados.

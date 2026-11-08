@@ -3,7 +3,7 @@
   "id": "shirokai-core",
   "version": "${version}",
   "name": "Shirokai Core",
-  "description": "Núcleo modular do servidor Shirokai. Em desenvolvimento.",
+  "description": "N\u00facleo modular do servidor Shirokai. Em desenvolvimento.",
   "environment": "server",
   "entrypoints": {
     "main": [
@@ -18,5 +18,12 @@
   },
   "mixins": [
     "shirokai-core.mixins.json"
-  ]
+  ],
+  "suggests": {
+    "luckperms": "*",
+    "placeholder-api": ">=2.4.2",
+    "cobblemon": "1.8.3+1.21.1",
+    "impactor": "5.3.5+1.21.1",
+    "shirokaidex": "*"
+  }
 }

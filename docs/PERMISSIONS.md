@@ -1,4 +1,4 @@
-# Permissões 0.8.0-dev
+# Permissões 0.9.0-dev
 
 LuckPerms é a fonte de verdade quando presente e inicializado. O adaptador usa API 5.4,
 usuário carregado e dados de permissão com contextos atuais. Não retém resultado de
@@ -26,9 +26,9 @@ vanilla nível 4. Console usa autoridade vanilla nível 4; command blocks padrã
 runtime não iniciar, apenas status/version permanecem disponíveis ao console nível 4.
 Se placeholders estiver desativado, o subcomando correspondente fica indisponível.
 
-A integração foi compilada e testada contra contrato da API; a distribuição real
-LuckPerms Fabric ainda não foi instalada/testada. Isso não comprova compatibilidade
-com todas as versões do mod.
+A API foi testada por contrato e a distribuição Fabric5.4.140 foi exercitada em0.9
+com grants/revokes e prefixo reais. Contextos de jogadores realmente conectados e
+compatibilidade com outras distribuições continuam pendentes.
 
 ## Clãs implementados
 
@@ -83,3 +83,11 @@ shirokaicore.command.scoreboard.inspect autoriza `/shirokaicore scoreboard`.
 sem conceder ownership de sidebar externo. Condições por layout/linha usam os nós
 LuckPerms configurados; não há grupo fictício nem permissão administrativa implícita.
 Comandos curtos/namespaced existentes são preservados; `/scoreboard` vanilla permanece.
+
+
+## Integrações0.9
+
+shirokaicore.command.integrations.inspect permite `/shirokaicore integrations`.
+Handlers do Shirokai Dex continuam exigindo a permissão da coleção do próprio Dex.
+A ponte não contorna essa autorização nem modifica grupos/permissões por aparência.
+O teste de integração concede nós só ao usuário sintético no mundo descartável.
