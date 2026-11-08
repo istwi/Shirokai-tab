@@ -147,3 +147,9 @@ externas continuam pendentes. Evidências e SHA em PROJECT_STATUS.md.
 - Estilo administrativo fixo por ID de título em presentation.titleTemplates;
   mesma renderização em chat, TAB/sidebar e preview, sem herdar preset pessoal.
 - Configurações antigas e títulos sem entrada preservados; reload valida todo candidato.
+
+## 0.13.3-dev
+
+- Sidebar recupera jogadores online cujo registro na entrada foi perdido/antecipado.
+- /sidebar carrega a preferência antes de alternar mesmo sem View prévia; toggles
+  concorrentes continuam serializados. Falhas são registradas no log do servidor.

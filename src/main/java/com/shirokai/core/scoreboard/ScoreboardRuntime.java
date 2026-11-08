@@ -79,6 +79,7 @@ public final class ScoreboardRuntime implements AutoCloseable {
         return view.writes;
     }
     public CompletableFuture<Boolean> toggle(UUID id) {
+        if (!closed && storage != null && !views.containsKey(id)) join(id);
         var view = views.get(id);
         if (closed || view == null || storage == null) return CompletableFuture.failedFuture(new IllegalStateException("Preferência de scoreboard indisponível"));
         var operation = view.writes.handle((v, error) -> null).thenComposeAsync(v -> {
@@ -130,7 +131,14 @@ public final class ScoreboardRuntime implements AutoCloseable {
         var active = new HashSet<UUID>(); players.forEach(p -> active.add(p.getUuid()));
         for (var id : List.copyOf(views.keySet())) if (!active.contains(id)) forget(id);
         for (var p : players) {
-            var view = views.get(p.getUuid()); if (view == null || view.player != p) continue;
+            var view = views.get(p.getUuid());
+            if (view == null || view.player != p) {
+                // JOIN may run before the player appears in PlayerManager. Reconcile on the next frame.
+                join(p.getUuid()).whenComplete((ignored, error) -> {
+                    if (error != null) logger.warn("[scoreboard] Preferência indisponível " + p.getUuid(), error);
+                });
+                continue;
+            }
             try { update(view, players.size()); }
             catch (RuntimeException error) { errors++; if (tick - view.lastError >= 200) { view.lastError = tick; logger.warn("[scoreboard] Último frame preservado para " + p.getUuid(), error); } }
         }

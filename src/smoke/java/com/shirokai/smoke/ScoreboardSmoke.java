@@ -40,7 +40,7 @@ public final class ScoreboardSmoke implements ModInitializer {
     private CompletableFuture<Void> test(net.minecraft.server.MinecraftServer server) {
         var storage = new SqliteStorage(FabricLoader.getInstance().getGameDir().resolve("sidebar-smoke-" + UUID.randomUUID() + ".db"));
         var pa = new ArrayList<Packet<?>>(); var pb = new ArrayList<Packet<?>>();
-        var a = ProfileSmoke.player(server, "SideAlice", pa::add); var b = ProfileSmoke.player(server, "SideBob", pb::add); var players = List.of(a, b);
+        var a = ProfileSmoke.player(server, "SideAlice", pa::add); var b = ProfileSmoke.player(server, "SideBob", pb::add); var players = new ArrayList<net.minecraft.server.network.ServerPlayerEntity>();
         var meta = new HashMap<UUID, PermissionService.Metadata>();
         meta.put(a.getUuid(), new PermissionService.Metadata("vip", "", "", 0)); meta.put(b.getUuid(), new PermissionService.Metadata("member", "", "", 0));
         var permissions = new PermissionService() {
@@ -70,6 +70,11 @@ public final class ScoreboardSmoke implements ModInitializer {
         b.networkHandler.sendPacket(new BundleS2CPacket(List.of(new ScoreboardObjectiveUpdateS2CPacket(old, 0), new ScoreboardDisplayS2CPacket(ScoreboardDisplaySlot.SIDEBAR, old))));
         var result = storage.ready().thenCompose(v -> storage.setAnimations(a.getUuid(), false)).thenCompose(v -> storage.setAnimations(b.getUuid(), false))
             .thenComposeAsync(v -> titles.equip(a.getUuid(), "traveler", false), server)
+            .thenComposeAsync(v -> endpoint.join(a.getUuid()), server)
+            .thenRunAsync(() -> {
+                check(endpoint.status().contains("viewers=0"), "Early join unexpectedly registered unavailable player");
+                players.addAll(List.of(a,b)); endpoint.update();
+            }, server)
             .thenComposeAsync(v -> endpoint.join(a.getUuid()), server).thenComposeAsync(v -> endpoint.join(b.getUuid()), server)
             .thenRunAsync(() -> {
                 owned[0] = objective(pa); check(owned[0].length() == 16, "Unsafe objective identifier");
@@ -106,6 +111,7 @@ public final class ScoreboardSmoke implements ModInitializer {
                 a.networkHandler.sendPacket(new ScoreboardDisplayS2CPacket(ScoreboardDisplaySlot.SIDEBAR, null)); pa.clear(); endpoint.update(); check(pa.stream().anyMatch(ScoreboardDisplayS2CPacket.class::isInstance), "External clear left stale display cache");
                 // Normal visibility toggles are serialized; two concurrent toggles must restore the original value.
             }, server).thenComposeAsync(v -> {
+                endpoint.forget(a.getUuid());
                 var one = endpoint.toggle(a.getUuid()); var two = endpoint.toggle(a.getUuid()); return CompletableFuture.allOf(one, two).thenRun(() -> { check(!one.join() && two.join(), "Concurrent toggles lost update"); });
             }, server).thenComposeAsync(v -> endpoint.toggle(a.getUuid()), server).thenComposeAsync(enabled -> {
                 check(!enabled, "Visibility did not turn off"); return storage.preferences(a.getUuid());

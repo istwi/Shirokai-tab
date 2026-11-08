@@ -1,4 +1,4 @@
-# Estado real do projeto — 0.13.2-dev
+# Estado real do projeto — 0.13.3-dev
 
 ## Entrega atual
 
@@ -96,3 +96,12 @@ Renderização em cliente real continua pendente.
 
 Suite server_smoke0.13.2:48 verificações aprovadas, incluindo reinício e isolamento
 de falha de storage; relatório em build/server-smoke/result.json.
+
+0.13.3: recuperação de View ausente na scoreboard durante update/toggle, sem schema
+novo. Regressão Fabric cobre JOIN antes de roster e dois toggles sem View prévia.
+Build0.13.3 aprovado (105 testes JUnit). SCOREBOARD_SMOKE_PASS no Fabric,
+incluindo recuperação de JOIN antes do roster, toggle sem View e preferência
+desativada preservada no reconnect. Cliente real permanece pendente.
+SHA256 do JAR local:020bf738c6f60b718be3e91bb178974b4cc4feecd4c18fe1f3d8ec314c7919c9.
+
+Suite server_smoke0.13.3:48 verificações aprovadas, incluindo reinício/storage.

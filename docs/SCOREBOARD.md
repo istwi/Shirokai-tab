@@ -126,3 +126,12 @@ TAB_EXTRAS.md descreve o objetivo privado BELOW_NAME, independente do sidebar.
 O ledger sincronizado é compartilhado, com revisão de display separada por superfície
 e retain/release de consumidores. Fechar sidebar preserva evidência de colisão usada
 por BELOW_NAME; o último consumidor libera o registro. Hook continua observacional.
+
+## Recuperação de registro0.13.3
+
+O runtime reconcilia conexões online sem View a cada frame. JOIN anterior à presença
+no PlayerManager não deixa viewers=0 permanentemente. /sidebar também inicializa
+a View ausente antes de enfileirar toggles; aguarda leitura persistida e preserva
+a serialização. Falha de carregamento mantém a visão fechada, sem sobrescrever
+a preferência. Erros de toggle agora têm stack trace no log. Nenhuma mudança de
+schema ou remoção de dados. Conflitos externos continuam preservados.

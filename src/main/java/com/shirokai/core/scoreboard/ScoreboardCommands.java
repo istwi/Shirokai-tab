@@ -31,7 +31,10 @@ public final class ScoreboardCommands {
     private int toggle(ServerCommandSource source) {
         var core = available(source); if (core == null) return 0;
         core.scoreboard().toggle(source.getPlayer().getUuid()).whenCompleteAsync((enabled, error) -> {
-            if (error != null) source.sendError(Text.literal("Não foi possível salvar preferência de scoreboard"));
+            if (error != null) {
+                org.slf4j.LoggerFactory.getLogger("shirokai-core").warn("[scoreboard] Falha ao alternar visibilidade para " + source.getPlayer().getUuid(), error);
+                source.sendError(Text.literal("Não foi possível salvar preferência de scoreboard; consulte o log do servidor"));
+            }
             else source.sendFeedback(() -> Text.literal("Scoreboard: " + (enabled ? "ativada" : "desativada")), false);
         }, source.getServer()); return 1;
     }
