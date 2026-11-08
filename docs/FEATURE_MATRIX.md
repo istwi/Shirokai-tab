@@ -4,18 +4,18 @@
 |---|---|---|
 | Bootstrap Fabric | Servidor chegou a Done | Login de jogadores não testado |
 | Lifecycle modular | Implementado e testado | Dependências em ordem de registro |
-| core.json | Defaults, validação e reload testados | Outros JSONs ainda pendentes |
-| SQLite | Schema5, upgrade com backup, perfis/concessões/clãs, CAS e auditoria | Schema3 clãs presente; restauração automática pendente |
+| core.json | Defaults, validação e reload testados | Presets/presentation e configs dos módulos documentados |
+| SQLite | Schema6, presets persistidos, upgrade com backup, perfis/concessões/clãs, CAS e auditoria | Schema3 clãs presente; restauração automática pendente |
 | Permissões | Adaptador API5.4 e runtime Fabric5.4.140: grant/revoke/prefixo reais | Contextos com cliente autenticado e outras versões pendentes |
 | Placeholders | Nativos e ponte PAPI2.4.2 real, argumentos e exportação literal | Depende de handlers instalados; conflitos preservados |
-| Administração | Status/version/modules/permissions/reload/debug/backup/placeholders | Gestão de clãs/títulos pendente |
-| Títulos e duas identificações | Implementados e testados | ROLE/SPECIAL; integração com renderizadores e clãs pendente |
-| Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Estilos, editor textual GUI e administração avançada pendentes |
-| Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real, assinaturas/login reais e personalização individual pendentes |
+| Administração | Status/version/modules/permissions/reload/debug/backup/placeholders | Títulos e consulta/correção de identidade de clãs; reparos relacionais avançados pendentes |
+| Títulos e duas identificações | Implementados e testados | ROLE/SPECIAL/CLAN integrados; cliente autenticado pendente |
+| Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Presets, editor textual e convites enviados implementados; administração relacional avançada pendente |
+| Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real e assinaturas/login reais pendentes; presets das identificações implementados |
 | TAB | Header/footer, nomes, título e teams opt-in implementados/testados | Cliente real, listed/vanish, nametags, bossbar e objetivos abaixo do nome pendentes |
 | Scoreboard visual | Sidebar privado por viewer, layouts/linhas condicionais, diffs e visibilidade persistida | Cliente real e compatibilidade universal não validados; cede a sidebar externo |
 | /perfil e menus de clãs | Handlers testados com jogadores sintéticos | Aparência/pacotes de cliente real não testados |
-| Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/sidebar e apresentação de chat/menus/títulos/clãs | Escolhas pessoais/editor de clã, animação de menus e transições pendentes |
+| Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/sidebar e apresentação de chat/menus/títulos/clãs | Presets pessoais/clã e editor textual implementados; animação de presets/menus e transições pendentes |
 | Cobblemon/Impactor/Dex/PAPI | Adaptadores opcionais implementados: Pokédex oficial, moedas separadas e Dex via PAPI | Versões/semântica em INTEGRATIONS.md; cliente real e versões futuras não certificados |
 | CI | Workflow de build criado | Execução no GitHub não realizada |
 | Release estável | Não disponível | Critérios completos não cumpridos |

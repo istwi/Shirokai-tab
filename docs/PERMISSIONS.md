@@ -1,4 +1,4 @@
-# Permissões 0.10.0-dev
+# Permissões 0.11.0-dev
 
 LuckPerms é a fonte de verdade quando presente e inicializado. O adaptador usa API 5.4,
 usuário carregado e dados de permissão com contextos atuais. Não retém resultado de
@@ -36,7 +36,7 @@ shirokaicore.clan.create autoriza criação; shirokaicore.clan.limit.<n> determi
 limite do líder conforme clans.json, usando o maior valor. Demais ações validam
 cargos internos no banco. Fallback admin sem LuckPerms não concede criação.
 
-## Nós futuros de estilos, ainda não implementados
+## Nós de estilos previstos no pedido original (estado atual abaixo)
 
 `shirokaicore.clan.color.hex`,
 `shirokaicore.clan.color.gradient`, `shirokaicore.clan.animation`,
@@ -99,4 +99,20 @@ Regras de presentation.json consultam sua permission/grupo/mundo em cada render.
 Não concedem entitlement de título nem permissões de clã. mentionPermission controla
 destaque/notificação de menções; vazio é público. Não ignora mute, ignore ou alcance.
 Perda de permissão visual usa fallback sem apagar regra ou seleção de título existente.
-Nós de personalização individual de clã continuam sem editor/persistência nesta entrega.
+A atualização0.11 abaixo acrescenta editor/persistência por ID separado dessas regras.
+
+## Atualização0.11
+
+Catálogo presets.json define permission por preset; vazio é público. Defaults
+shirokaicore.style.gold e shirokaicore.style.sunset autorizam esses presets. O
+administrador pode usar nós clan.style específicos. HEX de clã exige adicionalmente
+shirokaicore.clan.color.hex; gradiente exige shirokaicore.clan.color.gradient.
+Nome/sigla usam permissão atual do líder e somente ele pode salvar presets; roleActions
+continua controlando identidade textual, convites e membros. Sem LuckPerms não há
+premium automático; básicos vazios funcionam para jogador/líder.
+
+shirokaicore.command.clans.inspect permite list/inspect;
+shirokaicore.command.clans.identity permite correção administrativa rename/tag.
+Permissões administrativas não autorizam escolhas pessoais arbitrárias, transferência
+forçada ou remoção de clãs. clan.animation permanece pendente; clan.tag.edit pode ser
+configurado como requisito de preset, não é um bypass da política de cargos.

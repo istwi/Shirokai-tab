@@ -51,6 +51,31 @@ public final class IntegrationSmoke implements ModInitializer {
             .starting(starting).decimals(2).formatting(new Currency.CurrencyFormatting("{symbol}{amount}", "{amount} {currency}" )).build();
         return service.currencies().register(currency).thenApplyAsync(registered -> service.currencies().currency(Key.key(key)).orElseThrow(), server);
     }
+    private CompletableFuture<Void> testStyles(net.minecraft.server.MinecraftServer server,net.minecraft.server.network.ServerPlayerEntity player,
+            PermissionService permissions,net.luckperms.api.model.user.User user) {
+        var directory=net.fabricmc.loader.api.FabricLoader.getInstance().getGameDir().resolve("lp-style-"+UUID.randomUUID());
+        var storage=new com.shirokai.core.storage.SqliteStorage(directory.resolve("data.db"));
+        var engine=new StyleEngine(StyleConfig.defaults());
+        final com.shirokai.core.customization.PresetCatalog catalog;
+        try { catalog=com.shirokai.core.customization.PresetCatalog.load(directory.resolve("presets.json"),engine); }
+        catch(Exception error){try{storage.close();}catch(Exception close){error.addSuppressed(close);}return CompletableFuture.failedFuture(error);}
+        var choices=new com.shirokai.core.customization.StyleChoiceService(new com.shirokai.core.customization.StyleChoiceRepository(storage),catalog,permissions,null,server,id->id.equals(player.getUuid()));
+        var node=PermissionNode.builder("shirokaicore.style.gold").build();user.data().add(node);
+        var surface=com.shirokai.core.presentation.Surface.TITLE;
+        return choices.join(player.getUuid()).thenComposeAsync(v->choices.view(player.getUuid(),surface,null),server)
+            .thenComposeAsync(view->choices.choose(player.getUuid(),view,"gold",()->true),server)
+            .thenRunAsync(()->{
+                check(choices.resolution(player.getUuid(),surface).status()==com.shirokai.core.customization.PresetCatalog.Status.ACTIVE,"Real LP did not authorize saved preset");
+                user.data().remove(node);
+                check(choices.resolution(player.getUuid(),surface).status()==com.shirokai.core.customization.PresetCatalog.Status.UNAVAILABLE,"Real LP revoke did not apply style fallback");
+                check("gold".equals(choices.resolution(player.getUuid(),surface).saved()),"Real LP loss erased saved style");
+                user.data().add(node);
+                check(choices.resolution(player.getUuid(),surface).status()==com.shirokai.core.customization.PresetCatalog.Status.ACTIVE,"Real LP recovery did not restore saved preset");
+            },server).whenCompleteAsync((v,error)->{
+                choices.forget(player.getUuid());user.data().remove(node);
+                try{storage.close();}catch(Exception close){throw new CompletionException(close);}
+            },server);
+    }
     private CompletableFuture<Void> test(net.minecraft.server.MinecraftServer server) {
         var fixture = (SmokePlayers)server.getPlayerManager(); var player = ProfileSmoke.player(server, "CoreIntegrate");
         fixture.shirokai$players().add(player); fixture.shirokai$playerMap().put(player.getUuid(), player);
@@ -88,7 +113,7 @@ public final class IntegrationSmoke implements ModInitializer {
             check(!permissions.allowed(player.getUuid(), "shirokai.smoke.permission"), "Real LP revoke not observed");
             // Dex access remains its own provider and permission source; this grant is only for the test user.
             user.data().add(PermissionNode.builder("shirokaidex.*").build());
-            return currency("impactor:dollars", new BigDecimal("125.25"), server);
+            return testStyles(server,player,permissions,user).thenComposeAsync(v->currency("impactor:dollars", new BigDecimal("125.25"), server),server);
         }, server).thenComposeAsync(dollars -> EconomyService.instance().account(dollars, player.getUuid()).thenAcceptAsync(account -> before[0] = account.balance(), server), server)
             .thenComposeAsync(v -> currency("impactor:tokens", new BigDecimal("42.5"), server), server)
             .thenComposeAsync(tokens -> EconomyService.instance().account(tokens, player.getUuid()).thenAcceptAsync(account -> before[1] = account.balance(), server), server)

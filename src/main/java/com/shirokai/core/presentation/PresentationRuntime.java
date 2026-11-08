@@ -17,12 +17,22 @@ public final class PresentationRuntime implements SurfaceRenderer {
     private final Supplier<Collection<ServerPlayerEntity>> online;private PresentationPlan plan;
     public PresentationRuntime(MinecraftServer server,PresentationPlan plan,PermissionService permissions,TitleService titles){this(server,plan,permissions,titles,()->List.copyOf(server.getPlayerManager().getPlayerList()));}
     public PresentationRuntime(MinecraftServer server,PresentationPlan plan,PermissionService permissions,TitleService titles,Supplier<Collection<ServerPlayerEntity>> online){this.server=server;this.plan=plan;this.permissions=permissions==null?new PermissionService(){public boolean allowed(UUID id,String node){return false;}public String provider(){return "unavailable";}}:permissions;this.titles=titles;this.online=online;}
+    private com.shirokai.core.customization.StyleChoiceService customization;
+    public void customization(com.shirokai.core.customization.StyleChoiceService service){customization=service;}
+    @Override public boolean customizationEnabled(){return customization!=null;}
+    @Override public void openCustomization(ServerPlayerEntity player,Surface surface,UUID expectedClan){if(customization!=null)com.shirokai.core.customization.StyleChoiceMenu.open(player,customization,surface,expectedClan);}
+    @Override public Text renderClan(UUID viewer,UUID leader,Surface surface,String value){
+        if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
+        if(customization!=null){var selected=customization.render(viewer,surface,value);if(selected.isPresent())return selected.get();}
+        return render(leader,surface,value);
+    }
     public PresentationPlan plan(){return plan;}public void replacePlan(PresentationPlan candidate){plan=candidate;}
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(p->p.getUuid().equals(id)&&!p.isDisconnected()).findFirst().orElse(null);}
     @Override public boolean menusEnabled(){return plan.config().menusEnabled();}
     @Override public Text render(UUID subject,Surface surface,String value){
         if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
         if(surface.name().startsWith("MENU_")&&!plan.config().menusEnabled())return Text.literal(value);
+        if(customization!=null){var selected=customization.render(subject,surface,value);if(selected.isPresent())return selected.get();}
         var p=player(subject);String world=p==null?"":p.getWorld().getRegistryKey().getValue().toString();
         var template=plan.template(surface,permissions.metadata(subject),world,node->permissions.allowed(subject,node));
         return plan.styles().render(template,key->value,0,false);

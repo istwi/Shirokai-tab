@@ -153,4 +153,12 @@ Display/descrição do catálogo continuam literais. presentation.json aplica es
 TITLE/CLAN_TAG fora do dado, com condições dinâmicas. TAB/sidebar e preview do perfil
 compõem esse mesmo título sem alterar a seleção. Revogar permissão visual troca o
 estilo por fallback; não revoga título nem apaga a regra configurada. Entitlement do
-título continua independente. Escolha pessoal persistida de estilo ainda não existe.
+título continua independente. Escolha pessoal persistida é acrescentada pela atualização0.11 abaixo.
+
+## Personalização0.11
+
+/perfil oferece seletor de preset e /estilo titulo [id|padrao] salva estilo no
+player_style_choices, separado de selected_visual. O mesmo preset envolve ROLE/SPECIAL
+no preview/chat e título compartilhado TAB/sidebar. CLAN usa escolha do clã.
+Entitlement de título continua independente: perder título limpa seleção inválida
+como antes; perder permissão do preset preserva o ID e usa fallback. Ver CUSTOMIZATION.md.

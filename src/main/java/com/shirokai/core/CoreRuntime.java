@@ -1,6 +1,7 @@
 package com.shirokai.core;
 
 import com.shirokai.core.config.*;
+import com.shirokai.core.customization.*;
 import com.shirokai.core.titles.*;
 import com.shirokai.core.clans.*;
 import com.shirokai.core.chat.*;
@@ -39,6 +40,7 @@ public final class CoreRuntime implements AutoCloseable {
     private MinecraftChat chat;
     private StyleEngine styles;
     private PresentationRuntime presentation;
+    private StyleChoiceService customization;
     private TabRuntime tab;
     private ScoreboardRuntime scoreboard;
     private IntegrationRuntime integrations;
@@ -110,6 +112,13 @@ public final class CoreRuntime implements AutoCloseable {
             styles=new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json")));
             var visual=PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json"));
             presentation=new PresentationRuntime(server,new PresentationPlan(visual,styles,chat==null?ChatConfig.defaults():chat.service().config()),permissions,titles);
+            var presets=PresetCatalog.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presets.json"),styles);
+            if(running("storage")&&running("permissions")) {
+                customization=new StyleChoiceService(new StyleChoiceRepository(storage),presets,permissions,running("clans")?clans:null,server,id->server.getPlayerManager().getPlayer(id)!=null);
+                customization.onChange(id->{if(scoreboard!=null)scoreboard.invalidate();});
+                presentation.customization(customization);
+                if(clans!=null)clans.onChange(affected->affected.forEach(id->{if(server.getPlayerManager().getPlayer(id)!=null)customization.join(id).whenComplete((v,e)->{if(e!=null)logger.warn("[styles] Refresh falhou "+id,e);});}));
+            }
             if(titles!=null)titles.presentation(presentation);if(clans!=null)clans.presentation(presentation);if(chat!=null)chat.presentation(presentation);
         },()->{}));
         modules.register(module("tab",Set.of("styles","permissions"),()->{
@@ -138,6 +147,7 @@ public final class CoreRuntime implements AutoCloseable {
             public void stop() throws Exception { stop.run(); }
         };
     }
+    public StyleChoiceService customization(){return running("styles")?customization:null;}
     public IntegrationRuntime integrations(){if(!running("integrations")||integrations==null)throw new IllegalStateException("Integrações indisponíveis");return integrations;}
     public ScoreboardRuntime scoreboard(){if(!running("scoreboard")||scoreboard==null)throw new IllegalStateException("Scoreboard indisponível");return scoreboard;}
     public TabRuntime tab(){if(!running("tab")||tab==null)throw new IllegalStateException("TAB indisponível");return tab;}
@@ -151,6 +161,7 @@ public final class CoreRuntime implements AutoCloseable {
         return titles;
     }
     public void playerJoined(java.util.UUID player) {
+        if(customization()!=null)customization.join(player).whenComplete((v,e)->{if(e!=null)logger.warn("[styles] Escolhas indisponíveis "+player,e);});
         if(running("integrations"))integrations.join(player);
         if(running("tab"))tab.join(player);
         if(running("scoreboard"))scoreboard.join(player).whenComplete((v,error)->{if(error!=null)logger.warn("[scoreboard] Preferência indisponível "+player,error);});
@@ -165,7 +176,7 @@ public final class CoreRuntime implements AutoCloseable {
             if (error != null) logger.warn("[titles] Falha ao carregar perfil " + player, error);
         });
     }
-    public void playerLeft(java.util.UUID player) { if (titles != null) titles.forget(player); if(clans!=null)clans.forget(player); if(chat!=null)chat.service().leave(player);if(tab!=null)tab.forget(player);if(scoreboard!=null)scoreboard.forget(player);if(integrations!=null)integrations.forget(player); }
+    public void playerLeft(java.util.UUID player) { if(customization!=null)customization.forget(player); if (titles != null) titles.forget(player); if(clans!=null)clans.forget(player); if(chat!=null)chat.service().leave(player);if(tab!=null)tab.forget(player);if(scoreboard!=null)scoreboard.forget(player);if(integrations!=null)integrations.forget(player); }
     public void tick() {
         if(running("integrations"))integrations.tick();
         if(running("tab"))tab.tick();
@@ -204,8 +215,9 @@ public final class CoreRuntime implements AutoCloseable {
                 TabPlan tabPlan=tab==null?null:new TabPlan(TabConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab.json")),candidateStyles);
                 var scoreboardPlan=scoreboard==null?null:new ScoreboardPlan(ScoreboardConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/scoreboard.json")),candidateStyles);
                 var presentationPlan=presentation==null?null:new PresentationPlan(PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json")),candidateStyles,chatConfig==null?ChatConfig.defaults():chatConfig);
+                var presetCatalog=presentation==null?null:PresetCatalog.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presets.json"),candidateStyles);
                 var integrationConfig=integrations==null?null:IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
-                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan);
+                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog);
             } catch (Exception failure) { throw new CompletionException(failure); }
         }, io).whenComplete((candidate, error) -> {
             if (closed) { reloading.set(false); result.completeExceptionally(new IllegalStateException("Servidor encerrando")); return; }
@@ -224,6 +236,7 @@ public final class CoreRuntime implements AutoCloseable {
                     if (clans != null) clans.replaceConfig(candidate.clans());
                     if(chat!=null)chat.service().replaceConfig(candidate.chat());
                     if(integrations!=null)integrations.replaceConfig(candidate.integrations());
+                    if(customization!=null)customization.replaceCatalog(candidate.presets());
                     if(presentation!=null)presentation.replacePlan(candidate.presentation());
                     styles=candidate.styles();if(tab!=null)tab.replacePlan(candidate.tab());if(scoreboard!=null)scoreboard.replacePlan(candidate.scoreboard());
                     logger.info("[core] Configuração recarregada com segurança");
@@ -234,7 +247,7 @@ public final class CoreRuntime implements AutoCloseable {
         });
         return result;
     }
-    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation) {}
+    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets) {}
     public void prepareStop(){try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;

@@ -62,7 +62,7 @@ public final class ClanRepository {
         update(c,"DELETE FROM chat_identifications WHERE player_uuid=? AND title_id=?",player,title);
     }
     private void history(Connection c,UUID clan,UUID actor,String action,String details) throws SQLException {
-        update(c,"INSERT INTO clan_history(clan_id,actor_uuid,action,details,created_at) VALUES(?,?,?,?,?)",clan,actor,action,details,clock.millis());
+        update(c,"INSERT INTO clan_history(clan_id,actor_uuid,action,details,created_at) VALUES(?,?,?,?,?)",clan,actor==null?new UUID(0,0):actor,action,details,clock.millis());
         update(c,"INSERT INTO admin_audit(actor_uuid,action,created_at) VALUES(?,?,?)",actor,"clan "+action+" "+clan+" "+details,java.time.Instant.ofEpochMilli(clock.millis()).toString());
     }
     public CompletableFuture<Optional<ClanSnapshot>> membership(UUID player){return storage.transact(c->{
@@ -86,6 +86,25 @@ public final class ClanRepository {
     }
     public CompletableFuture<ClanSnapshot> own(UUID player) {return storage.transact(c->own(c,player));}
     public CompletableFuture<ClanSnapshot> find(String name) {return storage.transact(c->snapshot(c,lookup(c,name)));}
+    public CompletableFuture<List<String>> list(int page) {
+        if(page<0)throw new IllegalArgumentException("Página inválida");
+        return storage.transact(c->{var result=new ArrayList<String>();
+            try(var s=prepare(c,"SELECT id,name FROM clans ORDER BY name_key,id LIMIT 20 OFFSET ?",(long)page*20);var rows=s.executeQuery()){
+                while(rows.next())result.add(rows.getString(1)+" "+rows.getString(2));
+            }return List.copyOf(result);
+        });
+    }
+    public CompletableFuture<ClanSnapshot> adminIdentity(UUID actor,ClanSnapshot expected,String value,boolean tag,ClanConfig config){
+        String validated=tag?config.tag(value):config.name(value);
+        return storage.transact(c->{
+            var clan=snapshot(c,expected.id());
+            require(Objects.equals(tag?clan.tag():clan.name(),tag?expected.tag():expected.name()),"Nome/sigla mudou; consulte novamente");
+            String column=tag?"tag":"name";
+            update(c,"UPDATE clans SET "+column+"=?,"+column+"_key=? WHERE id=?",validated,ClanConfig.key(validated),clan.id());
+            history(c,clan.id(),actor,tag?"admin-tag":"admin-rename",validated);
+            return snapshot(c,clan.id());
+        });
+    }
     public CompletableFuture<ClanSnapshot> create(UUID actor,String name,ClanConfig config) {
         return mutation(actor,c->{
             require(text(c,"SELECT clan_id FROM clan_members WHERE player_uuid=?",actor)==null,"Jogador já pertence a um clã");
@@ -98,9 +117,12 @@ public final class ClanRepository {
             history(c,id,actor,"create",name);return snapshot(c,id);
         });
     }
-    public CompletableFuture<ClanSnapshot> identity(UUID actor,String value,boolean tag,ClanConfig config) {
+    public CompletableFuture<ClanSnapshot> identity(UUID actor,String value,boolean tag,ClanConfig config) {return identity(actor,value,tag,config,null);}
+    public CompletableFuture<ClanSnapshot> identity(UUID actor,String value,boolean tag,ClanConfig config,ClanSnapshot expected) {
         return mutation(actor,c->{
-            var clan=own(c,actor);ClanPolicy.require(clan,actor,tag?"tag":"rename",config);long now=clock.millis();
+            var clan=own(c,actor);ClanPolicy.require(clan,actor,tag?"tag":"rename",config);
+            if(expected!=null)require(expected.id().equals(clan.id())&&Objects.equals(tag?expected.tag():expected.name(),tag?clan.tag():clan.name()),"Nome/sigla mudou desde a abertura do editor; reabra a tela");
+            long now=clock.millis();
             require(now>=(tag?clan.nextTagEdit():clan.nextNameEdit()),"Cooldown de alteração ativo");
             require(!value.equals(tag?clan.tag():clan.name()),"Identidade não foi alterada");
             String column=tag?"tag":"name", cooldown=tag?"next_tag_edit":"next_name_edit";
@@ -136,6 +158,15 @@ public final class ClanRepository {
     }
     public CompletableFuture<ClanSnapshot> decline(UUID actor,String name) {
         return mutation(actor,c->{UUID id=lookup(c,name);require(update(c,"DELETE FROM clan_invites WHERE clan_id=? AND target_uuid=?",id,actor)==1,"Convite não encontrado");history(c,id,actor,"decline","");return snapshot(c,id);});
+    }
+    public CompletableFuture<Map<UUID,Long>> sentInvitations(UUID actor) {
+        return mutation(actor,c->{
+            var clan=own(c,actor);var result=new LinkedHashMap<UUID,Long>();
+            try(var s=prepare(c,"SELECT target_uuid,expires_at FROM clan_invites WHERE clan_id=? AND expires_at>? ORDER BY expires_at,target_uuid",clan.id(),clock.millis());var rows=s.executeQuery()){
+                while(rows.next())result.put(UUID.fromString(rows.getString(1)),rows.getLong(2));
+            }
+            return Map.copyOf(result);
+        });
     }
     public CompletableFuture<ClanSnapshot> cancel(UUID actor,UUID target,ClanConfig config) {
         return mutation(actor,c->{var clan=own(c,actor);ClanPolicy.require(clan,actor,"invite",config);require(update(c,"DELETE FROM clan_invites WHERE clan_id=? AND target_uuid=?",clan.id(),target)==1,"Convite não encontrado");history(c,clan.id(),actor,"cancel-invite",target.toString());return clan;});

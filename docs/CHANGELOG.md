@@ -1,3 +1,14 @@
+# 0.11.0-dev
+
+- Presets estáticos por ID com permissões, escolhas persistidas de títulos pessoais e
+  nome/sigla de clã independentes; fallback/recuperação sem apagar IDs.
+- Schema6 transacional com backup, CAS, auditoria, FK/cascade e caches por sessão.
+- /estilo e seletores no perfil/clã; pipeline rico compartilhado de chat/TAB/sidebar.
+- Editor textual de identidade do clã, convites enviados/cancelamento e comandos
+  administrativos iniciais list/inspect/rename/tag com permissões próprias.
+- Novos testes de migração, concorrência, restart, perda de permissão, menus e LP real.
+- Sem mudanças de dependências/mixins, releases ou configuração do ambiente.
+
 # 0.10.0-dev — apresentação segura
 
 Cabeçalhos de chat, menus de perfil/clã e títulos recebem templates condicionais

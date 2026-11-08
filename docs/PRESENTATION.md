@@ -1,4 +1,4 @@
-# Apresentação de chat, menus e identificações — 0.10.0-dev
+# Apresentação de chat, menus e identificações — 0.11.0-dev
 
 O módulo styles agora compila presentation.json junto dos demais snapshots. Esse
 arquivo controla templates administrativos e regras por permissão/grupo/dimensão.
@@ -141,3 +141,12 @@ As conexões são sintéticas: não validam assinatura criptográfica, aparênci
 fonte/escala, notificações em todos os clientes ou carga. Não há atualização de mensagens
 antigas nem animação de menu/histórico. Personalização individual de títulos/clãs e
 editor/administração avançada seguem pendentes. Resultados atuais em PROJECT_STATUS.md.
+
+## Personalização0.11
+
+A política acima continua administrativa. Agora CUSTOMIZATION.md define escolhas
+separadas por ID persistidas no schema6: TITLE pessoal e CLAN_NAME/CLAN_TAG do clã.
+Preset ativo envolve o dado literal; sem escolha usa esta política; escolha bloqueada
+ou removida usa fallback básico sem apagar ID. Templates de presets compilam no mesmo
+candidato de reload. Corpo/assinatura/máscara/gates/limite de duas identificações
+continuam intactos. Não confundir animações de layout com animação de preset pessoal.

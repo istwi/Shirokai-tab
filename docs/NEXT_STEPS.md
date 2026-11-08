@@ -2,42 +2,43 @@
 
 ## Estado atual
 
-0.10.0-dev adiciona apresentação configurável de chat/perfil/clãs/títulos, compondo
-cores/HEX/gradientes com valores literais, condições e fallback dinâmico. TAB/sidebar
-usam o mesmo título formatado. Chat normal preserva corpo/assinatura/máscara e
-menções notificam separadamente; comandos system podem colorir menções.
-Regras/configuração em PRESENTATION.md. Integrações0.9 e módulos anteriores preservados.
-Schema SQLite permanece5; não foram criadas escolhas pessoais de estilo.
+0.11.0-dev entrega presets persistidos por jogador/clã, nome/sigla independentes,
+menus/comandos, fallback que preserva IDs, migração6/CAS/auditoria, editor textual,
+convites enviados e administração inicial de identidade. Não reaplicar fases anteriores.
+CUSTOMIZATION.md define os escopos; CLANS.md explica editor/convites/administração.
+Resultados executados e SHA atual em PROJECT_STATUS.md.
 
-## Próxima entrega
+## Próxima etapa de implementação
 
-1. Personalização persistida por jogador/clã: presets permitidos, escolha por ID,
-   estilos independentes de nome/sigla do clã e preservação da escolha após expiração
-   da permissão. Exige autorização fresca, escopo/CAS, transações e testes de migração/
-   restart; não aceitar markup do jogador como configuração executável.
-2. Ferramentas administrativas/editor textual de clãs, convites enviados e demais
-   requisitos completos. Preservar escopo da tela, confirmações e cooldowns independentes.
-3. Recursos adicionais de TAB: listed/vanish por viewer, nametags, objetivos abaixo
-   do nome e bossbar, sem substituir controle de outros mods.
-4. Cliente real: aparência de menus/TAB/sidebar/gradientes/actionbar, autenticação,
-   contextos LuckPerms com conexão real, mudanças de mundo, espectador, carga e conflitos.
-5. Novas versões do Shirokai Dex e APIs externas: confirmar contrato público antes
-   de ampliar a lista de versões suportadas. Fonte da Pokédex deve continuar explícita.
+1. Recursos adicionais de TAB, auditando versão exata e ownership antes de implementar:
+   listed/vanish por viewer, nametags, objetivo BELOW_NAME e bossbar. Javap1.21.1
+   confirma UPDATE_LISTED, ScoreboardDisplaySlot.BELOW_NAME e ServerBossBar, mas isso
+   não equivale a implementação. Não inventar list-order; teams têm efeitos globais.
+   Escolher opt-in por recurso e preservar proprietário/sistemas externos.
+2. Completar administração/configurações de clã conforme REQUIREMENTS.md: diagnósticos
+   e reparos relacionais devem ser explícitos/transacionais, sem exclusão/transferência
+   forçada que contorne confirmação. Comandos0.11 já corrigem nome/sigla com auditoria.
+3. Ampliar presets de forma segura quando viável: animação individual/clã, campos
+   pessoais separados além dos títulos, controles por superfície e respectivas permissões.
+   Não animar histórico de chat nem confundir animações de layout com preset animado.
+4. Cliente real: editor anvil (digitar/clique no papel à esquerda/Esc), menus de estilo,
+   TAB/sidebar/gradientes/escala/actionbar, autenticação e assinatura, contexto LP,
+   reconexão/mudança de mundo, multijogador/desempenho e conflitos de mods.
+5. Novas versões de providers: confirmar contratos públicos e artefatos exatos antes
+   de ampliar suporte. Pokédex deve manter provider/coleção explícitos e moedas distintas.
 
-## Limitações preservadas
+## Regras de continuidade
 
-A apresentação atual é política administrativa. Não declarar escolha pessoal/editor
-concluídos nem confundir regras que permanecem no JSON com preferência de jogador no DB.
-Não há animação de menus/histórico de chat nem reescrita visual de corpo assinado.
-Campos de packets testados não comprovam assinatura criptográfica válida ou renderização.
+ID de preset é dado persistente, não markup. Permissão perdida/preset removido nunca
+apaga escolha de estilo; entitlement do título tem regras próprias. Preservar CAS,
+catálogo/UUID de clã da tela e liderança fresca. Nome/sigla têm cooldowns independentes.
+Renderização usa cache e permissões atuais; APIs de jogo só na thread do servidor.
+Nenhuma transação distribuída é presumida entre SQLite e LuckPerms/providers externos.
 
-Adapters externos foram exercitados com JARs reais em0.9, mas login/renderização/carga
-continuam pendentes. Authlib pode falhar por DNS; não desabilitar online-mode para mascarar.
-Economia não tem fallback primário nem transação distribuída; hasAccount/account não são
-atômicos contra exclusão concorrente externa. Não acessar arquivos internos dos providers.
+Testes Fabric usam jogadores sintéticos. A falha UnknownHostException na busca de
+publickeys do authlib não autoriza desativar online-mode. Não declarar cliente real,
+assinatura criptográfica, contextos autenticados ou carga aprovados sem evidências.
+Sidebar/teams seguem ownership anterior e mixins/refmap fixados em1.21.1.
 
-Sidebar cede a SIDEBAR/TEAM_* externo; colisão exata suspende nessa conexão. Teams do TAB
-são opt-in. Preservar mixins/refmap e versão de Minecraft; nunca remover dados externos.
-
-Salvar progresso autorizado em istwi/Shirokai-tab/main, sem reescrever histórico.
-Não publicar ambiente ou release automaticamente. Não reaplicar setup publicado.
+Salvar progresso autorizado em istwi/Shirokai-tab/main sem reescrever histórico.
+Não publicar ambiente ou releases automaticamente; não reaplicar setup publicado.

@@ -111,6 +111,45 @@ class ClanRepositoryTest {
             assertEquals("ok",get(storage.integrityCheck()));
         }
     }
+    @Test void identityEditorUsesExpectedValueAndPreservesIndependentField()throws Exception{
+        UUID leader=UUID.randomUUID();var config=ClanConfig.defaults();
+        try(var storage=new SqliteStorage(directory.resolve("editor.db"))){
+            var repo=new ClanRepository(storage,new Time());var initial=get(repo.create(leader,"Original",config));
+            var renamed=get(repo.identity(leader,"Renamed",false,config,initial));
+            assertThrows(ExecutionException.class,()->get(repo.identity(leader,"Stale",false,config,initial)));
+            var tagged=get(repo.identity(leader,"TAG",true,config,initial));
+            assertEquals("Renamed",tagged.name());assertEquals("TAG",tagged.tag());
+            assertEquals(renamed.nextNameEdit(),tagged.nextNameEdit());
+        }
+    }
+    @Test void sentInvitesAreScopedExpiringAndCancellationRevalidatesRole()throws Exception{
+        UUID leader=UUID.randomUUID(),member=UUID.randomUUID(),target=UUID.randomUUID();var config=ClanConfig.defaults();var clock=new Time();
+        try(var storage=new SqliteStorage(directory.resolve("sent.db"))){
+            var repo=new ClanRepository(storage,clock);var clan=get(repo.create(leader,"Inviters",config));
+            get(repo.invite(leader,member,config));get(repo.accept(member,clan.id(),leader,20));get(repo.invite(leader,target,config));
+            assertTrue(get(repo.scoped(clan.id()).sentInvitations(member)).containsKey(target));
+            assertThrows(ExecutionException.class,()->get(repo.cancel(member,target,config)));
+            assertThrows(ExecutionException.class,()->get(repo.scoped(UUID.randomUUID()).sentInvitations(leader)));
+            get(repo.cancel(leader,target,config));assertTrue(get(repo.sentInvitations(leader)).isEmpty());
+            clock.advance(config.invitationCooldownSeconds()+1);get(repo.invite(leader,target,config));clock.advance(config.invitationSeconds()+1);
+            assertTrue(get(repo.sentInvitations(leader)).isEmpty());
+        }
+    }
+    @Test void adminCorrectionValidatesUniquenessCasAndAuditWithoutChangingCooldowns()throws Exception{
+        UUID leader=UUID.randomUUID(),other=UUID.randomUUID();var config=ClanConfig.defaults();Path db=directory.resolve("admin.db");
+        try(var storage=new SqliteStorage(db)){
+            var repo=new ClanRepository(storage,new Time());var initial=get(repo.create(leader,"Before",config));get(repo.create(other,"Occupied",config));
+            var renamed=get(repo.identity(leader,"After",false,config));
+            assertThrows(ExecutionException.class,()->get(repo.adminIdentity(null,initial,"Lost",false,config)));
+            assertThrows(ExecutionException.class,()->get(repo.adminIdentity(null,renamed,"Occupied",false,config)));
+            var corrected=get(repo.adminIdentity(null,renamed,"Corrected",false,config));
+            assertEquals("Corrected",corrected.name());assertEquals(renamed.nextNameEdit(),corrected.nextNameEdit());assertEquals(renamed.members(),corrected.members());
+            assertEquals(2,get(repo.list(0)).size());
+            storage.transact(c->{try(var statement=c.createStatement()){statement.execute("CREATE TRIGGER reject_admin BEFORE INSERT ON admin_audit BEGIN SELECT RAISE(ABORT,'failure'); END");}return null;}).get();
+            assertThrows(ExecutionException.class,()->get(repo.adminIdentity(null,corrected,"Rollback",false,config)));
+            assertEquals("Corrected",get(repo.own(leader)).name());
+        }
+    }
     @Test void upgradeFromSchemaTwoPreservesTitlesAndCreatesReadableBackup()throws Exception{
         Path file=directory.resolve("schema2.db");UUID player=UUID.randomUUID();Class.forName("org.sqlite.JDBC");
         try(var c=DriverManager.getConnection("jdbc:sqlite:"+file);var s=c.createStatement()){

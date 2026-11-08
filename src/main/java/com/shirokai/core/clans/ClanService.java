@@ -23,8 +23,11 @@ public final class ClanService {
     private ClanService(ClanRepository repository,PermissionService permissions,Executor server,State state){this.repository=repository;this.permissions=permissions;this.server=server;this.state=state;}
     public ClanService scoped(UUID expectedClan){return new ClanService(repository.scoped(expectedClan),permissions,server,state);}
     public void presentation(com.shirokai.core.presentation.SurfaceRenderer renderer){state.presentation=renderer;}
+    public boolean customizationEnabled(){return state.presentation.customizationEnabled();}
+    public void openCustomization(net.minecraft.server.network.ServerPlayerEntity player,com.shirokai.core.presentation.Surface surface,UUID expectedClan){state.presentation.openCustomization(player,surface,expectedClan);}
     public boolean menuPresentationEnabled(){return state.presentation.menusEnabled();}
     public net.minecraft.text.Text present(UUID subject,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.render(subject,surface,value);}
+    public net.minecraft.text.Text presentClan(UUID viewer,ClanSnapshot clan,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.renderClan(viewer,clan.leader(),surface,value);}
     public ClanConfig config(){return state.config;}
     public void replaceConfig(ClanConfig value){state.config=value;}
     public void cacheOnline(Predicate<UUID> predicate){state.cacheable=predicate;}
@@ -49,6 +52,8 @@ public final class ClanService {
     public CompletableFuture<Optional<ClanRepository.TransferOffer>> transferOffer(UUID player){return repository.transferOffer(player);}
     public CompletableFuture<Map<String,Long>> invitations(UUID player){return repository.invitations(player);}
     public CompletableFuture<ClanSnapshot> own(UUID player){return repository.own(player).thenApplyAsync(clan->{remember(player,Optional.of(clan));return clan;},server);}
+    public CompletableFuture<List<String>> list(int page){return repository.list(page);}
+    public CompletableFuture<ClanSnapshot> adminIdentity(UUID actor,ClanSnapshot expected,String value,boolean tag){return changed(repository.adminIdentity(actor,expected,value,tag,config()),Set.of(),false);}
     public CompletableFuture<ClanSnapshot> find(String name){return repository.find(name);}
     public CompletableFuture<ClanSnapshot> create(UUID actor,String name,long playedSeconds){
         if(!config().creationEnabled())throw new IllegalStateException("Criação de clãs desativada");
@@ -57,6 +62,10 @@ public final class ClanService {
         return changed(repository.create(actor,config().name(name),config()),Set.of(actor),false);
     }
     public CompletableFuture<ClanSnapshot> identity(UUID actor,String value,boolean tag){return changed(repository.identity(actor,tag?config().tag(value):config().name(value),tag,config()),Set.of(actor),false);}
+    public CompletableFuture<ClanSnapshot> identityFromMenu(UUID actor,String value,boolean tag,ClanSnapshot expected){
+        return changed(repository.scoped(expected.id()).identity(actor,tag?config().tag(value):config().name(value),tag,config(),expected),Set.of(actor),false);
+    }
+    public CompletableFuture<Map<UUID,Long>> sentInvitations(UUID actor){return repository.sentInvitations(actor);}
     public CompletableFuture<ClanSnapshot> invite(UUID actor,UUID target){return repository.invite(actor,target,config());}
     public CompletableFuture<ClanSnapshot> accept(UUID actor,String name){
         var operation=repository.find(name).thenComposeAsync(clan->permissions.prepare(clan.leader()).thenComposeAsync(v->repository.accept(actor,clan.id(),clan.leader(),limit(clan.leader())),server),server);

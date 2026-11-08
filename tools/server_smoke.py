@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.10.0-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.11.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -80,7 +80,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-profile-smoke', 'PROFILE_GUI_SMOKE_PASS')
         checks.append('native menu server-side interactions with synthetic players')
         server.command('shirokai-clan-menu-smoke', 'CLAN_MENU_SMOKE_PASS')
-        checks.append('native clan menus invites roles transfer and two-step deletion')
+        checks.append('native clan menus text editor sent invites cancellation roles transfer and two-step deletion')
         server.command('shirokai-clan-smoke', 'CLAN_SMOKE_PASS')
         checks.append('native clan transactions limits transfer and confirmed disband')
         server.command('clan', '/clan exige um jogador')
@@ -93,6 +93,8 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-scoreboard-smoke', 'SCOREBOARD_SMOKE_PASS')
         checks.append('native scoreboard packets diff shared title visibility and foreign sidebar ownership')
         server.command('shirokaicore scoreboard', 'viewers=')
+        server.command('shirokai-style-smoke', 'STYLE_CHOICE_SMOKE_PASS')
+        checks.append('persisted style native menu fallback recovery independent clan choices and stale authorization')
         server.command('shirokai-presentation-smoke', 'PRESENTATION_SMOKE_PASS')
         checks.append('rich chat menu title clan presentation permission fallback and filtered mention routing')
         server.command('shirokai-chat-smoke', 'CHAT_SMOKE_PASS')
@@ -212,6 +214,16 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-chat-alias-smoke', 'CHAT_ALIAS_SMOKE_PASS')
         chat_file.write_text(original_chat)
         checks += ['invalid chat config preserves active reload', 'private command ownership change requires restart']
+        presets_file = runtime / 'config/shirokai-core/presets.json'
+        original_presets = presets_file.read_text()
+        invalid_presets = json.loads(original_presets)
+        invalid_presets['presets']['basic']['template'] = '<aqua>%visual:value%%visual:value%</aqua>'
+        presets_file.write_text(json.dumps(invalid_presets))
+        server.command('shirokaicore reload', 'Preset exige um único')
+        server.command('shirokaicore status', 'SQLite=READY')
+        presets_file.write_text(original_presets)
+        server.command('shirokaicore reload', 'Configuração recarregada')
+        checks.append('invalid preset catalog rejected atomically and corrected catalog reloads')
         config['modules']['storage'] = False
         config_file.write_text(json.dumps(config))
         server.command('shirokaicore reload', 'exige reinício; configuração ativa preservada')
@@ -225,7 +237,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
     database = runtime / 'shirokai-core/shirokai.db'
     with sqlite3.connect(database) as connection:
         assert connection.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
-        assert connection.execute('PRAGMA user_version').fetchone()[0] == 5
+        assert connection.execute('PRAGMA user_version').fetchone()[0] == 6
         assert connection.execute('SELECT count(*) FROM admin_audit').fetchone()[0] >= 2
     backups = list((runtime / 'shirokai-core/backups').glob('*.db'))
     assert len(backups) == 1
@@ -262,6 +274,6 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         assert connection.execute('SELECT count(*) FROM admin_audit').fetchone()[0] >= 2
     checks += ['storage failure isolated from server and placeholders', 'future schema preserved']
 
-result = {'passed': checks, 'count': len(checks), 'not_tested': ['player connections', 'LuckPerms runtime', 'Cobblemon', 'Impactor', 'visual GUI and packets from a real client', 'visual TAB order and scoreboard rendering', 'persistent personal/clan style choices and graphical style editor']}
+result = {'passed': checks, 'count': len(checks), 'not_tested': ['player connections', 'LuckPerms runtime', 'Cobblemon', 'Impactor', 'visual GUI and packets from a real client', 'visual TAB order and scoreboard rendering']}
 (reports / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
 print(json.dumps(result, indent=2))

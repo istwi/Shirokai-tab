@@ -1,80 +1,78 @@
-# Estado real do projeto — 0.10.0-dev
+# Estado real do projeto — 0.11.0-dev
 
-## Situação
+## Entrega atual
 
-Apresentação configurável de cabeçalhos de chat, menus de perfil/clã e identificações
-adicionada. Valores continuam literais; seleção/permissões/roteamento são preservados.
-TAB/sidebar compõem o mesmo título formatado. Integrações0.9 e módulos anteriores
-preservados. O projeto completo NÃO está entregue: escolhas pessoais de estilos,
-editor/administração avançada de clãs, recursos extras e cliente real seguem pendentes.
+Personalização persistida implementada sobre a apresentação0.10, sem substituir
+seleções de títulos, sistema de clãs ou grupos LuckPerms. Catálogo administrativo de
+presets com IDs estáveis, permissões e três escopos: TITLE pessoal, CLAN_NAME e CLAN_TAG.
+As escolhas de clã são independentes, exclusivas do líder e compartilhadas entre membros.
+Detalhes, JSON, comandos e semântica em CUSTOMIZATION.md.
 
-## Implementado nesta etapa
+- /estilo e seletores no /perfil e /clan. Preview, paginação, estados explícitos,
+  reset por campo, bloqueio de ações de inventário/outro jogador/tela fechada.
+- ID salvo é preservado quando permissão expira/preset some; fallback básico permitido
+  é renderizado. Recuperação de permissão/reintrodução do ID restaura a escolha.
+- Um único título continua compartilhado por TAB/sidebar. Chat tem no máximo duas
+  identificações, com corpo/assinatura/máscara/gates intactos. CLAN continua associação real.
+- Rich slots aplicam escolhas em títulos e placeholders de nome/sigla sem reinterpretar
+  dados ou alterar Text compartilhado. Sem SQL por tick/render; cache por sessão/eventos.
+- Schema6 cria escolhas/revisões com FK/cascade do clã, auditoria atômica e CAS.
+  Migração1..5 faz backup antes da transação; rollback/futuro/restart são testados.
+  Escolhas concorrentes não se sobrescrevem. SQL revalida associação e líder do UUID exato.
+- Presets compilam junto dos demais snapshots de reload; inválidos rejeitam o candidato
+  inteiro. Telas e writes da geração anterior são recusados. Permissão é verificada
+  na thread do servidor antes de enfileirar; não há transação distribuída SQLite/LP.
+- Editor textual de nome/sigla por bigorna: digitar e clicar no papel à esquerda salva;
+  Esc cancela. Sem forja/material/XP; ícones são limpos antes de fechar. Escopo do clã,
+  CAS do campo, cargos/configuração/validade/unicidade e cooldowns são revalidados.
+- Convites enviados listados por UUID/prazo, com cancelamento autorizado no menu.
+- Administração inicial: list/inspect/rename/tag, permissões separadas e CAS/auditoria.
+  Correção ignora espera mas preserva prazos dos cooldowns, membros e liderança.
+  Não força transferências/exclusões nem faz reparos relacionais automáticos.
 
-- presentation.json com superfícies, regras por prioridade/permissão/grupo/dimensão,
-  flags e permissão de menção. Todos os candidatos, inclusive regras inativas, compilam
-  antes do reload atômico; arquivo existente nunca é sobrescrito. Uso em PRESENTATION.md.
-- StyleEngine compõe slots Text sem reanalisar dados, remove click/hover/insertion e
-  não altera Text compartilhado. Caminho de strings/cache anterior permanece disponível.
-- Cabeçalhos juntam as duas identificações selecionadas já validadas/ordenadas e seus
-  estilos. Não acrescentam cargo/prefixo fora dos dois slots. Duplicação de tags, corpo
-  e animações nos templates de chat são rejeitados; dados não são comandos ou markup.
-- Chat normal usa o mesmo SentMessage/withoutUnsigned: corpo, signature field e máscara
-  não são alterados para estilizar menções. Menção vira overlay separado apenas para
-  destinatário alcançado; destinatário sujeito a filtragem não recebe essa notificação.
-- Mensagens system continuam não assinadas. Podem colorir @Nome conhecido sem mudar
-  caracteres ou interpretar tags, e corpo não herda o clique do autor. Todos os gates
-  anteriores (mute/ignore/spam/alcance/staff/clã/privado) continuam na mesma rota.
-- Perfil aplica estilos de menus e preview do título. Cartão do clã permite templates
-  independentes para nome e sigla. Ações, proteção de inventário, escopo/CAS e confirmações
-  não mudaram. Botão de retorno do perfil mantém identidade exigida pelo pedido original.
-- Títulos compartilhados entre TAB/sidebar usam componentes formatados do TitleService.
-  Perda de permissão visual aplica fallback sem apagar seleção ou regra administrativa;
-  entitlement de título continua independente. Não cria escolha pessoal/editor persistido.
-- Nenhuma mudança de schema SQLite (permanece5), dependência, protocolo ou mixin de produção.
+Sem mudanças de dependências externas, protocolo ou mixins de produção. Nenhuma
+release ou configuração de ambiente foi publicada/reaplicada nesta tarefa.
 
-## Validação desta etapa
+## Validação executada
 
-- Build/JUnit:84testes executados,0falhas,0erros,0ignorados na rodada concluída.
-- Smoke sem opcionais:42checks aprovados em3boots reais Fabric, incluindo restart,
-  backups/schema futuro, regressões de todos os módulos e reload inválido de presentation.
-- Smoke com mods reais:12checks aprovados na rodada0.10, sem regressões dos adapters.
-- PresentationPlanTest valida arquivo/tipos/condições/fallback, candidatos inválidos,
-  proibição de corpo/animações/tags repetidas e rich slots com Unicode/cores/imutabilidade.
-- PresentationSmoke verifica cores de duas identificações, corpo/signature field/máscara/
-  unsignedContent, filtragem de menção, privado/local/mute, perdas/retorno de permissão,
-  remoção de ações de Text, título em TAB/sidebar e previews de perfil/nome/sigla de clã.
-- HoverEvent depende dos registries Minecraft; seu teste foi mantido no smoke Fabric
-  depois do diagnóstico Not bootstrapped no JUnit cru, sem desativar o cenário.
+- Build/JUnit: **95 testes, 0 falhas, 0 erros, 0 ignorados** na rodada final.
+- Smoke sem opcionais: **44 verificações em 3 boots Fabric**, incluindo editor textual,
+  convites enviados, estilos persistidos/menus, pacotes TAB/sidebar, fallback/recuperação,
+  catálogo removido/tela antiga/liderança antiga e reload inválido de presets.
+- Smoke com mods reais: **14 verificações aprovadas**, incluindo permissão real do
+  LuckPerms para preset persistido, perda/fallback/recuperação, consulta administrativa
+  pelo console e regressões Cobblemon/Impactor/Dex/PAPI.
+- Preparação de integrações: cinco mods oficiais e53dependências aninhadas verificados
+  sem alterar bytes, hashes, TLS ou versões.
+- JAR inspecionado: versão0.11/refmap presentes, sem classes smoke e somente SQLite aninhado.
 
-Evidências atuais: build/reports/tests/test/index.html, build/server-smoke/result.json,
-build/integration-smoke/result.json e logs de cada runner. Conexões/jogadores sintéticos,
-não autenticação, assinatura criptográfica válida ou cliente gráfico real.
+Evidências: build/reports/tests/test/index.html, build/server-smoke/result.json,
+build/integration-smoke/result.json e logs dos runners. Resultados0.10 históricos:
+84JUnit,42checks básicos e12com opcionais; não substituem as verificações atuais.
 
 ## Artefato
 
-`build/libs/shirokai-core-0.10.0-dev.jar`, de desenvolvimento, NÃO release estável.
-SHA-256: `308bb14a5982ec3f09f4b0e73d4fe54dbe618373d564b631c79c918e961a6b12`.
-JAR inspecionado: versão/refmap corretos, sem classes smoke e somente SQLite aninhado.
+build/libs/shirokai-core-0.11.0-dev.jar — desenvolvimento, não release estável.
+SHA-256: b50e8e7edc83a8888eb32b964eab6595cac3d8452f0c45a23b4bd93a48c8c264.
+Base remota antes desta etapa: f3db2d040399253e019e93af5491b6005b610689.
+Commit final é informado na entrega; não incluir o próprio hash no seu conteúdo.
 
-## Limitações e próxima entrega
+## Limitações e continuidade
 
-A política visual desta etapa é administrativa. Preservar uma regra no JSON quando
-uma permissão expira não equivale a uma escolha pessoal gravada no DB. O próximo passo
-é presets/seleções por jogador/clã com autorização, persistência e testes transacionais/
-restart, incluindo estilos independentes de nome/sigla. Não aceitar markup do jogador.
+Projeto completo NÃO está entregue. Presets desta etapa são estáticos: não há
+animação pessoal/de clã, transições ou personalização separada de nome de conta/menu.
+Animações de layouts anteriores continuam. Administração relacional avançada,
+listed/vanish por viewer, nametags, BELOW_NAME e bossbar permanecem em NEXT_STEPS.md.
 
-Não há animação de menus/histórico nem reescrita visual do corpo assinado. Menus abertos
-reavaliam ao atualizar/reabrir; renderização/escala/fonte/actionbar com cliente real e
-carga continuam pendentes. Assinaturas de verdade e contextos LP autenticados não foram
-validados; o authlib ainda pode falhar por DNS, sem desativar online-mode.
-
-Contratos/versões de adapters externos em INTEGRATIONS.md. Fonte da Pokédex e moedas
-continuam explícitas; não há fallback primário, dados fictícios, acesso privado ou
-transação distribuída. Sidebar cede a objetivos externos e teams do TAB seguem opt-in.
-Administração/editor de clãs e extras de TAB permanecem em NEXT_STEPS.md. CI remoto
-não verificado. Nenhuma release ou configuração de ambiente publicada/reaplicada.
+Jogadores/conexões dos smokes são sintéticos: não validam login autenticado,
+assinatura criptográfica válida, renderização real, contextos LP de clientes,
+reconexão/mudança de mundo de cliente, escala/actionbar ou carga/conflitos universais.
+Neste runtime, authlib registrou UnknownHostException para api.minecraftservices.com
+na busca de publickeys; online-mode foi preservado. Não há sessão de cliente
+Minecraft autenticado fornecida ao teste. Integrações usam somente APIs públicas
+fixadas; moedas/fontes de Pokédex continuam explícitas. CI remoto não foi verificado.
 
 ## GitHub
 
-Base desta etapa:f36fd1e em istwi/Shirokai-tab. Salvar progresso em main sem reescrever
-histórico, conforme autorização. Configuração de ambiente e publicação continuam separadas.
+Trabalho autorizado em istwi/Shirokai-tab/main, preservando histórico; commit/push
+somente após revisão e checks. Publicação de ambiente e release continuam separadas.

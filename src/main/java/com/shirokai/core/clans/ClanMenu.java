@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 
 /** Native read-only menus; mutation uses fresh server/SQL authorization and expected clan ID. */
 public final class ClanMenu extends GenericContainerScreenHandler {
-    public enum Page { HOME, MEMBERS, INVITES, INVITE_PLAYER, MEMBER, DISBAND, TRANSFER }
-    private record Data(Optional<ClanSnapshot> clan,Map<String,Long> invitations,Optional<ClanRepository.TransferOffer> transfer,int limit){}
+    public enum Page { HOME, MEMBERS, INVITES, INVITE_PLAYER, MEMBER, DISBAND, TRANSFER, SENT_INVITES, IDENTITY }
+    private record Data(Optional<ClanSnapshot> clan,Map<String,Long> invitations,Optional<ClanRepository.TransferOffer> transfer,int limit,Map<UUID,Long> sent){}
     private final ServerPlayerEntity owner;
     private final ClanService clans;
     private final SimpleInventory display;
@@ -35,7 +35,9 @@ public final class ClanMenu extends GenericContainerScreenHandler {
     }
     private static CompletableFuture<Data> load(UUID actor,ClanService service,java.util.concurrent.Executor server){
         return service.membership(actor).thenComposeAsync(clan->service.invitations(actor).thenComposeAsync(invites->service.transferOffer(actor).thenComposeAsync(transfer->
-            (clan.isPresent()?service.currentLimit(clan.get()):CompletableFuture.completedFuture(0)).thenApply(limit->new Data(clan,invites,transfer,limit)),server),server),server);
+            (clan.isPresent()?service.currentLimit(clan.get()):CompletableFuture.completedFuture(0)).thenApply(limit->new Data(clan,invites,transfer,limit,Map.of())),server),server),server)
+            .thenComposeAsync(data->data.clan().isEmpty()?CompletableFuture.completedFuture(data):service.scoped(data.clan().get().id()).sentInvitations(actor)
+                .thenApply(sent->new Data(data.clan(),data.invitations(),data.transfer(),data.limit(),sent)),server);
     }
     public static void open(ServerPlayerEntity player,ClanService service){
         var previous=player.currentScreenHandler;
@@ -64,19 +66,26 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     data.clan().map(clan->"Membros: "+clan.members().size()+"/"+data.limit()).orElse("Você pode aceitar um convite abaixo."),
                     data.clan().map(clan->"Seu cargo: "+clan.members().get(owner.getUuid())).orElse(""));
                 if(clans.menuPresentationEnabled())data.clan().ifPresent(clan->{
-                    var card=display.getStack(4);card.set(DataComponentTypes.CUSTOM_NAME,clans.present(clan.leader(),Surface.CLAN_NAME,clan.name()));
+                    var card=display.getStack(4);card.set(DataComponentTypes.CUSTOM_NAME,clans.presentClan(owner.getUuid(),clan,Surface.CLAN_NAME,clan.name()));
                     var lore=new ArrayList<Text>(card.get(DataComponentTypes.LORE).lines());
-                    lore.set(0,Text.literal("Sigla: ").formatted(Formatting.GRAY).append(clans.present(clan.leader(),Surface.CLAN_TAG,Objects.toString(clan.tag(),"Não definida"))));
+                    lore.set(0,Text.literal("Sigla: ").formatted(Formatting.GRAY).append(clans.presentClan(owner.getUuid(),clan,Surface.CLAN_TAG,Objects.toString(clan.tag(),"Não definida"))));
                     card.set(DataComponentTypes.LORE,new LoreComponent(lore));
                 });
                 item(22,Items.PAPER,"Convites recebidos",Integer.toString(data.invitations().size()));
                 if(data.clan().isPresent()){
                     item(20,Items.PLAYER_HEAD,"Membros e cargos");item(24,Items.WRITABLE_BOOK,"Convidar jogador");
-                    item(30,Items.NAME_TAG,"Nome e sigla","/clan rename <nome>","/clan tag <sigla>","Alterações gratuitas; cooldowns independentes.");
+                    item(30,Items.NAME_TAG,"Editar nome e sigla","Editor textual; sem custo de experiência.","Alterações gratuitas; cooldowns independentes.");
+                    item(31,Items.PAPER,"Convites enviados",Integer.toString(data.sent().size()),"Clique em um convite para cancelar.");
+                    if(clans.customizationEnabled()&&own().leader().equals(owner.getUuid())){item(28,Items.PAINTING,"Estilo do nome");item(29,Items.PAINTING,"Estilo da sigla");}
                     item(32,Items.OAK_DOOR,"Sair do clã");
                     if(own().leader().equals(owner.getUuid()))item(40,Items.TNT,"Excluir clã","Exige confirmação em outra tela.");
                 }
                 if(data.transfer().isPresent()){item(46,Items.EMERALD,"Aceitar liderança","Confirme a solicitação recebida.");item(47,Items.BARRIER,"Recusar liderança");}
+            }
+            case IDENTITY->{item(20,Items.NAME_TAG,"Editar nome completo");item(24,Items.PAPER,"Editar sigla");}
+            case SENT_INVITES->{
+                var entries=data.sent().keySet().stream().sorted().toList();index=Math.min(index,Math.max(0,(entries.size()-1)/36));
+                for(int i=0;i<36&&index*36+i<entries.size();i++){UUID player=entries.get(index*36+i);targets.put(9+i,player);item(9+i,Items.PAPER,name(player),"Expira em: "+java.time.Instant.ofEpochMilli(data.sent().get(player)),"Clique para cancelar; autorização revalidada.");}
             }
             case MEMBERS,INVITE_PLAYER->{
                 var entries=page==Page.MEMBERS?own().members().keySet().stream().sorted().toList():owner.getServer().getPlayerManager().getPlayerList().stream()
@@ -126,7 +135,10 @@ public final class ClanMenu extends GenericContainerScreenHandler {
             if(slot==45){index=Math.max(0,index-1);render();return;}if(slot==53){index++;render();return;}
             switch(page){
                 case HOME->{
-                    if(slot==22)navigate(Page.INVITES);
+                    if((slot==28||slot==29)&&data.clan().isPresent()&&clans.customizationEnabled())clans.openCustomization(owner,slot==28?Surface.CLAN_NAME:Surface.CLAN_TAG,own().id());
+                    else if(slot==22)navigate(Page.INVITES);
+                    else if(slot==30&&data.clan().isPresent())navigate(Page.IDENTITY);
+                    else if(slot==31&&data.clan().isPresent())navigate(Page.SENT_INVITES);
                     else if(slot==20&&data.clan().isPresent())navigate(Page.MEMBERS);
                     else if(slot==24&&data.clan().isPresent())navigate(Page.INVITE_PLAYER);
                     else if(slot==32&&data.clan().isPresent())action(()->scoped().leave(owner.getUuid()),Page.HOME);
@@ -134,6 +146,8 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     else if(slot==46&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),true),Page.HOME);
                     else if(slot==47&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),false),Page.HOME);
                 }
+                case IDENTITY->{if(slot==20||slot==24)ClanIdentityEditor.open(owner,clans,own(),slot==24);}
+                case SENT_INVITES->{if(targets.containsKey(slot)){UUID recipient=targets.get(slot);action(()->scoped().cancel(owner.getUuid(),recipient),Page.SENT_INVITES);}}
                 case MEMBERS->{if(targets.containsKey(slot)){target=targets.get(slot);navigate(Page.MEMBER);}}
                 case INVITE_PLAYER->{if(targets.containsKey(slot)){UUID recipient=targets.get(slot);action(()->scoped().invite(owner.getUuid(),recipient).thenApplyAsync(clan->{
                     var online=owner.getServer().getPlayerManager().getPlayer(recipient);if(online!=null)online.sendMessage(Text.literal("Convite do clã "+clan.name()+". Use /clan invites."),false);return clan;

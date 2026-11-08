@@ -1,7 +1,7 @@
 # Clãs nativos — 0.5.0-dev
 
 Núcleo por comandos e menus nativos; sigla integrada ao /perfil como identificação CLAN.
-Estilos avançados, ferramentas administrativas de correção seguem pendentes; chat de clã está integrado ao módulo chat0.6.
+Presets estáticos, editor textual e administração inicial estão descritos na atualização0.11 abaixo; animações e reparos relacionais avançados seguem pendentes. Chat de clã está integrado ao módulo chat0.6.
 
 ## Regras implementadas
 
@@ -120,8 +120,8 @@ Convites: clique esquerdo aceita, direito recusa; capacidade/validade são checa
 Transferência: líder escolhe membro e confirma solicitação; destinatário ainda deve
 aceitar em seu próprio menu. Exclusão: primeiro clique registra pedido e abre outra tela;
 segundo clique confirma. Cancelar também revoga o pedido no banco.
-Nome/sigla são orientados por comandos no painel; editor textual gráfico não implementado.
-Convites enviados podem ser cancelados por comando; listagem gráfica de enviados pendente.
+Nome/sigla têm editor textual desde0.11; instruções e segurança na atualização abaixo.
+Convites enviados podem ser cancelados por comando ou pela página adicionada em0.11.
 
 Menus são somente leitura de itens, com bloqueio de swaps/shift/throw/clone/craft,
 outro usuário e tela fechada. Toda ação com clã é vinculada ao ID mostrado na tela:
@@ -163,3 +163,37 @@ Templates administrativos CLAN_NAME e CLAN_TAG são independentes e envolvem val
 literais, com regras de grupo/permissão/mundo. Cartão do menu usa contexto do líder;
 identificação equipada usa contexto do jogador. Não há editor/escolha persistida de
 estilo do próprio clã ainda. Escopo, autorização e confirmações anteriores permanecem.
+
+## Atualização0.11
+
+Presets persistidos de nome/sigla, independentes e somente por líder, em
+CUSTOMIZATION.md. Cores básicas gratuitas; HEX/gradientes com permissões e fallback
+sem apagar ID. Transferir liderança preserva escolhas e reavalia permissões do sucessor.
+
+O menu agora oferece editor textual para nome/sigla: digite no campo da bigorna e
+clique no papel de entrada à esquerda para salvar; Esc cancela. O resultado de forja
+não é usado: nenhum XP/material é cobrado. Ícones não entram no inventário, inclusive
+ao fechar. Todas as formas de mover itens são bloqueadas. O campo exibido funciona
+como CAS: alterações concorrentes pedem reabrir; o outro campo continua independente.
+Revalida UUID do clã, cargo, config, validade/unicidade e cooldown na transação.
+Aparência/interação com cliente real ainda precisa ser verificada.
+
+Página Convites enviados lista destinatários por UUID/nome online e prazo. Clique
+cancela usando o mesmo serviço, que revalida cargo/config/clã. Convites vencidos não
+aparecem. Todos os membros podem consultar a lista do próprio clã; somente cargos
+autorizados a invite podem cancelar. Convites recebidos/aceitação continuam intactos.
+
+Administração inicial, separada das ações de jogador:
+
+- /shirokaicore clans list [page]: 20itens por página, começando em1.
+- /shirokaicore clans inspect <id>: UUID ou nome sem espaço; UUID é recomendado.
+- /shirokaicore clans rename <id> <nome>
+- /shirokaicore clans tag <id> <sigla>
+
+Consulta exige shirokaicore.command.clans.inspect. Correção exige
+shirokaicore.command.clans.identity, revalidada após leitura assíncrona e antes de
+enfileirar. Correção ignora a espera do cooldown, mas preserva seus prazos, membros,
+seleções e liderança. Valida regras/unicidade, CAS do campo e auditoria atômica;
+não força exclusão/transferência nem repara integridade relacional automaticamente.
+Console usa o fallback administrativo existente; clan_history identifica console pelo
+UUID zero, admin_audit mantém actor_uuid NULL. Falha de auditoria reverte correção.

@@ -37,7 +37,7 @@ class ChatRepositoryTest {
             storage.setScoreboard(player,false).get();storage.saveTitles(new TitleState(player,0,Map.of(),"traveler",List.of("traveler"))).get();new ClanRepository(storage,Clock.systemUTC()).create(player,"Preserved",ClanConfig.defaults()).get();
         }
         try(var c=DriverManager.getConnection("jdbc:sqlite:"+db);var s=c.createStatement()){
-            s.execute("DROP TABLE chat_profiles");s.execute("DROP TABLE chat_ignores");s.execute("DROP TABLE chat_mutes");s.execute("ALTER TABLE player_preferences DROP COLUMN animations_enabled");s.execute("PRAGMA user_version=3");
+            s.execute("DROP TABLE chat_profiles");s.execute("DROP TABLE chat_ignores");s.execute("DROP TABLE chat_mutes");s.execute("DROP TABLE clan_style_choices");s.execute("DROP TABLE player_style_choices");s.execute("ALTER TABLE player_preferences DROP COLUMN animations_enabled");s.execute("PRAGMA user_version=3");
         }
         try(var storage=new SqliteStorage(db)){
             assertFalse(storage.preferences(player).get().scoreboardEnabled());assertEquals("traveler",storage.titleState(player).get().selectedVisual());assertEquals("Preserved",new ClanRepository(storage,Clock.systemUTC()).own(player).get().name());

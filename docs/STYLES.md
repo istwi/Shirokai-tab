@@ -1,4 +1,4 @@
-# Motor de estilos — 0.10.0-dev
+# Motor de estilos — 0.11.0-dev
 
 StyleEngine compila templates administrativos em árvore imutável. Valores de placeholders
 são inseridos depois, como texto literal: tags contidas em nomes, prefixos, siglas ou
@@ -66,7 +66,7 @@ Templates de presentation.json e chat.json são compilados junto do candidato de
 Corpo normal assinado permanece inalterado; comandos system podem destacar menções
 sem interpretar markup. Ver PRESENTATION.md para condições, limites e compatibilidade.
 Dados dinâmicos não ganham estilo por conter tags; os templates envolvem valores literais.
-Escolhas pessoais de estilo e editor de clã continuam pendentes.
+Escolhas pessoais estáticas e editor de clã estão implementados em0.11; ver CUSTOMIZATION.md.
 
 styles.json, tab.json e scoreboard.json entram no mesmo reload atômico dos demais módulos. Animação
 desconhecida, tag inválida ou template estático grande impede publicar o candidato.
@@ -82,3 +82,10 @@ renderRich compõe slots de Text sem reanalisar markup, mantendo cores/formatos 
 removendo click/hover/insertion. Não altera Text da origem/cache. Usado para inserir
 identificações já formatadas em cabeçalhos/HUDs. Rich slots não compartilham cache de
 strings: evitam colisões entre valores iguais com estilos diferentes.
+
+## Atualização0.11
+
+Escolhas persistidas de presets estáticos foram implementadas: CUSTOMIZATION.md.
+O catálogo reusa o mesmo StyleEngine e os mesmos limites/remoção de ações de rich slots.
+Presets não aceitam animação ou placeholders extras porque são compartilhados por
+identificações de chat e HUDs. Animações existentes dos layouts continuam disponíveis.

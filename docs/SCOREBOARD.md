@@ -113,3 +113,9 @@ visibilidade/reconexão, comandos, sidebar externo/bundle/slots coloridos e coli
 O runner também rejeita scoreboard inválido dentro de reload atômico real.
 Resultados executados ficam em PROJECT_STATUS.md. Isso não valida aparência,
 login, autenticação, transporte real ou compatibilidade com todos os mods.
+
+## Personalização0.11
+
+selected_title mantém o mesmo preset do TAB; clan/clan_tag compõem rich slots com
+as escolhas independentes do clã. Alterações de seleção invalidam sidebar; perdas
+de permissão são reavaliadas no render. Sem SQL por frame ou mudança de ownership.

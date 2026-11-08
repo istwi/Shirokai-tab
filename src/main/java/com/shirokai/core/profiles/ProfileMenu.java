@@ -69,6 +69,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
             display.setStack(9+i,stack);
         }
         display.setStack(45, icon(Items.ARROW, "Página anterior"));
+        if(titles.customizationEnabled())display.setStack(47,icon(Items.PAINTING,"Estilo dos títulos","Escolher preset salvo; não muda seus títulos."));
         display.setStack(48, icon(Items.MILK_BUCKET, "Remover todas as seleções"));
         display.setStack(49, icon(Items.CLOCK, "Atualizar perfil", "Página " + (page + 1)));
         var back = new ItemStack(Items.ARROW);
@@ -95,6 +96,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
             else owner.sendMessage(Text.literal("Menu principal não está disponível neste servidor."), false);
             return;
         }
+        if(slot==47&&titles.customizationEnabled()){titles.openCustomization(owner);return;}
         CompletableFuture<TitleState> operation;
         try {
             if (slot == 48) operation = titles.clear(owner.getUuid());

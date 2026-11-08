@@ -22,6 +22,7 @@ public final class ShirokaiCore implements ModInitializer {
         var commands = new AdminCommands(() -> runtime, version);
         CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
             commands.register(dispatcher);
+            new com.shirokai.core.customization.StyleChoiceCommands(()->runtime).register(dispatcher);
             new ProfileCommands(() -> runtime).register(dispatcher);
             new com.shirokai.core.clans.ClanCommands(() -> runtime).register(dispatcher);
             new ChatCommands(()->runtime).register(dispatcher);

@@ -185,3 +185,22 @@ no smoke Fabric após Not bootstrapped no JUnit cru; não foi desativada.
 Sem mudança de versão externa, protocolo, schema SQLite ou novos mixins. Testes usam
 conexões sintéticas: preservação dos campos não valida assinatura criptográfica nem
 renderização no cliente. Contratos e limitações em PRESENTATION.md.
+
+## Atualização0.11
+
+Sem alteração de dependências, protocolo ou mixins. Presets usam o StyleEngine e
+Text/rich slots já auditados; JDBC usa transações, FK/cascade, revisão otimista e
+VACUUM INTO. Schema6 mantém as versões de configs anteriores.
+
+Antes do editor, javap do JAR nomeado MC1.21.1/Yarn1.21.1+build.3 confirmou
+AnvilScreenHandler(int,PlayerInventory,ScreenHandlerContext), setNewItemName(String),
+updateResult, canTakeOutput; ForgingScreenHandler.input/output e onClosed. O handler
+usa ScreenHandlerContext.EMPTY, intercepta cliques de entrada e nunca forja/consome XP.
+Limpa ícones antes de onClosed para não devolver papel sintético ao inventário.
+A validação Fabric do handler não comprova renderização/transporte de cliente real.
+
+Extras de TAB continuam exigindo implementação separada e ownership explícito:
+1.21.1 usa PlayerList action UPDATE_LISTED para presença na lista; não inventar
+list-order de versões futuras. Nametags dependem de teams globais; objetivos
+BELOW_NAME são globais por viewer; bossbars têm identidades próprias. Nenhum desses
+recursos novos foi implementado nesta etapa.

@@ -46,9 +46,9 @@ public final class SqliteStorage implements AutoCloseable {
         try (Statement s = c.createStatement(); ResultSet rows = s.executeQuery("PRAGMA user_version")) {
             if (!rows.next()) throw new SQLException("Schema não retornado"); version = rows.getInt(1);
         }
-        if (version > 5) throw new SQLException("Banco mais recente que o mod: schema " + version);
-        if (version == 5) return;
-        if (version >= 1 && version <= 4) {
+        if (version > 6) throw new SQLException("Banco mais recente que o mod: schema " + version);
+        if (version == 6) return;
+        if (version >= 1 && version <= 5) {
             Path backup = file.resolveSibling(file.getFileName() + ".schema" + version + "-" + UUID.randomUUID() + ".bak.db");
             try (PreparedStatement s = c.prepareStatement("VACUUM INTO ?")) { s.setString(1, backup.toString()); s.execute(); }
         }
@@ -66,8 +66,9 @@ public final class SqliteStorage implements AutoCloseable {
                 }
                 if(previous < 3)ClanSchema.migrate(s);
                 if(previous < 4)ChatSchema.migrate(s);
-                s.execute("ALTER TABLE player_preferences ADD COLUMN animations_enabled INTEGER NOT NULL DEFAULT 1 CHECK(animations_enabled IN(0,1))");
-                s.execute("PRAGMA user_version=5");
+                if(previous < 5)s.execute("ALTER TABLE player_preferences ADD COLUMN animations_enabled INTEGER NOT NULL DEFAULT 1 CHECK(animations_enabled IN(0,1))");
+                com.shirokai.core.customization.StyleChoiceRepository.migrate(s);
+                s.execute("PRAGMA user_version=6");
             }
             return null;
         });

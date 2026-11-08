@@ -58,6 +58,8 @@ public final class TabRuntime implements AutoCloseable{
         if(titles!=null&&(key.equals("shirokai:selected_title")||key.equals("shirokai:title_prefix"))){
             Text title=titles.visualPresentation(subject.getUuid());return key.equals("shirokai:title_prefix")&&!title.getString().isEmpty()?Text.empty().append(title).append(Text.literal(" ")):title;
         }
+        if(clans!=null&&(key.equals("shirokai:clan")||key.equals("shirokai:clan_tag"))&&clans.cached(subject.getUuid()).isPresent())
+            return clans.present(subject.getUuid(),key.equals("shirokai:clan")?com.shirokai.core.presentation.Surface.CLAN_NAME:com.shirokai.core.presentation.Surface.CLAN_TAG,resolve(key,subject,viewer,metadata,count));
         return Text.literal(resolve(key,subject,viewer,metadata,count));
     }
     private Text lines(List<StyleEngine.Compiled> templates,Function<String,Text> resolver,boolean animate){

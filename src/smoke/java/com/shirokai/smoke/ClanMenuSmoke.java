@@ -47,6 +47,28 @@ public final class ClanMenuSmoke implements ModInitializer {
             .thenComposeAsync(clan->clans.invite(a,b),server).thenComposeAsync(clan->{ClanMenu.open(member,clans);return until.apply(()->member.currentScreenHandler instanceof ClanMenu);},server)
             .thenComposeAsync(v->{click(member,22);check(menu(member).page()==ClanMenu.Page.INVITES,"Invite page missing");click(member,9);return until.apply(()->clans.cached(b).isPresent()&&menu(member).page()==ClanMenu.Page.HOME);},server)
             .thenComposeAsync(v->{ClanMenu.open(leader,clans);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);},server)
+            .thenComposeAsync(v->clans.invite(a,UUID.fromString("33333333-3333-3333-3333-333333333333")),server)
+            .thenComposeAsync(v->{click(leader,49);return until.apply(()->menu(leader).getSlot(31).getStack().get(net.minecraft.component.DataComponentTypes.LORE).lines().getFirst().getString().equals("1"));},server)
+            .thenComposeAsync(v->{click(leader,31);check(menu(leader).page()==ClanMenu.Page.SENT_INVITES,"Sent invites page missing");click(leader,9);return until.apply(()->menu(leader).getSlot(9).getStack().isEmpty());},server)
+            .thenComposeAsync(v->{click(leader,50);click(leader,30);click(leader,20);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor);},server)
+            .thenComposeAsync(v->{
+                var editor=(com.shirokai.core.clans.ClanIdentityEditor)leader.currentScreenHandler;
+                check(editor.setNewItemName("MenuEdited"),"Editor refused text");
+                for(var action:SlotActionType.values())if(action!=SlotActionType.PICKUP)editor.onSlotClick(0,0,action,leader);
+                editor.onSlotClick(0,0,SlotActionType.PICKUP,member);
+                check(clans.cached(a).orElseThrow().name().equals("MenuClan"),"Invalid editor action changed identity");
+                check(editor.quickMove(leader,0).isEmpty(),"Editor transferred paper");
+                editor.onSlotClick(0,0,SlotActionType.PICKUP,leader);
+                return until.apply(()->leader.currentScreenHandler instanceof ClanMenu&&clans.cached(a).orElseThrow().name().equals("MenuEdited"));
+            },server).thenComposeAsync(v->{
+                check(leader.getInventory().getStack(0).getCount()==5&&leader.experienceLevel==0,"Editor altered inventory or XP");
+                check(!leader.getInventory().contains(new ItemStack(Items.PAPER)),"Editor leaked display paper");
+                click(leader,30);click(leader,24);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor);
+            },server).thenComposeAsync(v->{
+                var editor=(com.shirokai.core.clans.ClanIdentityEditor)leader.currentScreenHandler;editor.setNewItemName("CANCEL");leader.closeHandledScreen();
+                editor.onSlotClick(0,0,SlotActionType.PICKUP,leader);check(clans.cached(a).orElseThrow().tag()==null,"Closed editor saved draft");
+                ClanMenu.open(leader,clans);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);
+            },server)
             .thenComposeAsync(v->{var menu=menu(leader);check(!menu.canUse(member),"Other player owns menu");
                 for(var action:SlotActionType.values())if(action!=SlotActionType.PICKUP)menu.onSlotClick(40,0,action,leader);
                 menu.onSlotClick(40,0,SlotActionType.PICKUP,member);menu.onSlotClick(-999,0,SlotActionType.PICKUP,leader);

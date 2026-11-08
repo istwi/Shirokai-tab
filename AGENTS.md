@@ -58,3 +58,12 @@ removem ações e não alteram Text do cache. Cabeçalho usa no máximo duas tag
 Corpo assinado/máscara permanecem intactos; notificação de menção só após roteamento
 e nunca para destinatário sujeito a filtragem. Estilos configurados não são escolhas
 pessoais persistidas: não declarar editor/personalização por jogador/clã concluídos.
+
+Personalização0.11: leia docs/CUSTOMIZATION.md. Schema6 guarda somente IDs de presets;
+perda de permissão/remoção de preset nunca apaga a escolha. CLAN_NAME/CLAN_TAG são
+independentes; somente líder atual pode escolher. Revalidar UUID do clã no SQL,
+revisão CAS e geração do catálogo; sem JDBC por render. Nunca modificar grupos LP.
+Editor textual de clã usa anvil sem itens/XP reais: clique no papel de entrada
+confirma, Esc cancela; limpar ícones antes de super.onClosed para não dar itens.
+Identidade exige snapshot do campo mostrado e cargo/config atuais. Administração
+de identidade tem permissão própria, auditoria/CAS e preserva cooldowns/membros.

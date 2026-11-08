@@ -143,3 +143,9 @@ Chat assinado mantém seu corpo/unsignedContent/máscara; menção usa overlay s
 somente após entrega autorizada e sem notificar destinatário que usa filtragem.
 Mensagens system destacam @Nome conhecido sem interpretar tags nem mudar caracteres.
 Detalhes, permissões de menção, formatos e testes atuais em PRESENTATION.md.
+
+## Personalização0.11
+
+Identificações ROLE/SPECIAL usam o preset pessoal TITLE; CLAN usa CLAN_TAG do clã.
+Não há identificação extra, alteração de corpo/assinatura/máscara ou reanálise de
+markup. Permissão visual é independente de entitlement e dos gates de roteamento.

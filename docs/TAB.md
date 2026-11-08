@@ -119,3 +119,10 @@ cliente real e runtime LuckPerms Fabric ainda não validados.
 Não implementados ainda: controle de listed/vanish por viewer, nametags customizados,
 objetivos abaixo do nome, bossbar, controles por grupo contextual além das condições
 atuais e adaptadores externos completos. Nada disso foi marcado como concluído.
+
+## Personalização0.11
+
+Título compartilhado incorpora preset pessoal/clã por rich slot; placeholders
+clan/clan_tag também compõem nome/sigla formatados sem reanálise de markup.
+Nenhum SQL por frame; escolhas são carregadas no join/eventos/ações. Ownership,
+ordenação e limitações listed/vanish/nametags/BELOW_NAME/bossbar não foram alterados.

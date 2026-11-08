@@ -157,3 +157,23 @@ literal sem clique herdado, perda/retorno de permissão sem apagar título/regra
 base compartilhado em TAB/sidebar e preview real dos menus de perfil/clã.
 Runner também rejeita presentation inválida dentro de um reload atômico completo.
 Não equivale a cliente autenticado, assinatura criptográfica válida ou aparência real.
+
+## Suítes0.11
+
+StyleChoiceTest usa SQLite real: upgrade5→6 com backup e preservação de prefs/títulos/
+clãs, rollback parcial da migração, auditoria, CAS/concorrência/restart, associação/
+liderança/clã correto, cascade de exclusão e ticket de catálogo inválido. Testa
+catálogo estrito/defaults preservados, fallback/remoção/recuperação e dados literais.
+ClanRepositoryTest acrescenta CAS de identidade, convites enviados com expiração/
+autorização/escopo e correção administrativa com unicidade, CAS e rollback de auditoria.
+
+StyleChoiceSmoke: menu real bloqueia movimentação/outro jogador/tela fechada,
+revalida permissão no clique, aplica preset persistido a título e pacotes TAB/sidebar,
+preserva ID na perda/retorno/remoção, separa nome/sigla compartilhados e rejeita líder
+antigo/catálogo antigo. ClanMenuSmoke agora exercita editor textual, cancelamento do
+rascunho sem XP/itens, convites enviados e regressões de cargos/confirmações.
+Runner também rejeita presets inválidos no reload atômico e aceita candidato corrigido.
+IntegrationSmoke acrescenta persistência/fallback/recuperação com LuckPerms real e
+runner verifica consulta administrativa de clãs pelo console. Conexões continuam
+sintéticas: não comprovam cliente autenticado, assinatura criptográfica, renderização
+do editor/gradientes, contextos de mundo reais ou carga. Resultados em PROJECT_STATUS.md.

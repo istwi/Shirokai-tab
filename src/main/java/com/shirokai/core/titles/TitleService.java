@@ -18,6 +18,8 @@ public final class TitleService {
     private final Set<UUID> refreshing = new HashSet<>();
     private com.shirokai.core.presentation.SurfaceRenderer presentation=com.shirokai.core.presentation.SurfaceRenderer.literal();
     public void presentation(com.shirokai.core.presentation.SurfaceRenderer renderer){presentation=renderer;}
+    public boolean customizationEnabled(){return presentation.customizationEnabled();}
+    public void openCustomization(net.minecraft.server.network.ServerPlayerEntity player){presentation.openCustomization(player,com.shirokai.core.presentation.Surface.TITLE,null);}
     public boolean menuPresentationEnabled(){return presentation.menusEnabled();}
     public net.minecraft.text.Text present(UUID player,com.shirokai.core.presentation.Surface surface,String value){return presentation.render(player,surface,value);}
     public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return present(player,definition.category()==TitleDefinition.Category.CLAN?com.shirokai.core.presentation.Surface.CLAN_TAG:com.shirokai.core.presentation.Surface.TITLE,definition.display());}

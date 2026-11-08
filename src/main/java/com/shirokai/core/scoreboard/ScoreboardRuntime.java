@@ -149,7 +149,12 @@ public final class ScoreboardRuntime implements AutoCloseable {
         Predicate<String> allowed = node -> permissions.allowed(p.getUuid(), node);
         var layout = plan.layout(meta, world, allowed); var values = new HashMap<String, String>();
         Function<String, String> resolver = key -> values.computeIfAbsent(key, k -> resolve(k, p, meta, count));
-        Function<String,Text> richResolver = key -> key.equals("shirokai:selected_title") && titles != null ? titles.visualPresentation(p.getUuid()) : Text.literal(resolver.apply(key));
+        Function<String,Text> richResolver = key -> {
+            if(key.equals("shirokai:selected_title")&&titles!=null)return titles.visualPresentation(p.getUuid());
+            if(clans!=null&&(key.equals("shirokai:clan")||key.equals("shirokai:clan_tag"))&&clans.cached(p.getUuid()).isPresent())
+                return clans.present(p.getUuid(),key.equals("shirokai:clan")?com.shirokai.core.presentation.Surface.CLAN_NAME:com.shirokai.core.presentation.Surface.CLAN_TAG,resolver.apply(key));
+            return Text.literal(resolver.apply(key));
+        };
         boolean animate = animations == null ? view.animations : animations.apply(p.getUuid());
         Text title = plan.styles().renderRich(layout.title(), richResolver, tick, animate);
         if (title.getString().codePointCount(0, title.getString().length()) > 128) throw new IllegalArgumentException("Título de scoreboard excede 128 caracteres");

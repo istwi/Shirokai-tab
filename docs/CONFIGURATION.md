@@ -1,4 +1,4 @@
-# Configuração 0.10.0-dev
+# Configuração 0.11.0-dev
 
 Arquivo real: `config/shirokai-core/core.json`, relativo ao diretório do servidor.
 Criado somente se ausente. Arquivos existentes, inclusive inválidos, não são sobrescritos.
@@ -92,7 +92,7 @@ aplicados pelo template, nunca por reinterpretação do valor.
 
 scoreboard participa do mesmo candidato atômico de reload. Layouts/linhas/estilos
 são compilados antes de publicar qualquer snapshot. modules.scoreboard exige reinício;
-demais opções de scoreboard aceitam reload. Schema SQLite continua5: a visibilidade
+demais opções de scoreboard aceitam reload. No schema6 atual, a visibilidade
 usa scoreboard_enabled existente, independente de animations_enabled. Sem leitura
 da preferência, sidebar fica oculto. Ownership por conexão e comandos em SCOREBOARD.md.
 
@@ -108,3 +108,12 @@ presentation.json participa de styles e do reload atômico, sem novo módulo ou 
 Templates de chat/menus/títulos/clãs e regras de condição em PRESENTATION.md. Chat
 nameFormats agora compila tags seguras quando styles ativo; texto dinâmico segue literal.
 Configuração candidata inválida preserva todos os snapshots, inclusive presentation.
+
+## Atualização0.11
+
+presets.json/schema1 participa do mesmo reload atômico, com defaults apenas quando
+ausente, limites e exemplos completos em CUSTOMIZATION.md. Não muda schemas de
+presentation/titles/clans. SQLite passa para schema6 com backup antes da migração
+e duas tabelas de IDs/revisões; preferências anteriores são preservadas.
+styles controla apresentação/presets; escolhas exigem storage/permissions, e clã
+ativo para nome/sigla. Configuração inválida preserva todos os snapshots.

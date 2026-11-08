@@ -54,11 +54,12 @@ public final class AdminCommands {
         root.then(literal("integrations").requires(s->allowed(s,"integrations.inspect")).executes(c->feedback(c.getSource(),runtime.get().integrations().status())));
         root.then(literal("scoreboard").requires(s->allowed(s,"scoreboard.inspect")).executes(c->feedback(c.getSource(),runtime.get().scoreboard().status())));
         root.then(new ChatAdminCommands(runtime,this::allowed).node());
+        root.then(new ClanAdminCommands(runtime,this::allowed).node());
         root.then(new TitleAdminCommands(runtime, this::allowed).node());
         dispatcher.register(root);
     }
     private boolean canSeeAny(ServerCommandSource source) {
-        for (String node : new String[]{"status", "version", "modules", "permissions", "reload", "debug", "backup", "placeholders", "titles.inspect", "titles.grant", "titles.revoke", "chat.mute", "chat.unmute", "chat.inspect", "tab.inspect", "scoreboard.inspect", "integrations.inspect"})
+        for (String node : new String[]{"status", "version", "modules", "permissions", "reload", "debug", "backup", "placeholders", "titles.inspect", "titles.grant", "titles.revoke", "chat.mute", "chat.unmute", "chat.inspect", "tab.inspect", "scoreboard.inspect", "integrations.inspect", "clans.inspect", "clans.identity"})
             if (allowed(source, node)) return true;
         return false;
     }
@@ -69,6 +70,7 @@ public final class AdminCommands {
             return console && (action.equals("status") || action.equals("version"));
         if (action.equals("placeholders") && !core.running("placeholders")) return false;
         if (action.startsWith("titles.") && !core.running("titles")) return false;
+        if(action.startsWith("clans.")&&!core.running("clans"))return false;
         if(action.startsWith("chat.")&&!core.running("chat"))return false;
         if(action.startsWith("tab.")&&!core.running("tab"))return false;
         if(action.startsWith("scoreboard.")&&!core.running("scoreboard"))return false;
