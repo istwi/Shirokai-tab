@@ -34,7 +34,7 @@ public final class ClanMenuSmoke implements ModInitializer {
     private static ClanMenu menu(ServerPlayerEntity player){return (ClanMenu)player.currentScreenHandler;}
     private static void click(ServerPlayerEntity player,int slot){menu(player).onSlotClick(slot,0,SlotActionType.PICKUP,player);}
     private static int memberSlot(ServerPlayerEntity owner,UUID target){
-        for(int slot=9;slot<45;slot++){var name=menu(owner).getSlot(slot).getStack().get(DataComponentTypes.CUSTOM_NAME);if(name!=null&&name.getString().equals(target.toString()))return slot;}
+        for(int slot=9;slot<45;slot++){var name=menu(owner).getSlot(slot).getStack().get(DataComponentTypes.CUSTOM_NAME);if(name!=null&&name.getString().equals("Offline • "+target.toString().substring(0,8)))return slot;}
         throw new AssertionError("Member not listed");
     }
     private CompletableFuture<Void> test(MinecraftServer server){

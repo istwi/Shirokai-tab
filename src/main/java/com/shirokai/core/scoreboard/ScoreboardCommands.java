@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.shirokai.core.CoreRuntime;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import com.shirokai.core.messages.Messages;
 import java.util.function.Supplier;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -18,14 +19,14 @@ public final class ScoreboardCommands {
             dispatcher.register(literal(name).executes(c -> toggle(c.getSource())).then(literal("toggle").executes(c -> toggle(c.getSource())))
                 .then(literal("refresh").executes(c -> {
                     var core = available(c.getSource()); if (core == null) return 0;
-                    core.scoreboard().refresh(c.getSource().getPlayer().getUuid()); c.getSource().sendFeedback(() -> Text.literal("Scoreboard atualizada"), false); return 1;
+                    core.scoreboard().refresh(c.getSource().getPlayer().getUuid()); c.getSource().sendFeedback(() -> Messages.info("Scoreboard atualizada"), false); return 1;
                 })));
         }
     }
     private CoreRuntime available(ServerCommandSource source) {
-        if (source.getPlayer() == null) { source.sendError(Text.literal("Scoreboard exige jogador")); return null; }
+        if (source.getPlayer() == null) { source.sendError(Messages.error("Scoreboard exige jogador")); return null; }
         var core = runtime.get();
-        if (core == null || !core.running("scoreboard")) { source.sendError(Text.literal("Scoreboard indisponível")); return null; }
+        if (core == null || !core.running("scoreboard")) { source.sendError(Messages.error("Scoreboard indisponível")); return null; }
         return core;
     }
     private int toggle(ServerCommandSource source) {
@@ -33,9 +34,9 @@ public final class ScoreboardCommands {
         core.scoreboard().toggle(source.getPlayer().getUuid()).whenCompleteAsync((enabled, error) -> {
             if (error != null) {
                 org.slf4j.LoggerFactory.getLogger("shirokai-core").warn("[scoreboard] Falha ao alternar visibilidade para " + source.getPlayer().getUuid(), error);
-                source.sendError(Text.literal("Não foi possível salvar preferência de scoreboard; consulte o log do servidor"));
+                source.sendError(Messages.error("Não foi possível salvar preferência de scoreboard; consulte o log do servidor"));
             }
-            else source.sendFeedback(() -> Text.literal("Scoreboard: " + (enabled ? "ativada" : "desativada")), false);
+            else source.sendFeedback(() -> Messages.info("Scoreboard: " + (enabled ? "ativada" : "desativada")), false);
         }, source.getServer()); return 1;
     }
 }

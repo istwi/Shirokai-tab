@@ -48,15 +48,16 @@ public final class StyleChoiceMenu extends GenericContainerScreenHandler {
         var saved=view.choices().selections().get(view.surface());
         var status=view.catalog().resolve(saved,view.surface(),node->service.allowed(owner.getUuid(),view.surface(),saved));
         item(4,Items.BOOK,Text.literal("Escolha salva: "+Objects.toString(saved,"padrão administrativo")),
-            "Estado: "+status.status(),"Escopo: "+view.choices().owner(),"Revisão: "+view.choices().revision(),
-            "Permissão indisponível: usa fallback sem apagar escolha.");
+            "Estado: "+switch(status.status()){case ADMINISTRATIVE->"Padrão do servidor";case ACTIVE->"Aplicado";case UNAVAILABLE->"Sem acesso no momento";case REMOVED->"Estilo indisponível";},
+            "Sua escolha fica salva mesmo sem acesso ao estilo.",
+            "Enquanto indisponível, usamos o estilo padrão.");
         entries=view.catalog().presets().entrySet().stream().filter(e->e.getValue().definition().surfaces().contains(view.surface())).map(Map.Entry::getKey).sorted().toList();
         page=Math.min(page,Math.max(0,(entries.size()-1)/36));
         for(int i=0;i<36&&page*36+i<entries.size();i++){
             String id=entries.get(page*36+i);var preset=view.catalog().presets().get(id);
             var preview=view.catalog().styles().render(preset.template(),key->id,0,false);
             item(9+i,service.allowed(owner.getUuid(),view.surface(),id)?Items.NAME_TAG:Items.BARRIER,preview,
-                "ID: "+id,"Permitido: "+service.allowed(owner.getUuid(),view.surface(),id),"Salvo: "+id.equals(saved),"Clique para escolher");
+                "Acesso: "+(service.allowed(owner.getUuid(),view.surface(),id)?"Disponível":"Bloqueado"),"Seleção: "+(id.equals(saved)?"Escolhido":"Não selecionado"),"Clique para escolher");
         }
         item(45,Items.ARROW,Text.literal("Página anterior"));item(53,Items.ARROW,Text.literal("Próxima página"));
         item(48,Items.MILK_BUCKET,Text.literal("Usar padrão administrativo"));

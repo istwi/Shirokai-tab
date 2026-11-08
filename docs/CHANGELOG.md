@@ -153,3 +153,14 @@ externas continuam pendentes. Evidências e SHA em PROJECT_STATUS.md.
 - Sidebar recupera jogadores online cujo registro na entrada foi perdido/antecipado.
 - /sidebar carrega a preferência antes de alternar mesmo sem View prévia; toggles
   concorrentes continuam serializados. Falhas são registradas no log do servidor.
+
+## 0.13.4-dev
+
+- Mensagens de uso comum com prefixo dourado e componentes literais, cores coerentes
+  e confirmações específicas para cada ação de clã, sem dumps de mapas/UUIDs.
+- /clan info e members mostram ficha em linhas, nomes online, cargos em português
+  e até10 membros; lista completa em /clan menu. UUID fica no hover de diagnóstico.
+- Perfil mostra os títulos formatados, ausência como Nenhum/Nenhuma, sem IDs/null.
+- Canais de chat e cargos dos menus em português; notificações de convites, editor,
+  estilos, TAB e sidebar seguem o mesmo padrão. Comandos administrativos preservados.
+- Menus de perfil/estilos traduzem estados e seleções; dados técnicos de escopo/revisão saem do seletor de uso comum.

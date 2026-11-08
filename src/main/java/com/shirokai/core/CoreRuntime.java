@@ -174,7 +174,7 @@ public final class CoreRuntime implements AutoCloseable {
         if (running("clans")) clans.invitations(player).whenCompleteAsync((invites,error) -> {
             if(error!=null){logger.warn("[clans] Falha ao consultar convites "+player,error);return;}
             var online=server.getPlayerManager().getPlayer(player);
-            if(online!=null && !invites.isEmpty()) online.sendMessage(net.minecraft.text.Text.literal("Você tem convites de clã: "+invites.keySet()+". Use /clan invites e /clan accept <nome>."),false);
+            if(online!=null && !invites.isEmpty()) online.sendMessage(com.shirokai.core.messages.Messages.info("Você tem "+invites.size()+" convite(s) de clã. Veja em /clan invites."),false);
         },server);
         if (running("titles")) titles.view(player).whenComplete((value, error) -> {
             if (error != null) logger.warn("[titles] Falha ao carregar perfil " + player, error);

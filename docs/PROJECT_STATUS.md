@@ -1,4 +1,4 @@
-# Estado real do projeto — 0.13.3-dev
+# Estado real do projeto — 0.13.4-dev
 
 ## Entrega atual
 
@@ -105,3 +105,11 @@ desativada preservada no reconnect. Cliente real permanece pendente.
 SHA256 do JAR local:020bf738c6f60b718be3e91bb178974b4cc4feecd4c18fe1f3d8ec314c7919c9.
 
 Suite server_smoke0.13.3:48 verificações aprovadas, incluindo reinício/storage.
+
+0.13.4 revisa apresentação das mensagens comuns e fichas de clã/perfil.
+Não altera schemas, permissões, limite de tags ou confirmações destrutivas.
+Build final aprovado:105 testes JUnit. Suite server_smoke:48 verificações
+aprovadas; última tradução de menus verificada adicionalmente por quatro smokes
+Fabric (perfil, menu de clã, estilos e apresentação), MESSAGES_NATIVE_SMOKE_PASS.
+Aparência em cliente real continua pendente.
+SHA256 do JAR local:06458291ac369fa3383116ce1e7f2d606a7c1783118a360b609fe17c9ed71c99.

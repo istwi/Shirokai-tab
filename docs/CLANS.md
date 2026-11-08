@@ -197,3 +197,12 @@ seleções e liderança. Valida regras/unicidade, CAS do campo e auditoria atôm
 não força exclusão/transferência nem repara integridade relacional automaticamente.
 Console usa o fallback administrativo existente; clan_history identifica console pelo
 UUID zero, admin_audit mantém actor_uuid NULL. Falha de auditoria reverte correção.
+
+## Mensagens0.13.4
+
+Ações de clã retornam confirmação curta específica depois da operação concluir.
+Info/members mostram ficha formatada em várias linhas, com até10 membros e atalho
+para o menu completo. Nomes online substituem UUIDs; jogador offline aparece como
+Jogador offline, com UUID no hover. Menu diferencia offline por prefixo abreviado
+do UUID. Cargos: Líder/Oficial/Membro. Diagnósticos administrativos mantêm UUIDs.
+Dados de jogador/clã são componentes literais, nunca templates de estilo.

@@ -6,6 +6,7 @@ import com.shirokai.core.CoreRuntime;
 import com.shirokai.core.titles.TitleState;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
+import com.shirokai.core.messages.Messages;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import static net.minecraft.server.command.CommandManager.*;
@@ -40,19 +41,26 @@ public final class ProfileCommands {
     }
     private boolean available(ServerCommandSource source) {
         var core = runtime.get();
-        if (source.getPlayer() == null) { source.sendError(Text.literal("/perfil exige um jogador")); return false; }
+        if (source.getPlayer() == null) { source.sendError(Messages.error("/perfil exige um jogador")); return false; }
         if (core == null || !core.running("profiles") || !core.running("titles")) {
-            source.sendError(Text.literal("Perfil indisponível; consulte a administração")); return false;
+            source.sendError(Messages.error("Perfil indisponível; consulte a administração")); return false;
         }
         return true;
     }
     private int respond(ServerCommandSource source, CompletableFuture<TitleState> operation) {
-        source.sendFeedback(() -> Text.literal("Atualizando perfil…"), false);
         operation.whenCompleteAsync((state, error) -> {
             if (error != null) {
                 Throwable cause = error; while (cause.getCause() != null) cause = cause.getCause();
-                source.sendError(Text.literal("Perfil: " + cause.getMessage()));
-            } else source.sendFeedback(() -> Text.literal("Título: " + state.selectedVisual() + " | Identificações: " + state.chatIds().size() + "/2 " + state.chatIds()), false);
+                source.sendError(Messages.error("Perfil: " + cause.getMessage()));
+            } else source.sendFeedback(() -> {
+                var titles=runtime.get().titles();var id=source.getPlayer().getUuid();
+                var card=Messages.info("Perfil atualizado.");
+                var visual=titles.visualPresentation(id);
+                card.append(Text.literal("\n")).append(Messages.field("Título no TAB e scoreboard",visual.getString().isEmpty()?Text.literal("Nenhum"):visual));
+                var tags=Text.empty();for(var tag:titles.chatPresentation(id)){if(!tags.getString().isEmpty())tags.append(Text.literal(" "));tags.append(tag);}
+                card.append(Text.literal("\n")).append(Messages.field("Tags no chat ("+state.chatIds().size()+"/2)",tags.getString().isEmpty()?Text.literal("Nenhuma"):tags));
+                return card;
+            }, false);
         }, source.getServer()); return 1;
     }
 }

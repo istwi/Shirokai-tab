@@ -8,6 +8,7 @@ import net.minecraft.screen.*;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import com.shirokai.core.messages.Messages;
 import java.util.*;
 
 /** Vanilla rename text input. Click the left paper to save; never extracts items or spends XP. */
@@ -31,7 +32,7 @@ public final class ClanIdentityEditor extends AnvilScreenHandler {
             ClanPolicy.require(expected,player.getUuid(),tag?"tag":"rename",clans.config());
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((sync,inventory,ignored)->
                 new ClanIdentityEditor(sync,inventory,player,clans,expected,tag),Text.literal("Digite; clique no papel para salvar")));
-        }catch(Exception error){player.sendMessage(Text.literal("Editor: "+error.getMessage()),false);}
+        }catch(Exception error){player.sendMessage(Messages.error("Não foi possível editar o clã: "+error.getMessage()),false);}
     }
     @Override public boolean setNewItemName(String value){
         if(owner==null||closed||busy||value==null||value.length()>64||value.codePoints().anyMatch(Character::isISOControl))return false;
@@ -47,10 +48,10 @@ public final class ClanIdentityEditor extends AnvilScreenHandler {
             var operation=clans.identityFromMenu(owner.getUuid(),draft,tag,expected);busy=true;
             operation.whenCompleteAsync((clan,error)->{
                 busy=false;if(!canUse(owner)||owner.currentScreenHandler!=this)return;
-                if(error!=null){while(error.getCause()!=null)error=error.getCause();owner.sendMessage(Text.literal("Editor: "+error.getMessage()),false);return;}
-                owner.sendMessage(Text.literal("Nome/sigla atualizado."),false);ClanMenu.open(owner,clans);
+                if(error!=null){while(error.getCause()!=null)error=error.getCause();owner.sendMessage(Messages.error("Não foi possível editar o clã: "+error.getMessage()),false);return;}
+                owner.sendMessage(Messages.info(tag?"Sigla do clã atualizada.":"Nome do clã atualizado."),false);ClanMenu.open(owner,clans);
             },owner.getServer());
-        }catch(Exception error){owner.sendMessage(Text.literal("Editor: "+error.getMessage()),false);}
+        }catch(Exception error){owner.sendMessage(Messages.error("Não foi possível editar o clã: "+error.getMessage()),false);}
     }
     @Override public void onClosed(PlayerEntity player){
         closed=true;
