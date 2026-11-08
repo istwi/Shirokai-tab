@@ -1,12 +1,12 @@
 # Prompt para continuar o Shirokai Core em outro Codex
 
 Copie o texto abaixo para o outro Codex, com acesso ao repositório
-`Daniel-r-design/Shirokai-tab` na branch `main`.
+`istwi/Shirokai-tab` na branch `main`.
 
 ---
 
 Continue o desenvolvimento do Shirokai Core no repositório
-https://github.com/Daniel-r-design/Shirokai-tab, a partir da versão mais recente
+https://github.com/istwi/Shirokai-tab, a partir da versão mais recente
 da branch main. O projeto ainda não está concluído. Trabalhe no checkout existente
 e preserve alterações locais e o histórico remoto. Confira git status, branch e
 remoto antes de sincronizar; não use reset destrutivo, force push ou reescrita de
@@ -23,48 +23,30 @@ REQUIREMENTS.md contém o pedido original completo; este resumo não o substitui
 Se o estado atual tiver avançado, use o código e as evidências mais recentes e
 atualize este documento. Não reaplique etapas já concluídas.
 
-## Ponto de partida desta passagem
+## Ponto de partida atualizado
 
-Versão 0.7.0-dev, implementação registrada no commit
-d9099c02b26a16a9f94f9212d11a157c665b1741. Commits posteriores podem conter
-esta documentação ou novas entregas; não volte o checkout para esse commit.
+Versão0.8.0-dev adiciona a fase7: scoreboard/sidebar real privado por viewer, layouts
+e condições, linhas incrementais, título único compartilhado com TAB, animações e
+visibilidade persistida independente. Leia SCOREBOARD.md e PROJECT_STATUS.md para
+semântica, limites, testes e SHA atuais. Schema permanece5. Não reaplique a fase7.
 
-Implementados: infraestrutura modular, configuração com reload atômico, SQLite
-assíncrono, permissões LuckPerms, placeholders nativos, administração/auditoria,
-títulos persistidos, menu /perfil, clãs e seus menus, chat moderado e canais,
-motor seguro de estilos/animações e TAB nativo incremental. SQLite está no schema5.
-TAB possui header/footer, layouts condicionais, título selecionado, nomes por
-viewer, preferência persistente de animação e ordenação opcional por teams.
-Styles ainda é consumido pelo TAB; sua adoção nas demais superfícies está pendente.
+Módulos anteriores0.7 preservados: infraestrutura, perfil/títulos, clãs/menus, chat,
+motor de estilos e TAB. O projeto completo continua pendente. Validação0.8 executada:76JUnit sem falhas/erros/ignorados e39checks em3boots reais.
+Resultados atuais em PROJECT_STATUS.md; históricos73JUnit/37checks da0.7 não substituem execução atual.
+Smokes usam jogadores/conexões sintéticas: cliente real/autenticação/carga não validados.
 
-Última validação documentada: 73 testes JUnit sem falhas e 37 verificações
-funcionais em três boots Fabric. São resultados anteriores, não testes executados
-por você. Os jogadores do smoke são sintéticos: não houve validação de renderização
-com cliente real, autenticação/assinaturas reais, carga ou runtime LuckPerms Fabric.
-Não apresente esses cenários como validados.
+## Próxima entrega
 
-## Próxima entrega: scoreboard visual
+Siga NEXT_STEPS.md: auditar artefatos/versões e implementar adapters opcionais reais
+para Cobblemon1.8.3, Impactor, Shirokai Dex e Fabric Placeholder API, além de validar
+a distribuição LuckPerms Fabric. Não simule dados nem chame placeholders nativos de PAPI.
+Depois integrar estilos a chat/menus/títulos/clãs e completar ferramentas de clãs/TAB.
 
-Implemente a fase7 descrita nos requisitos: objetivos e linhas reais, layouts e
-condições, atualizações por diferenças, o mesmo título visual escolhido no perfil
-e preferência persistente de visibilidade. A preferência scoreboard_enabled já
-existe; preserve sua independência de animations_enabled. Use o motor de estilos
-existente e dados reais disponíveis, com fallback explícito para indisponíveis.
-
-Antes de programar, audite as classes, assinaturas e limites reais de scoreboard
-e packets em Minecraft 1.21.1/Yarn da versão fixada. Não invente métodos ou campos.
-Defina ownership seguro do sidebar por viewer, respeitando outros mods e liberando
-somente recursos próprios. Planeje reconexão, reload, mudanças de layout, desligamento
-e limpeza. Trate colisões de comandos sem assumir comandos de terceiros.
-Integre módulo/configuração ao reload atômico, mantendo o snapshot anterior quando
-a configuração candidata falhar. CoreConfig já tem dez módulos em Map.of; ao
-adicionar o décimo primeiro, use uma construção compatível, como Map.ofEntries.
-
-Depois avance conforme NEXT_STEPS e requisitos: integrações reais de Cobblemon
-1.8.3, Impactor, Dex e Fabric Placeholder API; estilos nas demais superfícies;
-ferramentas administrativas/editor gráfico de clãs; recursos restantes de TAB;
-testes com cliente real e compatibilidade entre mods. Não simule essas integrações
-nem considere a API nativa de placeholders como integração Fabric PAPI entregue.
+Preserve os objetivos privados da scoreboard fora do scoreboard salvo do mundo.
+O observer de send é somente leitura: não cancela/reescreve pacotes externos.
+Ceder a SIDEBAR/TEAM_* externo; colisão do nome exato revoga ownership até reconectar.
+Limpar somente recursos próprios, preservar /scoreboard vanilla e aliases externos.
+modules.scoreboard usa defaults em memória para arquivos antigos.
 
 ## Regras que devem permanecer verdadeiras
 
@@ -119,7 +101,7 @@ O source set smoke é habilitado por -PprofileSmoke e não pode entrar no JAR fi
 Testes que dependem das transformações Fabric devem rodar no smoke apropriado,
 sem desabilitar cenários para fazer a suíte passar.
 
-Artefato atual: build/libs/shirokai-core-0.7.0-dev.jar. Relatórios ficam em
+Artefato atual: build/libs/shirokai-core-0.8.0-dev.jar. Relatórios ficam em
 build/reports/tests/test/index.html e build/server-smoke/result.json.
 CI de build/upload de JAR está configurado em .github/workflows/build.yml;
 não afirme que a execução remota passou sem verificá-la.

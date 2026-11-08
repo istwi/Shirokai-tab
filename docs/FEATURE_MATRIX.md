@@ -13,11 +13,11 @@
 | Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Estilos, editor textual GUI e administração avançada pendentes |
 | Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real, estilos por grupo e menções avançadas pendentes |
 | TAB | Header/footer, nomes, título e teams opt-in implementados/testados | Cliente real, listed/vanish, nametags, bossbar e objetivos abaixo do nome pendentes |
-| Scoreboard visual | Pendente | Mesmo título do TAB; diferenças incrementais |
+| Scoreboard visual | Sidebar privado por viewer, layouts/linhas condicionais, diffs e visibilidade persistida | Cliente real e compatibilidade universal não validados; cede a sidebar externo |
 | /perfil e menus de clãs | Handlers testados com jogadores sintéticos | Aparência/pacotes de cliente real não testados |
-| Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB | Integração a chat/menus/títulos/clãs e transições pendentes |
+| Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/scoreboard | Integração a chat/menus/títulos/clãs e transições pendentes |
 | Cobblemon/Impactor/Dex/PAPI | Pendente | Auditoria de versões e APIs |
 | CI | Workflow de build criado | Execução no GitHub não realizada |
 | Release estável | Não disponível | Critérios completos não cumpridos |
 
-Não confundir a API de preferência de scoreboard com uma scoreboard funcional.
+Scoreboard funcional implementada em0.8; a validação de pacotes sintéticos não equivale à aparência com cliente real.

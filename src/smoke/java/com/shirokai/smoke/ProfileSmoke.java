@@ -33,6 +33,7 @@ public final class ProfileSmoke implements ModInitializer {
         new ClanSmoke().onInitialize();
         new ChatSmoke().onInitialize();
         new TabSmoke().onInitialize();
+        new ScoreboardSmoke().onInitialize();
         new TeamOwnershipSmoke().onInitialize();
         new ClanMenuSmoke(this::until).onInitialize();
         ServerTickEvents.END_SERVER_TICK.register(server -> {

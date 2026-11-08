@@ -3,6 +3,11 @@
   "package": "com.shirokai.core.mixin",
   "compatibilityLevel": "JAVA_21",
   "refmap": "shirokai-core-refmap.json",
-  "server": ["PlayerListPacketAccessor"],
-  "injectors": {"defaultRequire": 1}
+  "server": [
+    "PlayerListPacketAccessor",
+    "SidebarPacketObserver"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

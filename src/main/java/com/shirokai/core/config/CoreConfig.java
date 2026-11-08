@@ -5,11 +5,10 @@ import java.util.Set;
 
 public record CoreConfig(int schemaVersion, Map<String, Boolean> modules,
                          String databaseFile, String unavailablePlaceholder) {
-    public static final Set<String> MODULES = Set.of("storage", "permissions", "placeholders", "administration", "titles", "profiles", "clans", "chat", "styles", "tab");
+    public static final Set<String> MODULES = Set.of("storage", "permissions", "placeholders", "administration", "titles", "profiles", "clans", "chat", "styles", "tab", "scoreboard");
     public CoreConfig { modules = Map.copyOf(modules); }
     public static CoreConfig defaults() {
-        return new CoreConfig(1, Map.of("storage", true, "permissions", true,
-                "placeholders", true, "administration", true, "titles", true, "profiles", true, "clans", true, "chat", true, "styles", true, "tab", true), "shirokai.db", "N/D");
+        return new CoreConfig(1, MODULES.stream().collect(java.util.stream.Collectors.toUnmodifiableMap(id -> id, id -> true)), "shirokai.db", "N/D");
     }
     public boolean enabled(String id) { return modules.getOrDefault(id, false); }
     public boolean requiresRestartComparedTo(CoreConfig previous) {

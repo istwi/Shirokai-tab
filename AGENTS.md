@@ -40,3 +40,8 @@ TAB/estilos: docs/TAB.md e STYLES.md. Dados dinâmicos nunca são reanalisados c
 Text do cache é read-only. Ordenação teams é opt-in, não adotar team por prefixo de nome.
 Liberar próprios teams em SERVER_STOPPING antes do save; não remover integrantes externos.
 Accessor de PlayerList exige manter versão/refmap; não inventar packet list-order1.21.1.
+
+Scoreboard: docs/SCOREBOARD.md. Objetivos privados por conexão, sem salvar no mundo.
+Ceder a SIDEBAR/TEAM_* externo; colisão do nome exato revoga ownership até reconectar.
+Observer de send não cancela/reinterpreta pacotes. Limpar somente recursos próprios,
+preservar /scoreboard vanilla e aliases externos. Visibilidade e animação são independentes.

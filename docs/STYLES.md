@@ -61,12 +61,12 @@ precisem alterar devem copiar antes. TAB monta novos roots sem modificar spans d
 
 ## Integração atual
 
-O TAB já usa o motor. Chat continua com corpo/cabeçalho literal por segurança e
+O TAB e a scoreboard já usam o motor. Chat continua com corpo/cabeçalho literal por segurança e
 compatibilidade de assinatura nesta etapa; migração de estilos de cabeçalho de chat,
 menus e personalização individual de títulos/clãs continua pendente.
 Dados dinâmicos não ganham estilo por conter tags. Para colorir prefixo, configure
 <gold>%luckperms:prefix%</gold> no template, não dependa de interpretar markup no valor.
 
-styles.json e tab.json entram no mesmo reload atômico dos demais módulos. Animação
+styles.json, tab.json e scoreboard.json entram no mesmo reload atômico dos demais módulos. Animação
 desconhecida, tag inválida ou template estático grande impede publicar o candidato.
 Dados dinâmicos que excedem limites preservam o último frame válido e geram diagnóstico.

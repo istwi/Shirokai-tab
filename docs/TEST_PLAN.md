@@ -109,3 +109,19 @@ zero pacotes em frame igual, preservação/restauração de team externo, toggle
 congelamento de animação por viewer, cleanup. Refmap/entry action verificados no JAR/server.
 Script também valida rollback de styles/tab e ownership que exige restart.
 Cliente/renderização real/carga não testados; não confundir captura de pacotes com visual aprovado.
+
+
+## Suítes0.8 — sidebar
+
+ScoreboardPlanTest: default sem overwrite, JSON estrito/tipos/limites/duplicatas,
+prioridade/condições, limite15linhas e compilação de título/linhas antes de publicar.
+ScoreboardSmoke: pacotes reais no Fabric para título único TAB/sidebar, linhas
+repetidas/vazias e ordem, números ocultos, placeholders literais/fallback, delta de
+uma linha, remoção condicional/reload, frame dinâmico inválido sem publicação parcial,
+frames/freeze, comandos sem sobrescrever alias externo, toggles concorrentes,
+visibilidade independente de animação/reconexão, nenhuma alteração no board do mundo,
+bundle anterior ao join, sidebar colorido externo, retirada/retorno, clear externo,
+reset global de holder, colisão do nome exato e stop preservando replacement externo.
+Runner real verifica candidato inválido scoreboard+core rejeitado atomicamente.
+TabPreferenceTest preserva restart/upgrade4→5 das duas preferências; schema não mudou.
+Resultados executados em PROJECT_STATUS.md; cliente real continua pendente.

@@ -26,6 +26,7 @@ public final class ShirokaiCore implements ModInitializer {
             new com.shirokai.core.clans.ClanCommands(() -> runtime).register(dispatcher);
             new ChatCommands(()->runtime).register(dispatcher);
             new com.shirokai.core.tab.TabCommands(()->runtime).register(dispatcher);
+            new com.shirokai.core.scoreboard.ScoreboardCommands(()->runtime).register(dispatcher);
         });
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             try { runtime = new CoreRuntime(server, LOGGER); }

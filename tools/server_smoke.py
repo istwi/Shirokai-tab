@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('Done (')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.7.0-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.8.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -89,6 +89,9 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-tab-smoke', 'TAB_SMOKE_PASS')
         checks.append('TAB packets selected title layouts delta updates teams and animations')
         server.command('shirokaicore tab', 'viewers=')
+        server.command('shirokai-scoreboard-smoke', 'SCOREBOARD_SMOKE_PASS')
+        checks.append('native scoreboard packets diff shared title visibility and foreign sidebar ownership')
+        server.command('shirokaicore scoreboard', 'viewers=')
         server.command('shirokai-chat-smoke', 'CHAT_SMOKE_PASS')
         checks.append('chat transport channels private moderation ignore and literal payloads')
         server.command('shirokai-chat-alias-smoke', 'CHAT_ALIAS_SMOKE_PASS')
@@ -155,6 +158,19 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokaicore reload', 'ownership do TAB exige reinício')
         tab_file.write_text(original_tab)
         checks += ['styles and TAB validation preserves active reload', 'TAB ownership change requires restart']
+        scoreboard_file = runtime / 'config/shirokai-core/scoreboard.json'
+        original_scoreboard = scoreboard_file.read_text()
+        scoreboard = json.loads(original_scoreboard)
+        scoreboard['layouts'][0]['title'] = '%animation:missing%'
+        scoreboard_file.write_text(json.dumps(scoreboard))
+        rejected = dict(config)
+        rejected['unavailablePlaceholder'] = 'MUST_NOT_APPLY_SCOREBOARD'
+        config_file.write_text(json.dumps(rejected))
+        server.command('shirokaicore reload', 'Animação desconhecida')
+        server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
+        scoreboard_file.write_text(original_scoreboard)
+        config_file.write_text(customized)
+        checks.append('invalid scoreboard candidate rejects complete reload atomically')
         chat_file = runtime / 'config/shirokai-core/chat.json'
         original_chat = chat_file.read_text()
         chat_file.write_text('{broken')

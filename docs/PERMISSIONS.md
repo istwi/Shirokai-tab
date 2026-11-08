@@ -1,4 +1,4 @@
-# Permissões 0.7.0-dev
+# Permissões 0.8.0-dev
 
 LuckPerms é a fonte de verdade quando presente e inicializado. O adaptador usa API 5.4,
 usuário carregado e dados de permissão com contextos atuais. Não retém resultado de
@@ -74,3 +74,12 @@ só operam sobre a própria visão/preferência. Condições em tab.json usam pe
 LuckPerms configuradas, grupo primário e dimensão. Peso/prefixo/sufixo são dados atuais
 do LP; ausência de provider não inventa grupo ou saldo. Ownership de teams é opção
 administrativa em JSON/reinício, não permissão que jogador possa conceder a si.
+
+
+## Scoreboard0.8
+
+shirokaicore.command.scoreboard.inspect autoriza `/shirokaicore scoreboard`.
+`/sidebar` e `/shirokai:sidebar` operam somente a preferência/visão do próprio jogador,
+sem conceder ownership de sidebar externo. Condições por layout/linha usam os nós
+LuckPerms configurados; não há grupo fictício nem permissão administrativa implícita.
+Comandos curtos/namespaced existentes são preservados; `/scoreboard` vanilla permanece.

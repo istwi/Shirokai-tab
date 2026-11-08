@@ -1,106 +1,77 @@
-# Estado real do projeto — 0.7.0-dev
+# Estado real do projeto — 0.8.0-dev
 
 ## Situação
 
-Motor de estilos e TAB nativo implementados na fase6; infraestrutura, perfil,
-títulos, clãs e chat anteriores preservados. Projeto completo NÃO entregue.
-Scoreboard visual, integrações externas completas, estilos em todas as superfícies,
-features adicionais de TAB e validação com cliente real continuam pendentes.
-SQLite schema5 adiciona animações sem alterar preferência anterior de scoreboard.
+Fase7 implementa scoreboard/sidebar real por viewer. Núcleo, títulos/perfil, clãs,
+chat, motor de estilos e TAB anteriores preservados. O projeto completo NÃO está
+entregue: integrações externas, estilos nas demais superfícies, administração avançada,
+recursos adicionais de TAB e cliente real continuam pendentes (NEXT_STEPS.md).
+SQLite permanece schema5; visibilidade reutiliza scoreboard_enabled existente.
 
 ## Implementado nesta etapa
 
-- StyleEngine com AST allowlisted, cores Minecraft/HEX, gradiente por ponto de código
-  Unicode, estilos aninhados, templates e animações de frames com relógio compartilhado.
-- Placeholder é inserido literalmente, sem reanalisar markup ou permitir click/run_command.
-  Fontes/expansão/recursão são limitadas; caches LRU de compilação e render.
-- styles.json/tab.json validados e recompilados antes de aplicar snapshot atômico.
-- Header/footer multilinha e layouts por permissão, grupo primário e dimensão/prioridade.
-- Nome de TAB usa título visual único do perfil, nunca todos os títulos desbloqueados.
-- Nome por regra e dados atuais de prefixo/sufixo/grupo/peso LuckPerms via API5.4.
-- UPDATE_DISPLAY_NAME envia apenas entradas alteradas por viewer; não muda roster,
-  ping, profile, gamemode, assinatura de chat ou visibilidade/listed.
-- Controle de teams opt-in (defaultfalse), prioridade invertida e mesmo rank compartilhado,
-  preservando desempate vanilla por nome. Nenhum team externo é adotado/movido/removido.
-- Colisão/replacement e integrantes externos preservados; limpeza de próprios teams
-  em SERVER_STOPPING, antes do save. Nome externo/getPlayerListName é respeitado.
-- Preferência individual de animação persistente, frame0 até carregar/desativar;
-  snapshots/nomes comuns reutilizados e caches limpos no disconnect.
-- /tab refresh, /tab animations e /shirokaicore tab com estatísticas reais.
-- Accessor Mixin mínimo e version-pinned de entries do packetvanilla, com refmap gerado.
-- Migração1/2/3/4→5 com backup consistente; preferência de scoreboard preservada.
+- Objetivos privados por conexão, linhas reais do protocolo1.21.1 e números ocultos.
+  Nada é registrado no scoreboard salvo do mundo; nenhum team de formatação/fake player.
+- Layouts por prioridade/permissão/grupo/dimensão e condições por linha, até15linhas.
+  Linhas iguais/vazias são independentes e ordenadas. Limites locais128/256pontos de código.
+- StyleEngine para HEX/gradientes/animações e valores literais; fallback para dados
+  indisponíveis. Não há saldo/Pokédex/ginásios fictícios.
+- Mesma selected_visual/TitleService do TAB, sem seleção separada nem alteração de grupos.
+- Atualizações por componente/score: sem pacotes quando frame não muda; remoção de
+  sobras de linhas/layouts. Frame inválido não publica conteúdo parcial.
+- Visibilidade persistida, toggles serializados, carregamento seguro e limpeza no disconnect.
+  scoreboard_enabled é independente de animations_enabled. Sem preferências, sidebar oculta.
+- Reload de scoreboard/styles compila candidato antes de alterar qualquer snapshot.
+  Eventos de títulos/clãs, join, toggle e reload invalidam visão; demais dados usam intervalo.
+- Observer Mixin de send(Packet,PacketCallbacks), incluindo bundles/pre-JOIN, sem cancelar
+  ou modificar pacotes. Cede a sidebar/slots coloridos externos; colisão do nome exato
+  revoga ownership até reconectar. Remove somente recursos próprios ainda reconhecidos.
+- /sidebar e /shirokai:sidebar com toggle/refresh; aliases externos e /scoreboard vanilla
+  preservados. /shirokaicore scoreboard fornece diagnóstico com permissão própria.
+- CoreConfig suporta11módulos sem limite de Map.of; modules.scoreboard ausente usa default
+  em memória. Nenhuma migração SQLite ou nova dependência externa.
 
-## Resultados finais executados
+## Validação desta etapa
 
-| Verificação | Resultado |
-|---|---|
-| python3 tools/gradle_cloud.py build smokeClasses | PASSOU: Java21, testes, compilação smoke e remap do JAR |
-| JUnit | 73 executados; 0 falhas; 0 erros; 0 ignorados |
-| python3 tools/server_smoke.py --accept-eula | 37 verificações funcionais passaram em três boots reais |
-| StyleEngineTest | Cores/HEX/Unicode, segurança de placeholder, tags inválidas, frames/freeze/cache/limites passaram |
-| TabPlanTest | JSON/condições/prioridade/default/restart e rejeição de animação/template inválido passaram |
-| TeamOwnershipSmoke | TEAM_OWNERSHIP_SMOKE_PASS, mantendo3 cenários de ownership reais |
-| TabSmoke | TAB_SMOKE_PASS, com pacotes reais capturados em jogadores sintéticos |
-| Header/nome | Layout VIP, título escolhido e conteúdo dos componentes conferidos |
-| Delta | Frame igual não envia pacotes; mudança de grupo altera só uma entrada |
-| Protocol | Só UPDATE_DISPLAY_NAME; latência original preservada e UUID real de origem |
-| Teams | Rank atualizado; foreign team preservado e display restaurado uma única vez |
-| Animação | Viewer habilitado recebe frame; viewer desabilitado não recebe; preferência persistida |
-| Stop | Teams próprios liberados, foreign preservado; mundos salvos e serviços STOPPED |
-| Migração4→5 | Backup legível schema4 e preferências independentes após restart |
-| Reload | Styles/TAB inválidos preservam snapshot; ownership exige restart |
-| JAR/refmap | Accessor/config/refmap presentes; entries→field_12369 mapeado; mod de teste ausente |
-| Regressões | Chat, aliases/datapack reload, mute/restart, clãs/menus/títulos e schema futuro passaram |
-| Cliente real/LuckPerms Fabric/assinaturas criptográficas | NÃO EXECUTADOS |
+- `python3 tools/gradle_cloud.py build smokeClasses --max-workers=2`: PASSOU (build final).
+- JUnit: 76 testes executados, 0 falhas, 0 erros, 0 ignorados no build final desta etapa.
+- Smoke final:39verificações passaram em3boots reais Fabric, incluindo os testes
+  ampliados de animação/comandos/reset e rejeição atômica de candidato scoreboard/core inválido.
+- ScoreboardPlanTest cobre defaults/arquivo preservado, tipos/limites/duplicatas,
+  condições/prioridade e compilação integral antes do reload.
+- ScoreboardSmoke captura pacotes reais com jogadores sintéticos: título igual ao TAB,
+  linhas repetidas/vazias, ordem e número oculto, valores literais/fallback, delta de
+  uma linha, remoção condicional/reload, frame inválido, frames/freeze, visibilidade e
+  toggles concorrentes/reconexão, ownership externo/bundles/slots coloridos/clear/colisão/stop.
+- TabPreferenceTest preserva testes de restart e upgrade4→5 das preferências independentes.
+- Regressões de chat, aliases/datapack reload, clãs/menus/títulos, backups e schema futuro
+  fazem parte do mesmo smoke real; todos os servidores são encerrados com stop.
 
-62 testes anteriores preservados; adicionados StyleEngineTest(5), TabPlanTest(3),
-TabPreferenceTest(2) e metadataLP(1), total11. Três cenários de TeamOwnership foram
-transferidos para o servidor Fabric após diagnóstico de bootstrap/IllegalAccessError
-do jar nomeado no JUnit cru; não foram desativados ou substituídos por checks triviais.
-No servidor real, os mesmos cenários passaram com registries e transformações reais.
-O primeiro runner desta versão tinha assert de schema futuro incorreto (52 em vez do
-42 injetado); foi corrigido e a rodada final completa passou preservando42.
+Resultados atuais: build/test-results/test, build/reports/tests/test/index.html,
+build/server-smoke/result.json e logs first-boot/restart/storage-failure.
+Resultados históricos0.7:73JUnit/37checks e SHA1f37125b…; não substituem execução atual.
 
-Smokes usam ServerPlayerEntity sintéticos/conexão sem transporte e providers LP de teste.
-Não equivalem a cliente autenticado, renderização real ou teste de carga/multiclientes.
+## Artefato
 
-## Artefato e evidências
+`build/libs/shirokai-core-0.8.0-dev.jar` (desenvolvimento, NÃO release estável).
+SHA-256: `c64a7ca236c4a3fb7dea6903cb6cb3a77c535693bba6f8e10c03c34c0f9a3de2`.
+JAR inspecionado: ambos os mixins/refmap presentes; nenhuma classe smoke em produção.
 
-JAR: `build/libs/shirokai-core-0.7.0-dev.jar`
+## Limitações
 
-SHA-256: `1f37125b61bc7ab022323c61a384750d013358d296c8189d1f3e83ad7fc72c68`
+Conexões sintéticas validam transformação Fabric, API e pacotes, não entrega/renderização,
+login, assinatura criptográfica ou carga. LuckPerms Fabric/contextos reais, Cobblemon,
+Impactor, Dex e PAPI continuam sem validação/integração completa. CI remoto não verificado.
 
-JUnit: `build/reports/tests/test/index.html`.
-Resultado: `build/server-smoke/result.json`.
-Logs: `build/server-smoke/first-boot.log`, `restart.log`, `storage-failure.log`.
-Refmap: shirokai-core-refmap.json dentro do JAR, alvo de campo confirmado.
-Todos os servidores de teste foram parados com stop; diretórios temporários removidos.
-Artefato de desenvolvimento, NÃO release estável.
+Sidebar preserva qualquer slot colorido externo por segurança, mesmo fora do team do
+viewer. Colisão exata ou overflow do ledger suspende gestão na conexão. Mods que enviam
+por ClientConnection diretamente/contornam o send vanilla podem escapar do observador;
+não prometemos compatibilidade universal. Ver SCOREBOARD.md para configuração/limites.
+Ordenação teams do TAB é opt-in; listed/vanish, nametags/below-name/bossbar pendentes.
+Styles ainda aguarda chat/menus/personalizações de títulos/clãs.
 
-## Limitações restantes
+## Continuidade e GitHub
 
-- Teams podem afetar mecânicas de equipe e são opt-in. Espectadores seguem precedência
-  do cliente; visual/ordenação real ainda exigem cliente conectado.
-- Mods que enviam nomes/header diretamente por pacotes não são detectáveis universalmente;
-  escolher dono do TAB, desabilitar módulo/nomes conforme TAB.md.
-- Styles é usado pelo TAB; chat/menus e configurações individuais de títulos/clãs ainda
-  aguardam integração. Nada de interpretar texto do jogador como estilo.
-- Listed/vanish por viewer, nametags customizados, abaixo do nome e bossbar não implementados.
-- Scoreboard visual, saldos/pokédex/ginásios reais e adapters Cobblemon/Impactor/Dex/PAPI pendentes.
-- Runtime LuckPerms/contextos, Yggdrasil/login, aparência/carga e assinaturas reais não validados.
-  Autenticação não foi desativada para mascarar rede.
-
-## Arquivos desta etapa
-
-styles/*, tab/*, mixin/PlayerListPacketAccessor, mixin JSON/refmapconfig, fabric.mod.json,
-CoreRuntime/ShirokaiCore/CoreConfig, PermissionService/LuckPermsPermissions,
-PlayerPreferences/SqliteStorage, AdminCommands, build.gradle, testes styles/tab/metadata,
-smoke/TabSmoke/TeamOwnershipSmoke/ProfileSmoke, tools/server_smoke.py e docs TAB/STYLES.
-ChatRepositoryTest teve fixture histórica ajustada para representar schema3 sem a nova coluna.
-Nenhuma dependência externa nova ou configuração de terceiro foi adicionada/modificada.
-
-## GitHub e continuidade
-
-Base anterior salva em main (53e5832). Esta etapa segue em commit separado conforme
-autorização persistente do usuário, sem reescrever histórico. Não houve publicação de
-ambiente ou release. Próximos passos em NEXT_STEPS; uso em TAB/STYLES/CHAT/CLANS/TITLES.
+Base sincronizada por fast-forward até528c692, preservando d9099c0 e histórico anterior.
+Progresso autorizado em istwi/Shirokai-tab/main, conforme confirmação do proprietário.
+Nenhuma release ou configuração do ambiente é publicada por esta etapa.

@@ -59,7 +59,7 @@ quando casa; sem regra, usa peso do grupo primário LuckPerms. Mesma prioridade 
 
 Valores são literais. Prefixo LuckPerms com markup/legacy não é interpretado; aplique
 estilo fora do placeholder. O serviço revalida título antes de renderizar, mantendo
-a mesma chave de seleção prevista para a futura scoreboard visual.
+a mesma chave de seleção compartilhada com a scoreboard visual (SCOREBOARD.md).
 
 ## Ordenação e propriedade
 
@@ -118,4 +118,4 @@ cliente real e runtime LuckPerms Fabric ainda não validados.
 
 Não implementados ainda: controle de listed/vanish por viewer, nametags customizados,
 objetivos abaixo do nome, bossbar, controles por grupo contextual além das condições
-atuais, scoreboard visual e adaptadores externos completos. Nada disso foi marcado como concluído.
+atuais e adaptadores externos completos. Nada disso foi marcado como concluído.

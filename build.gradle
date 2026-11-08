@@ -2,7 +2,7 @@ plugins {
     id 'fabric-loom' version '1.10.5'
     id 'maven-publish'
 }
-version = '0.7.0-dev'
+version = '0.8.0-dev'
 group = 'com.shirokai'
 base { archivesName = 'shirokai-core' }
 repositories { mavenCentral() }

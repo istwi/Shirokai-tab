@@ -100,3 +100,24 @@ contrato compilado/testado, sem afirmar runtime Fabric/contextos reais.
 Team/HoverEvent precisa de registries Minecraft; JUnit puro dá IllegalAccessError
 no bootstrap do jar nomeado. Cenários de ownership foram mantidos e migrados ao
 source set smoke no servidor Fabric, com bootstrap/transformações reais.
+
+
+## Atualização0.8 — MC1.21.1/Yarn1.21.1+build.3
+
+Auditados com javap antes de implementar: ScoreboardObjective(Scoreboard,String,
+ScoreboardCriterion,Text,RenderType,boolean,NumberFormat);
+ScoreboardObjectiveUpdateS2CPacket(objective,int) ADD/REMOVE/UPDATE_MODE;
+ScoreboardDisplayS2CPacket(slot,nullableObjective), getSlot/getName;
+ScoreboardScoreUpdateS2CPacket(holder,objective,int,Optional<Text>,Optional<NumberFormat>);
+ScoreboardScoreResetS2CPacket(holder,nullableObjective); BlankNumberFormat.INSTANCE.
+HUD vanilla renderScoreboardSidebar filtra/ordena e limita15entradas. Os limites
+128/256 de título/linha são política conservadora do Core, não limite em pixels.
+
+Bytecode de ServerCommonNetworkHandler.sendPacket confirma delegação para
+send(Packet,PacketCallbacks), que chama ClientConnection.send(packet,callbacks,flush).
+Mixin HEAD em send apenas observa scoreboard/bundles; não cancela nem altera pacotes.
+Refmap acompanha os dois mixins. BundleS2CPacket.getPackets compila/executa na versão fixa.
+ScoreboardDisplaySlot inclui SIDEBAR e TEAM_*; Core cede conservadoramente a qualquer
+sidebar colorido externo. Objetivos privados não entram no scoreboard global.
+A detecção não cobre mods que contornam/reescrevem essa rota; ver SCOREBOARD.md.
+Testes Fabric usam conexão sintética; não afirmam renderização/autenticação real.

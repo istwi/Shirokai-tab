@@ -1,3 +1,13 @@
+# 0.8.0-dev — scoreboard visual
+
+Sidebar privado por viewer com layouts/condições, linhas ordenadas e repetidas,
+estilos/animações, título compartilhado com TAB, diffs e visibilidade persistida.
+Ownership conservador observa pacotes sem os cancelar, preserva sidebars externos
+e libera somente recursos próprios. Comandos /sidebar e /shirokai:sidebar, diagnóstico
+/shirokaicore scoreboard, reload atômico e testes
+JUnit/Fabric adicionados. Schema SQLite permanece5. Cliente real e integrações
+externas continuam pendentes. Evidências e SHA em PROJECT_STATUS.md.
+
 # Histórico
 
 ## 0.7.0-dev — estilos e TAB

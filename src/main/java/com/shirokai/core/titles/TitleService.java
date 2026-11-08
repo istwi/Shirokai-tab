@@ -17,6 +17,8 @@ public final class TitleService {
     private final Map<UUID, TitleState> cache = new HashMap<>();
     private final Set<UUID> refreshing = new HashSet<>();
     private TitleCatalog catalog;
+    private Consumer<UUID> changed = id -> {};
+    public void onChange(Consumer<UUID> listener) { changed = changed.andThen(listener); }
     private Function<UUID,Optional<String>> clanName=player->Optional.empty();
     private Function<UUID,Optional<TitleDefinition>> dynamic=player->Optional.empty();
     private Function<UUID,CompletableFuture<Void>> refresh=player->CompletableFuture.completedFuture(null);
@@ -41,7 +43,10 @@ public final class TitleService {
     private TitleState remember(TitleState state) {
         if (cacheable.test(state.player())) {
             var previous = cache.get(state.player());
-            if (previous == null || previous.revision() <= state.revision()) cache.put(state.player(), state);
+            if (previous == null || previous.revision() <= state.revision()) {
+                cache.put(state.player(), state);
+                if (!state.equals(previous)) changed.accept(state.player());
+            }
         }
         return rules.normalize(state, catalog(state.player()), now());
     }

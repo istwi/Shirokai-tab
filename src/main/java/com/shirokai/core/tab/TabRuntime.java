@@ -27,6 +27,7 @@ public final class TabRuntime implements AutoCloseable{
         this.server=server;this.plan=plan;this.permissions=permissions;this.placeholders=placeholders;this.titles=titles;this.clans=clans;this.storage=storage;this.fallback=fallback;this.logger=logger;this.online=online;teams=new TeamOwnership(server.getScoreboard(),message->logger.warn("[tab] Ordenação ignorada: {}",message));
     }
     public TabPlan plan(){return plan;}
+    public boolean animationsEnabled(UUID id){return animations.getOrDefault(id,false);}
     public void replacePlan(TabPlan candidate){if(candidate.config().requiresRestartComparedTo(plan.config()))throw new IllegalArgumentException("Ownership do TAB exige reinício");plan=candidate;update();}
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(p->p.getUuid().equals(id)&&!p.isDisconnected()).findFirst().orElse(null);}
     public void join(UUID id){

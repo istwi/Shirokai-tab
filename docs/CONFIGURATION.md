@@ -1,4 +1,4 @@
-# Configuração 0.7.0-dev
+# Configuração 0.8.0-dev
 
 Arquivo real: `config/shirokai-core/core.json`, relativo ao diretório do servidor.
 Criado somente se ausente. Arquivos existentes, inclusive inválidos, não são sobrescritos.
@@ -16,7 +16,8 @@ Criado somente se ausente. Arquivos existentes, inclusive inválidos, não são 
     "clans": true,
     "chat": true,
     "styles": true,
-    "tab": true
+    "tab": true,
+    "scoreboard": true
   },
   "databaseFile": "shirokai.db",
   "unavailablePlaceholder": "N/D"
@@ -69,7 +70,7 @@ não reescrevemos a configuração personalizada. titles depende de storage/perm
 profiles depende de titles. Desabilitar exige reinício.
 Placeholders adicionais: selected_title, chat_tag_1 e chat_tag_2 do namespace shirokai.
 clans.json é funcional: ver CLANS.md; participa do reload atômico junto dos outros catálogos.
-chat.json é funcional: ver CHAT.md. tab.json e styles.json são funcionais: ver TAB/STYLES. Scoreboard.json visual ainda não existe.
+chat.json é funcional: ver CHAT.md. tab.json e styles.json são funcionais: ver TAB/STYLES. scoreboard.json também é funcional: ver SCOREBOARD.md.
 
 
 clans.json inclui roleActions a partir0.5; campo ausente em arquivos antigos usa
@@ -87,3 +88,10 @@ styles/tab são snapshots validados junto de core/titles/clans/chat. Candidato c
 animações/templates antes de publicar. managePlayerNames/manageTeams exigem reinício.
 Nenhum arquivo existente é substituído por default; estilos de placeholders são
 aplicados pelo template, nunca por reinterpretação do valor.
+
+
+scoreboard participa do mesmo candidato atômico de reload. Layouts/linhas/estilos
+são compilados antes de publicar qualquer snapshot. modules.scoreboard exige reinício;
+demais opções de scoreboard aceitam reload. Schema SQLite continua5: a visibilidade
+usa scoreboard_enabled existente, independente de animations_enabled. Sem leitura
+da preferência, sidebar fica oculto. Ownership por conexão e comandos em SCOREBOARD.md.
