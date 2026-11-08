@@ -177,3 +177,20 @@ IntegrationSmoke acrescenta persistência/fallback/recuperação com LuckPerms r
 runner verifica consulta administrativa de clãs pelo console. Conexões continuam
 sintéticas: não comprovam cliente autenticado, assinatura criptográfica, renderização
 do editor/gradientes, contextos de mundo reais ou carga. Resultados em PROJECT_STATUS.md.
+
+## Suítes0.12
+
+TabExtrasPlanTest: defaults desligados/config preservada, tipos/enums/campos/ownership,
+compilação atômica de templates e números; N/D/overflow/NaN/fora de faixa não viram
+valores fictícios. Rich slots mantêm dados literais.
+TabExtrasSmoke no Fabric: listagem por viewer/self/seehidden e baseline falso,
+cedência a UPDATE_LISTED/REMOVE externos, restauração normal; nametags individuais
+e teams externos/mutados; objetivo privado fora do mundo, valores reais, invisíveis
+não recebem linhas, BELOW_NAME externo/bundle/clear/colisão e limpeza; bossbar por
+viewer, diffs, condição de permissão/mundo, reload de nome/progresso/cor/estilo,
+coexistência, colisão exata e stop. Testa frame inválido sem inventar valores,
+recuperação e zero pacotes em frame igual.
+Suíte sidebar mantém a asserção de ledger vazio após último consumidor fechar;
+registro compartilhado não é apagado enquanto outro recurso ainda precisa dele.
+Runner rejeita config numérica inválida e enabled que exige restart no reload real.
+São conexões sintéticas: não comprovam renderização cliente ou autenticação/carga.

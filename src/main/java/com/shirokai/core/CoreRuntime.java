@@ -124,6 +124,8 @@ public final class CoreRuntime implements AutoCloseable {
         modules.register(module("tab",Set.of("styles","permissions"),()->{
             var tabConfig=TabConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab.json"));
             tab=new TabRuntime(server,new TabPlan(tabConfig,styles),permissions,placeholders,running("titles")?titles:null,running("clans")?clans:null,running("storage")?storage:null,()->config.unavailablePlaceholder(),logger);
+            tab.configureExtras(new TabExtrasPlan(TabExtrasConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab-extras.json")),styles));
+            if(tab.extrasPlan().config().nametags().enabled())logger.warn("[tab] Nametags opt-in usam teams globais próprios; teams externos serão preservados");
             if(tabConfig.manageTeams())logger.warn("[tab] Teams habilitados explicitamente: Core usa teams de ordenação sem remover teams externos");
         },()->{if(tab!=null)tab.close();}));
         modules.register(module("scoreboard", Set.of("styles", "permissions"), () -> {
@@ -213,11 +215,12 @@ public final class CoreRuntime implements AutoCloseable {
                 ChatConfig chatConfig=chat==null?null:ChatConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/chat.json"));
                 StyleEngine candidateStyles=styles==null?null:new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json")));
                 TabPlan tabPlan=tab==null?null:new TabPlan(TabConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab.json")),candidateStyles);
+                var extrasPlan=tab==null?null:new TabExtrasPlan(TabExtrasConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/tab-extras.json")),candidateStyles);
                 var scoreboardPlan=scoreboard==null?null:new ScoreboardPlan(ScoreboardConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/scoreboard.json")),candidateStyles);
                 var presentationPlan=presentation==null?null:new PresentationPlan(PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json")),candidateStyles,chatConfig==null?ChatConfig.defaults():chatConfig);
                 var presetCatalog=presentation==null?null:PresetCatalog.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presets.json"),candidateStyles);
                 var integrationConfig=integrations==null?null:IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
-                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog);
+                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog,extrasPlan);
             } catch (Exception failure) { throw new CompletionException(failure); }
         }, io).whenComplete((candidate, error) -> {
             if (closed) { reloading.set(false); result.completeExceptionally(new IllegalStateException("Servidor encerrando")); return; }
@@ -230,6 +233,7 @@ public final class CoreRuntime implements AutoCloseable {
                     if(chat!=null&&candidate.chat().takeVanillaPrivateCommands()!=chat.service().config().takeVanillaPrivateCommands())
                         throw new IllegalStateException("Alteração de takeVanillaPrivateCommands exige reinício");
                     if(tab!=null&&candidate.tab().config().requiresRestartComparedTo(tab.plan().config()))throw new IllegalStateException("Alteração de ownership do TAB exige reinício");
+                    if(tab!=null&&candidate.extras().config().requiresRestartComparedTo(tab.extrasPlan().config()))throw new IllegalStateException("Ownership de extras do TAB exige reinício");
                     if(integrations!=null&&candidate.integrations().requiresRestartComparedTo(integrations.config()))throw new IllegalStateException("Ativação de integrações exige reinício");
                     config = candidate.core();
                     if (titles != null) titles.replaceCatalog(candidate.titles());
@@ -238,7 +242,7 @@ public final class CoreRuntime implements AutoCloseable {
                     if(integrations!=null)integrations.replaceConfig(candidate.integrations());
                     if(customization!=null)customization.replaceCatalog(candidate.presets());
                     if(presentation!=null)presentation.replacePlan(candidate.presentation());
-                    styles=candidate.styles();if(tab!=null)tab.replacePlan(candidate.tab());if(scoreboard!=null)scoreboard.replacePlan(candidate.scoreboard());
+                    styles=candidate.styles();if(tab!=null){tab.configureExtras(candidate.extras());tab.replacePlan(candidate.tab());}if(scoreboard!=null)scoreboard.replacePlan(candidate.scoreboard());
                     logger.info("[core] Configuração recarregada com segurança");
                     result.complete(null);
                 } catch (Exception failure) { result.completeExceptionally(failure); }
@@ -247,7 +251,7 @@ public final class CoreRuntime implements AutoCloseable {
         });
         return result;
     }
-    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets) {}
+    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras) {}
     public void prepareStop(){try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;

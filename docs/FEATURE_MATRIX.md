@@ -12,7 +12,7 @@
 | Títulos e duas identificações | Implementados e testados | ROLE/SPECIAL/CLAN integrados; cliente autenticado pendente |
 | Clãs nativos | Comandos, menus, matriz de ações e identificação CLAN testados | Presets, editor textual e convites enviados implementados; administração relacional avançada pendente |
 | Chat e moderação | Canais, privado, ignore, mute e gates implementados/testados | Cliente real e assinaturas/login reais pendentes; presets das identificações implementados |
-| TAB | Header/footer, nomes, título e teams opt-in implementados/testados | Cliente real, listed/vanish, nametags, bossbar e objetivos abaixo do nome pendentes |
+| TAB | Header/footer, nomes, título, listed por viewer, nametags, BELOW_NAME e bossbar; ownership opt-in/diffs testados | Cliente real, vanish de entidades e compatibilidade universal pendentes; efeitos globais de teams explícitos |
 | Scoreboard visual | Sidebar privado por viewer, layouts/linhas condicionais, diffs e visibilidade persistida | Cliente real e compatibilidade universal não validados; cede a sidebar externo |
 | /perfil e menus de clãs | Handlers testados com jogadores sintéticos | Aparência/pacotes de cliente real não testados |
 | Estilos e animações | Cores/HEX/gradientes/frames com cache usados no TAB/sidebar e apresentação de chat/menus/títulos/clãs | Presets pessoais/clã e editor textual implementados; animação de presets/menus e transições pendentes |

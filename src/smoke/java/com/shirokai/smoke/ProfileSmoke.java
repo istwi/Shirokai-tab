@@ -33,6 +33,7 @@ public final class ProfileSmoke implements ModInitializer {
         new ClanSmoke().onInitialize();
         new ChatSmoke().onInitialize();
         new TabSmoke().onInitialize();
+        new TabExtrasSmoke().onInitialize();
         new ScoreboardSmoke().onInitialize();
         new PresentationSmoke(this::until).onInitialize();
         new StyleChoiceSmoke(this::until).onInitialize();

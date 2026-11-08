@@ -70,7 +70,7 @@ public final class ScoreboardRuntime implements AutoCloseable {
         var previous = views.get(id);
         if (previous != null && previous.player == player) return previous.writes;
         if (previous != null) forget(id);
-        var view = new View(player); views.put(id, view);
+        var view = new View(player); views.put(id, view); SidebarPackets.retain(player.networkHandler);
         if (storage == null) return CompletableFuture.completedFuture(null); // Fail closed until persisted visibility is known.
         view.writes = storage.preferences(id).thenAcceptAsync(prefs -> {
             if (closed || views.get(id) != view) return;
@@ -188,7 +188,7 @@ public final class ScoreboardRuntime implements AutoCloseable {
         var view = views.remove(id);
         if (view != null) {
             try { if (!view.player.isDisconnected()) release(view, SidebarPackets.state(view.player.networkHandler)); }
-            finally { SidebarPackets.forget(view.player.networkHandler); }
+            finally { SidebarPackets.release(view.player.networkHandler); }
         }
     }
     public String status() { return "viewers=" + views.size() + " objectives=" + views.values().stream().filter(v -> v.objective != null).count() + " packets=" + packets + " conflicts=" + conflicts + " errors=" + errors; }

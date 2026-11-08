@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.11.0-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.12.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -88,6 +88,8 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokai-teams-smoke', 'TEAM_OWNERSHIP_SMOKE_PASS')
         checks.append('team ownership scenarios run with Fabric registries')
         server.command('shirokai-tab-smoke', 'TAB_SMOKE_PASS')
+        server.command('shirokai-tab-extras-smoke', 'TAB_EXTRAS_SMOKE_PASS')
+        checks.append('opt-in listed nametags below-name bossbars ownership diffs collisions and cleanup')
         checks.append('TAB packets selected title layouts delta updates teams and animations')
         server.command('shirokaicore tab', 'viewers=')
         server.command('shirokai-scoreboard-smoke', 'SCOREBOARD_SMOKE_PASS')
@@ -224,6 +226,20 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         presets_file.write_text(original_presets)
         server.command('shirokaicore reload', 'Configuração recarregada')
         checks.append('invalid preset catalog rejected atomically and corrected catalog reloads')
+        extras_file = runtime / 'config/shirokai-core/tab-extras.json'
+        original_extras = extras_file.read_text()
+        invalid_extras = json.loads(original_extras)
+        invalid_extras['bossbar']['progress'] = 'NaN'
+        extras_file.write_text(json.dumps(invalid_extras))
+        server.command('shirokaicore reload', 'Progresso exige decimal')
+        extras_file.write_text(original_extras)
+        ownership_extras = json.loads(original_extras)
+        ownership_extras['bossbar']['enabled'] = True
+        extras_file.write_text(json.dumps(ownership_extras))
+        server.command('shirokaicore reload', 'Ownership de extras do TAB exige reinício')
+        extras_file.write_text(original_extras)
+        server.command('shirokaicore reload', 'Configuração recarregada')
+        checks.append('invalid extra numeric config and ownership reload rejected atomically')
         config['modules']['storage'] = False
         config_file.write_text(json.dumps(config))
         server.command('shirokaicore reload', 'exige reinício; configuração ativa preservada')

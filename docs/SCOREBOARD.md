@@ -119,3 +119,10 @@ login, autenticação, transporte real ou compatibilidade com todos os mods.
 selected_title mantém o mesmo preset do TAB; clan/clan_tag compõem rich slots com
 as escolhas independentes do clã. Alterações de seleção invalidam sidebar; perdas
 de permissão são reavaliadas no render. Sem SQL por frame ou mudança de ownership.
+
+## Coexistência com BELOW_NAME0.12
+
+TAB_EXTRAS.md descreve o objetivo privado BELOW_NAME, independente do sidebar.
+O ledger sincronizado é compartilhado, com revisão de display separada por superfície
+e retain/release de consumidores. Fechar sidebar preserva evidência de colisão usada
+por BELOW_NAME; o último consumidor libera o registro. Hook continua observacional.

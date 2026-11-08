@@ -10,32 +10,28 @@ Leia integralmente AGENTS.md, REQUIREMENTS.md, PROJECT_STATUS.md e NEXT_STEPS.md
 (os três últimos em docs/). Antes de mudar cada área, leia CUSTOMIZATION.md,
 PRESENTATION.md, STYLES.md, TITLES.md, CLANS.md, CHAT.md, TAB.md, SCOREBOARD.md,
 INTEGRATIONS.md, CONFIGURATION.md, PERMISSIONS.md, API_COMPATIBILITY.md,
-FEATURE_MATRIX.md e TEST_PLAN.md em docs/.
+FEATURE_MATRIX.md, TAB_EXTRAS.md e TEST_PLAN.md em docs/.
 
 ## Estado atual
 
-0.11.0-dev, schema SQLite6. Presets estáticos por ID com permissões e seleções
-persistidas de títulos pessoais, nome e sigla de clã independentes. Fallback sem
-apagar ID em permissão perdida/preset removido; recupera ao voltar. Reusa apresentação,
-TitleService e clãs existentes. Presets não concedem títulos/grupos. Menu/commands
-revalidam catálogo, CAS, associação e líder do UUID de clã exibido. Sem SQL por render.
-Editor textual anvil: digitar e clicar no papel esquerdo salva; Esc cancela; não usar
-output de forja/XP/material e limpar ícones antes de onClosed. Sent invites permitem
-consulta/cancelamento autorizado. Administração list/inspect/rename/tag tem nós
-separados, CAS/auditoria e preserva cooldowns/membros. Contratos em CUSTOMIZATION/CLANS.
+0.12.0-dev, SQLite6, versões externas preservadas (INTEGRATIONS.md).
+0.11 já entregou presets estáticos persistidos, fallback que preserva ID, editor
+textual/convites enviados e administração inicial de clã. CUSTOMIZATION/CLANS definem
+contratos, não reaplique. 0.12 acrescenta listagem por viewer, nametags, BELOW_NAME
+privado e bossbar pessoal opt-in; tab-extras.json/ownership em TAB_EXTRAS.md.
+UPDATE_LISTED não é vanish de entidades nem privacidade de chat/contagem online.
 
-Core/Fabric/Java21 e integrações anteriores preservados. Dependências fixadas:
-Gradle8.12.1/Loom1.10.5/Yarn1.21.1+build.3/Fabric API0.116.17+1.21.1/Kotlin2.2.20.
-Loader mínimo0.16.14; perfil Cobblemon/Dex0.17.2. APIs/artefatos exatos em INTEGRATIONS.
-Resultado atual, SHA e limitações estão em PROJECT_STATUS; reexecute após mudanças.
+Todos os enabled de extras exigem reinício; templates/condições/numéricos validam
+no reload atômico. Teams de nametag são globais e modificam ordenação/mecânicas;
+ceder a teams externos/mutados. Objetivos privados cedem a slots externos/colisões.
+Bossbar tem UUID por viewer e preserva outros UUIDs/replacements. SidebarPackets
+agora usa retain/release para não apagar evidência de outro consumidor. Hooks de
+send só observam, com chaves fracas/limites; runtime na thread servidor e sem SQL por frame.
 
-## Continue
-
-NEXT_STEPS.md prioriza extras de TAB (listed/vanish, nametags, BELOW_NAME, bossbar),
-administração relacional restante e ampliação dos presets. Não reaplique escolhas
-persistidas/editor/convites já entregues. Auditoria javap confirma símbolos1.21.1,
-não compatibilidade universal nem implementação concluída. Recursos de ownership
-precisam de opt-in e preservar mods externos.
+Resultado/SHA atuais em PROJECT_STATUS; reexecute após mudanças. NEXT_STEPS prioriza
+administração relacional/diagnóstico/histórico de clãs, ampliação dos presets e
+integração de um mod real de vanish se necessário. Cliente real/renderização/carga
+continuam pendentes. APIs1.21.1 foram auditadas, não extrapolar para outra versão.
 
 Preserve: título único TAB/sidebar; até duas identificações ROLE/SPECIAL/CLAN;
 clan_ representa associação real; clãs gratuitos, limites não expulsam membros,

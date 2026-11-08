@@ -117,3 +117,11 @@ presentation/titles/clans. SQLite passa para schema6 com backup antes da migraç
 e duas tabelas de IDs/revisões; preferências anteriores são preservadas.
 styles controla apresentação/presets; escolhas exigem storage/permissions, e clã
 ativo para nome/sigla. Configuração inválida preserva todos os snapshots.
+
+## Extras0.12
+
+tab-extras.json/schema1 é criado só se ausente e compila no mesmo candidato de reload.
+Estrutura completa em TAB_EXTRAS.md. listed/nametags/belowName/bossbar.enabled começam
+false e exigem reinício para mudar ownership. Demais campos aceitam reload, inclusive
+condições/permissões/templates. Dado numérico indisponível não é convertido em0.
+Não há nova migração SQLite: schema6 permanece.

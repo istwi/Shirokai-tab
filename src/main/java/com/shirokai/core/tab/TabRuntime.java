@@ -21,10 +21,16 @@ public final class TabRuntime implements AutoCloseable{
     private final MinecraftServer server;private final PermissionService permissions;private final PlaceholderService placeholders;private final TitleService titles;private final ClanService clans;private final SqliteStorage storage;
     private final Supplier<Collection<ServerPlayerEntity>> online;private final Supplier<String> fallback;private final Logger logger;private final TeamOwnership teams;
     private final Map<UUID,View> views=new HashMap<>();private final Map<UUID,Boolean> animations=new HashMap<>();private final Map<UUID,Long> errors=new HashMap<>();
+    private TabExtrasRuntime extras;
     private TabPlan plan;private long tick,headerPackets,namePackets,nameEntries,failedUpdates;private Long globalErrorTick;private boolean closed;
     public TabRuntime(MinecraftServer server,TabPlan plan,PermissionService permissions,PlaceholderService placeholders,TitleService titles,ClanService clans,SqliteStorage storage,Supplier<String> fallback,Logger logger){this(server,plan,permissions,placeholders,titles,clans,storage,fallback,logger,()->List.copyOf(server.getPlayerManager().getPlayerList()));}
     public TabRuntime(MinecraftServer server,TabPlan plan,PermissionService permissions,PlaceholderService placeholders,TitleService titles,ClanService clans,SqliteStorage storage,Supplier<String> fallback,Logger logger,Supplier<Collection<ServerPlayerEntity>> online){
         this.server=server;this.plan=plan;this.permissions=permissions;this.placeholders=placeholders;this.titles=titles;this.clans=clans;this.storage=storage;this.fallback=fallback;this.logger=logger;this.online=online;teams=new TeamOwnership(server.getScoreboard(),message->logger.warn("[tab] Ordenação ignorada: {}",message));
+    }
+    public TabExtrasPlan extrasPlan(){return extras==null?null:extras.plan();}
+    public void configureExtras(TabExtrasPlan candidate){
+        if(extras==null)extras=new TabExtrasRuntime(server,candidate,permissions,(key,subject,viewer)->resolveRich(key,subject,viewer,permissions.metadata(subject.getUuid()),online.get().size()),this::animationsEnabled,logger);
+        else extras.replacePlan(candidate);
     }
     public TabPlan plan(){return plan;}
     public boolean animationsEnabled(UUID id){return animations.getOrDefault(id,false);}
@@ -35,7 +41,7 @@ public final class TabRuntime implements AutoCloseable{
             if(error!=null){logger.warn("[tab] Preferência indisponível "+id,error);return;}if(!closed&&player(id)!=null){animations.put(id,prefs.animationsEnabled());update();}
         },server);
     }
-    public void forget(UUID id){views.remove(id);animations.remove(id);errors.remove(id);}
+    public void forget(UUID id){if(extras!=null)extras.forget(id);views.remove(id);animations.remove(id);errors.remove(id);}
     public CompletableFuture<Boolean> toggleAnimations(UUID id){
         if(storage==null)return CompletableFuture.failedFuture(new IllegalStateException("Persistência de preferências indisponível"));boolean enabled=!animations.getOrDefault(id,false);
         return storage.setAnimations(id,enabled).thenApplyAsync(v->{if(!closed&&player(id)!=null){animations.put(id,enabled);update();}return enabled;},server);
@@ -78,7 +84,13 @@ public final class TabRuntime implements AutoCloseable{
         var metadata=new HashMap<UUID,PermissionService.Metadata>();for(var player:players)metadata.put(player.getUuid(),permissions.metadata(player.getUuid()));
         var rules=new HashMap<UUID,Optional<TabPlan.Name>>();
         for(var subject:players)rules.put(subject.getUuid(),plan.name(metadata.get(subject.getUuid()),subject.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(subject.getUuid(),node)));
-        if(plan.config().manageTeams())teams.reconcile(players.stream().map(p->{int priority=rules.get(p.getUuid()).map(n->n.definition().priority()).orElse(metadata.get(p.getUuid()).weight());return new TeamOwnership.Player(p.getUuid(),p.getGameProfile().getName(),priority);}).toList());
+        if(extras!=null)extras.update(players,tick);
+        boolean nametags=extras!=null&&extras.plan().config().nametags().enabled();
+        if(plan.config().manageTeams()||nametags)try{
+            var desired=players.stream().map(p->{int priority=rules.get(p.getUuid()).map(n->n.definition().priority()).orElse(metadata.get(p.getUuid()).weight());
+                return nametags?extras.nametag(p,priority,tick):new TeamOwnership.Player(p.getUuid(),p.getGameProfile().getName(),priority);}).toList();
+            teams.reconcile(desired);
+        }catch(RuntimeException failure){failedUpdates++;if(globalErrorTick==null||tick-globalErrorTick>=200){globalErrorTick=tick;logger.warn("[tab] Nametags anteriores preservadas",failure);}}
         var values=new HashMap<UUID,Map<String,Text>>();var commonNames=new HashMap<UUID,Text[]>();
         for(var subject:players)values.put(subject.getUuid(),new HashMap<>());
         for(var viewer:players)try{
@@ -102,9 +114,9 @@ public final class TabRuntime implements AutoCloseable{
             view.names.clear();view.names.putAll(desired);
         }catch(RuntimeException failure){failedUpdates++;Long previous=errors.get(viewer.getUuid());if(previous==null||tick-previous>=200){errors.put(viewer.getUuid(),tick);logger.warn("[tab] Atualização preservada para "+viewer.getUuid(),failure);}}
     }
-    public String status(){return "viewers="+views.size()+" headers="+headerPackets+" namePackets="+namePackets+" nameEntries="+nameEntries+" teams="+teams.ownedTeams()+" conflicts="+teams.conflicts()+" errors="+failedUpdates;}
+    public String status(){return "viewers="+views.size()+" headers="+headerPackets+" namePackets="+namePackets+" nameEntries="+nameEntries+" teams="+teams.ownedTeams()+" conflicts="+teams.conflicts()+" errors="+failedUpdates+(extras==null?"":" "+extras.status());}
     @Override public void close(){
-        if(closed)return;closed=true;try{for(var viewer:online.get()){
+        if(closed)return;closed=true;try{if(extras!=null)extras.close();for(var viewer:online.get()){
             var view=views.get(viewer.getUuid());if(view==null||viewer.isDisconnected())continue;
             viewer.networkHandler.sendPacket(new PlayerListHeaderS2CPacket(Text.empty(),Text.empty()));var reset=new ArrayList<PlayerListS2CPacket.Entry>();
             for(UUID id:view.names.keySet()){var subject=player(id);if(subject!=null)reset.add(entry(subject,subject.getPlayerListName()));}if(!reset.isEmpty())viewer.networkHandler.sendPacket(TabPackets.names(reset));

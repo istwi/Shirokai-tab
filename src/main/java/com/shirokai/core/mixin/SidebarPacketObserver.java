@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class SidebarPacketObserver {
     @Inject(method = "send", at = @At("HEAD"))
     private void shirokai$observe(Packet<?> packet, PacketCallbacks callbacks, CallbackInfo ci) {
+        com.shirokai.core.tab.TabExtrasPackets.observe((ServerCommonNetworkHandler)(Object)this,packet);
         SidebarPackets.observe((ServerCommonNetworkHandler)(Object)this, packet);
     }
 }

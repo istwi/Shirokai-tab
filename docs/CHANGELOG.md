@@ -1,3 +1,15 @@
+# 0.12.0-dev
+
+- Extras opt-in em tab-extras.json: UPDATE_LISTED por viewer respeitando baseline
+  externo, nametags de prefixo/sufixo/visibilidade, BELOW_NAME privado e bossbar pessoal.
+- Diffs por componente, permissões/condições dinâmicas, dados numéricos estritos e
+  ownership com cedência a sistemas externos/colisões. Sem vanish de entidades.
+- Teams individuais têm rank estável por prioridade/nome/UUID e preservam mutações
+  externas. Ledger de scoreboard compartilhado com contagem de consumidores.
+- Testes de config/numéricos, pacotes, dimensão, conflitos e limpeza; regressões
+  anteriores preservadas. Schema SQLite6 e dependências permanecem.
+- Sem release ou alteração/publicação de configuração do ambiente.
+
 # 0.11.0-dev
 
 - Presets estáticos por ID com permissões, escolhas persistidas de títulos pessoais e

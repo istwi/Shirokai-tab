@@ -116,3 +116,13 @@ shirokaicore.command.clans.identity permite correção administrativa rename/tag
 Permissões administrativas não autorizam escolhas pessoais arbitrárias, transferência
 forçada ou remoção de clãs. clan.animation permanece pendente; clan.tag.edit pode ser
 configurado como requisito de preset, não é um bypass da política de cargos.
+
+## Extras0.12
+
+Com listagem opt-in, shirokaicore.tab.hidden oculta o sujeito apenas na lista de
+quem não tem shirokaicore.tab.seehidden. O próprio sujeito continua listado para si,
+e um baseline falso externo não é revelado. Nós podem ser alterados em tab-extras.json.
+Isto não autoriza esconder entidades ou contornar mod de vanish. Nametags/BELOW_NAME
+são políticas administrativas globais/por conexão, sem comando de autoelevação.
+Bossbar usa condição permission/grupo/mundos de TAB; nenhuma permissão é concedida
+pelo Core. Diagnóstico continua em shirokaicore.command.tab.inspect.

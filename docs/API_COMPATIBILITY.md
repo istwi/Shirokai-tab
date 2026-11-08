@@ -204,3 +204,31 @@ Extras de TAB continuam exigindo implementação separada e ownership explícito
 list-order de versões futuras. Nametags dependem de teams globais; objetivos
 BELOW_NAME são globais por viewer; bossbars têm identidades próprias. Nenhum desses
 recursos novos foi implementado nesta etapa.
+
+## Atualização0.12 — extras de TAB
+
+Auditado com javap no JAR nomeado MC1.21.1/Yarn1.21.1+build.3, antes de implementar:
+PlayerListS2CPacket.Action.UPDATE_LISTED/getActions/getEntries/Entry e
+PlayerRemoveS2CPacket.profileIds. Core envia somente UPDATE_LISTED, sem ADD/REMOVE
+de perfis ou campos list-order inexistentes nesta versão.
+
+Team.setPrefix/setSuffix/setNameTagVisibilityRule/getNameTagVisibilityRule,
+getDeathMessageVisibilityRule/getColor/getCollisionRule e regras ALWAYS/NEVER/
+HIDE_FOR_OTHER_TEAMS/HIDE_FOR_OWN_TEAM. Teams globais continuam tendo efeitos
+colaterais explícitos; um rank por jogador mantém prioridade/nome/UUID determinísticos.
+
+ScoreboardDisplaySlot.BELOW_NAME e os mesmos Objective/Display/Score/Reset packets
+da sidebar foram usados em objetivo privado. NumberFormat nulo mantém número vanilla.
+Revisão de BELOW_NAME não força recrear sidebar; reset global de scores afeta ambos.
+Ledger compartilhado usa retain/release e preserva evidência até o último consumidor.
+
+ServerBossBar(Text,Color,Style), BossBar.getUuid/getName/getPercent/getColor/getStyle
+e setters; BossBarS2CPacket.add/remove/updateName/updateProgress/updateStyle e
+accept(Consumer), com callbacks add/remove/updateName/updateProgress/updateStyle/
+updateProperties. Barra sem membros não autoenvia; Core envia diffs com marcador
+de ownership. Não usa bossbarManager do mundo nem música/névoa/escurecimento.
+
+ServerPlayerEntity.setServerWorld foi conferido para fixture sintética de dimensão.
+Observer send existente cobre também roster/bossbar/bundles, sem novo mixin,
+cancelamento, reescrita de pacote ou mudança de dependências/protocolo. Refmap mantido.
+Detalhes/limites em TAB_EXTRAS.md; teste sintético não certifica cliente real/vanish.

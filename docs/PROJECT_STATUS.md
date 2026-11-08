@@ -1,78 +1,84 @@
-# Estado real do projeto — 0.11.0-dev
+# Estado real do projeto — 0.12.0-dev
 
 ## Entrega atual
 
-Personalização persistida implementada sobre a apresentação0.10, sem substituir
-seleções de títulos, sistema de clãs ou grupos LuckPerms. Catálogo administrativo de
-presets com IDs estáveis, permissões e três escopos: TITLE pessoal, CLAN_NAME e CLAN_TAG.
-As escolhas de clã são independentes, exclusivas do líder e compartilhadas entre membros.
-Detalhes, JSON, comandos e semântica em CUSTOMIZATION.md.
+Quatro extras de TAB implementados em tab-extras.json, todos opt-in/desligados por
+default. Documentação completa, JSON, efeitos e limites em TAB_EXTRAS.md.
 
-- /estilo e seletores no /perfil e /clan. Preview, paginação, estados explícitos,
-  reset por campo, bloqueio de ações de inventário/outro jogador/tela fechada.
-- ID salvo é preservado quando permissão expira/preset some; fallback básico permitido
-  é renderizado. Recuperação de permissão/reintrodução do ID restaura a escolha.
-- Um único título continua compartilhado por TAB/sidebar. Chat tem no máximo duas
-  identificações, com corpo/assinatura/máscara/gates intactos. CLAN continua associação real.
-- Rich slots aplicam escolhas em títulos e placeholders de nome/sigla sem reinterpretar
-  dados ou alterar Text compartilhado. Sem SQL por tick/render; cache por sessão/eventos.
-- Schema6 cria escolhas/revisões com FK/cascade do clã, auditoria atômica e CAS.
-  Migração1..5 faz backup antes da transação; rollback/futuro/restart são testados.
-  Escolhas concorrentes não se sobrescrevem. SQL revalida associação e líder do UUID exato.
-- Presets compilam junto dos demais snapshots de reload; inválidos rejeitam o candidato
-  inteiro. Telas e writes da geração anterior são recusados. Permissão é verificada
-  na thread do servidor antes de enfileirar; não há transação distribuída SQLite/LP.
-- Editor textual de nome/sigla por bigorna: digitar e clicar no papel à esquerda salva;
-  Esc cancela. Sem forja/material/XP; ícones são limpos antes de fechar. Escopo do clã,
-  CAS do campo, cargos/configuração/validade/unicidade e cooldowns são revalidados.
-- Convites enviados listados por UUID/prazo, com cancelamento autorizado no menu.
-- Administração inicial: list/inspect/rename/tag, permissões separadas e CAS/auditoria.
-  Correção ignora espera mas preserva prazos dos cooldowns, membros e liderança.
-  Não força transferências/exclusões nem faz reparos relacionais automáticos.
+- UPDATE_LISTED por observador: sujeito hidden e viewer seehidden revalidados,
+  opção de mesma dimensão, self preservado e baseline falso/roster removido externo
+  nunca reexibido. UPDATE_LISTED externo posterior revoga controle naquela conexão.
+  Não oculta entidades/chat/contagem online e não é vanish completo.
+- Nametags de prefixo/sufixo/visibilidade via teams próprios individuais globais.
+  Rank por prioridade/nome/UUID; um team por jogador permite estilos independentes.
+  Templates ricos preservam dados literais e título compartilhado. Teams externos,
+  nomes ocupados, integrantes externos e mutações de atributos são preservados.
+  Friendly fire/colisão/invisíveis têm os efeitos explícitos documentados.
+- BELOW_NAME privado por viewer, fora do scoreboard salvo; label e valores int32
+  disponíveis, default ping real. Diffs, remoção de linhas e reenvio após reset.
+  Não cria jogadores fictícios nem converte dado indisponível em0. Cede a slot externo
+  global/pacote/bundle; colisão do nome exato suspende até reconectar, sem deletar replacement.
+- Bossbar pessoal com UUID independente, templates/animações/condições por LP/mundo,
+  progresso decimal0..1 e diffs de nome/progresso/cor/estilo. Coexiste com outras barras,
+  sem registro no bossbarManager salvo ou música/névoa/escurecimento. Colisão de UUID
+  cede ao sistema externo até reconectar, inclusive durante limpeza.
+- Configs/templates compilam juntos no reload atômico; enabled altera ownership e
+  exige reinício. Não sobrescreve configurações personalizadas. Diagnóstico de extras
+  está no comando tab existente. Nenhum SQLite por frame/tick; APIs na thread do servidor.
+- Observer de send existente cobre roster/bossbar/bundles, sem cancelar ou reescrever
+  pacotes. Ledger de objetivos agora tem revisão de BELOW_NAME e retain/release por
+  consumidor, preservando evidência de conflito até o último fechar.
 
-Sem mudanças de dependências externas, protocolo ou mixins de produção. Nenhuma
-release ou configuração de ambiente foi publicada/reaplicada nesta tarefa.
+Schema SQLite permanece6, tab.json/schema1 e dependências externas permanecem.
+Sem novos mixins; o observer existente foi estendido e o refmap mantido.
+Personalização/clãs/chat/sidebar e demais recursos0.11 foram preservados.
+Nenhuma release ou alteração/publicação de configuração de ambiente nesta tarefa.
 
 ## Validação executada
 
-- Build/JUnit: **95 testes, 0 falhas, 0 erros, 0 ignorados** na rodada final.
-- Smoke sem opcionais: **44 verificações em 3 boots Fabric**, incluindo editor textual,
-  convites enviados, estilos persistidos/menus, pacotes TAB/sidebar, fallback/recuperação,
-  catálogo removido/tela antiga/liderança antiga e reload inválido de presets.
-- Smoke com mods reais: **14 verificações aprovadas**, incluindo permissão real do
-  LuckPerms para preset persistido, perda/fallback/recuperação, consulta administrativa
-  pelo console e regressões Cobblemon/Impactor/Dex/PAPI.
-- Preparação de integrações: cinco mods oficiais e53dependências aninhadas verificados
-  sem alterar bytes, hashes, TLS ou versões.
-- JAR inspecionado: versão0.11/refmap presentes, sem classes smoke e somente SQLite aninhado.
+- Build/JUnit: **100 testes,0falhas,0erros,0ignorados** na rodada final.
+- Smoke básico: **46 verificações em3boots Fabric**. Inclui os quatro extras, diffs,
+  baseline/roster externos, permissão/dimensão sintéticas, BELOW_NAME externo e colisão,
+  bossbar alheia/colisão/condição/reload, nametag externa/mutada e limpeza.
+  Suítes de títulos/clãs/editor/presets/chat/TAB/sidebar continuam passando.
+- Teste antigo de sidebar inicialmente detectou limpeza prematura/compartilhada do
+  ledger; retain/release corrigiu o ciclo de vida. A asserção de limpeza foi mantida
+  e passou junto da preservação de evidência para consumidores ainda ativos.
+- Smoke com mods reais0.12: **14 verificações aprovadas**, incluindo LP real com
+  escolha persistida/fallback/recuperação, PAPI, Cobblemon, Impactor, Dex e shutdown.
+- Preparação verificou os cinco mods oficiais e53dependências aninhadas fixadas.
+- JAR inspecionado: versão0.12 e refmap presentes, sem classes smoke.
 
 Evidências: build/reports/tests/test/index.html, build/server-smoke/result.json,
-build/integration-smoke/result.json e logs dos runners. Resultados0.10 históricos:
-84JUnit,42checks básicos e12com opcionais; não substituem as verificações atuais.
+build/integration-smoke/result.json e logs dos runners. Resultados0.11 são históricos
+(95JUnit/44básicos/14opcionais); não substituem os checks após estas mudanças.
 
 ## Artefato
 
-build/libs/shirokai-core-0.11.0-dev.jar — desenvolvimento, não release estável.
-SHA-256: b50e8e7edc83a8888eb32b964eab6595cac3d8452f0c45a23b4bd93a48c8c264.
-Base remota antes desta etapa: f3db2d040399253e019e93af5491b6005b610689.
-Commit final é informado na entrega; não incluir o próprio hash no seu conteúdo.
+build/libs/shirokai-core-0.12.0-dev.jar — desenvolvimento, não release estável.
+SHA-256: 73b3542e531f9ea44d22d8bad976ce9ec326930a8a6bff578dce2670cd630fe3.
+Base antes desta etapa:422db579bb560489681fdac8019111701dc4d4a8.
+Commit final é informado na entrega, sem hash autorreferente neste documento.
 
-## Limitações e continuidade
+## Limitações e próxima etapa
 
-Projeto completo NÃO está entregue. Presets desta etapa são estáticos: não há
-animação pessoal/de clã, transições ou personalização separada de nome de conta/menu.
-Animações de layouts anteriores continuam. Administração relacional avançada,
-listed/vanish por viewer, nametags, BELOW_NAME e bossbar permanecem em NEXT_STEPS.md.
+Projeto completo NÃO está entregue. Faltam integração de vanish de entidades,
+administração relacional avançada de clãs, animação de presets pessoais/clã e
+personalização de outros campos além dos títulos/identidades de clã.
 
-Jogadores/conexões dos smokes são sintéticos: não validam login autenticado,
-assinatura criptográfica válida, renderização real, contextos LP de clientes,
-reconexão/mudança de mundo de cliente, escala/actionbar ou carga/conflitos universais.
-Neste runtime, authlib registrou UnknownHostException para api.minecraftservices.com
-na busca de publickeys; online-mode foi preservado. Não há sessão de cliente
-Minecraft autenticado fornecida ao teste. Integrações usam somente APIs públicas
-fixadas; moedas/fontes de Pokédex continuam explícitas. CI remoto não foi verificado.
+Testes usam jogadores/conexões sintéticos. Não validam login autenticado, assinatura
+criptográfica real, renderização/escala/actionbar/nametags/bossbars/BELOW_NAME do
+cliente, contextos LP de jogadores conectados, carga ou compatibilidade universal.
+A fixture altera a referência de dimensão do jogador sintético; não equivale ao
+protocolo completo de transferência de um cliente real. Authlib ainda pode registrar
+UnknownHostException para publickeys; online-mode não foi desativado.
+
+Observer não captura mods que contornam send ou reescrevem pacotes depois dele.
+Ownership/efeitos globais/overflow e escolha de responsável estão em TAB_EXTRAS.md.
+Integrações continuam fixadas/isoladas, moedas distintas e provider/coleção explícitos.
+Não há transação distribuída SQLite/LP/providers externos. CI remoto não verificado.
 
 ## GitHub
 
-Trabalho autorizado em istwi/Shirokai-tab/main, preservando histórico; commit/push
-somente após revisão e checks. Publicação de ambiente e release continuam separadas.
+Commit/push autorizados para istwi/Shirokai-tab/main após checks/revisão, preservando
+histórico. Releases e publicação de ambiente continuam fora deste trabalho.

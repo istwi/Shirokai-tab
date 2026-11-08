@@ -126,3 +126,11 @@ Título compartilhado incorpora preset pessoal/clã por rich slot; placeholders
 clan/clan_tag também compõem nome/sigla formatados sem reanálise de markup.
 Nenhum SQL por frame; escolhas são carregadas no join/eventos/ações. Ownership,
 ordenação e limitações listed/vanish/nametags/BELOW_NAME/bossbar não foram alterados.
+
+## Extras0.12
+
+Listagem por viewer, nametags de prefixo/sufixo/visibilidade, objetivos BELOW_NAME
+e bossbar foram implementados como opt-in. Defaults, permissões, JSON, ownership,
+efeitos globais e limites em TAB_EXTRAS.md. tab.json permanece schema1, SQLite6.
+UPDATE_LISTED não oculta entidades/chat/contagem online: vanish completo segue pendente.
+Nenhum list-order foi inventado; cliente/autenticação/renderização/carga seguem pendentes.

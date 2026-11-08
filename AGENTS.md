@@ -56,8 +56,8 @@ Não confundir o jogador sintético registrado na fixture com login/autenticaç�
 Apresentação: docs/PRESENTATION.md. Dado dinâmico nunca vira template. Rich slots
 removem ações e não alteram Text do cache. Cabeçalho usa no máximo duas tags selecionadas.
 Corpo assinado/máscara permanecem intactos; notificação de menção só após roteamento
-e nunca para destinatário sujeito a filtragem. Estilos configurados não são escolhas
-pessoais persistidas: não declarar editor/personalização por jogador/clã concluídos.
+e nunca para destinatário sujeito a filtragem. Regras de presentation.json são políticas
+administrativas; escolhas persistidas por ID são definidas em CUSTOMIZATION.md.
 
 Personalização0.11: leia docs/CUSTOMIZATION.md. Schema6 guarda somente IDs de presets;
 perda de permissão/remoção de preset nunca apaga a escolha. CLAN_NAME/CLAN_TAG são
@@ -67,3 +67,13 @@ Editor textual de clã usa anvil sem itens/XP reais: clique no papel de entrada
 confirma, Esc cancela; limpar ícones antes de super.onClosed para não dar itens.
 Identidade exige snapshot do campo mostrado e cargo/config atuais. Administração
 de identidade tem permissão própria, auditoria/CAS e preserva cooldowns/membros.
+
+Extras0.12: leia docs/TAB_EXTRAS.md antes de mudar listagem/nametags/BELOW_NAME/bossbar.
+Todos são opt-in em tab-extras.json e enabled exige reinício. UPDATE_LISTED não é
+vanish de entidades; nunca reexibir baseline falso/roster removido por terceiros.
+Alteração externa revoga ownership da listagem nessa conexão. Nametags usam teams
+globais próprios, com efeitos/ordenação documentados; mutação externa revoga ownership.
+BELOW_NAME é objetivo privado, cede ao slot externo e colisão exata suspende até
+reconectar. Bossbars têm UUID por viewer: coexistem com outras, não removem replacement.
+SidebarPackets tem retain/release por consumidor: não apagar evidência antes da última
+liberação. Hooks observam somente, sem jogo/IO; ações/caches na thread do servidor.
