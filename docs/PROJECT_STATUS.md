@@ -1,6 +1,14 @@
-# Estado real do projeto — 0.13.0-dev
+# Estado real do projeto — 0.13.1-dev
 
 ## Entrega atual
+
+Correção0.13.1 solicitada pelo usuário: somente nick branco em todos os canais,
+remetente/destinatário do privado e avisos de conexão. Indicadores, tags, mensagem,
+cores &, assinaturas/filtragem e roteamento permanecem como na0.13.0. A apresentação
+usa slots brancos explícitos; o fallback literal agora mantém componentes separados
+para não herdar a cor do canal no nick. Smoke existente verifica branco e as cores
+anteriores dos indicadores/corpo, incluindo todos os canais.
+
 
 Chat ajustado ao exemplo visual do usuário. Configuração/semântica completas em
 CHAT_APPEARANCE.md, sem alterar SQLite6 ou dependências externas.
@@ -40,9 +48,10 @@ será disponibilizada pelo workflow de pré-release já solicitado pelo usuário
   opcional/autorização revogada, filtragem/alcance, comandos e callbacks transformados
   de entrada/saída. Reload de configuração inválida preserva o estado ativo.
   Regressões de clãs/presets/editor/chat/TAB/nametags/BELOW_NAME/bossbar/sidebar passam.
-- Smoke com mods opcionais reais: **14 verificações aprovadas**.
+- Smoke com mods opcionais reais: **14 verificações históricas da0.13.0**; não
+  repetido nesta correção de cor, que não altera adaptadores/dependências.
 - Preparação revalidou cinco mods/53dependências aninhadas fixadas sem mudar bytes/hashes/TLS.
-- JAR inspecionado: versão0.13, refmap e quatro mixins de produção,16chat_types,
+- JAR inspecionado: versão0.13.1, refmap e quatro mixins de produção,16chat_types,
   somente SQLite aninhado e nenhuma fixture/classe smoke.
 
 Evidências: build/reports/tests/test/index.html, build/server-smoke/result.json,
@@ -52,9 +61,9 @@ A pré-release0.12 não contém os ajustes0.13.
 
 ## Artefato
 
-build/libs/shirokai-core-0.13.0-dev.jar — desenvolvimento, não release estável.
-SHA-256: 58a79e39661257289ee3b4c207b93c5a5928bb906d314ae704038985b3659882.
-Base antes desta etapa:899c3342f87a0e7be4fdbcdbc12c5155545eb49f (workflow de release).
+build/libs/shirokai-core-0.13.1-dev.jar — desenvolvimento, não release estável.
+SHA-256: ee5ad4f9c2e9e4085a61a2dacc6ac237f93daf9c7cfd09b1036d7072cc1385de.
+Base desta correção:e56c77666c62a7e5f79f41ef1d4a5ff871b4562c.
 Commit final é informado na entrega, sem hash autorreferente aqui.
 
 ## Limites e continuidade

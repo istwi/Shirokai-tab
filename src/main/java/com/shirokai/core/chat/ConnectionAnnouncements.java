@@ -20,6 +20,6 @@ public final class ConnectionAnnouncements {
     }
     public static Text format(String player,boolean joined){
         return Text.empty().append(Text.literal(joined?"[+] ":"[-] ").formatted(joined?Formatting.GREEN:Formatting.RED))
-            .append(Text.literal(player).formatted(Formatting.GRAY));
+            .append(Text.literal(player).formatted(Formatting.WHITE));
     }
 }

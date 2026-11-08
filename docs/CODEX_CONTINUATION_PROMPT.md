@@ -14,6 +14,10 @@ FEATURE_MATRIX.md, TAB_EXTRAS.md, CHAT_APPEARANCE.md e TEST_PLAN.md em docs/.
 
 ## Estado atual
 
+Correção0.13.1: somente nick branco em todos os canais e avisos; componentes de
+remetente/alvo separados para preservar indicador/tag/corpo. Não reaplicar layout.
+
+
 0.13 ajusta o chat ao pedido visual: [G] cinza/[L] amarelo, Nick: mensagem, /g e /l,
 [+] verde/[-] vermelho em avisos vanilla. chat-appearance.json e CHAT_APPEARANCE.md
 controlam cores. A interpretação limitada de &0..f/&r foi solicitada explicitamente:
@@ -24,7 +28,7 @@ Cores padrão usam chat_type sincronizado sem unsignedContent. Novos mixins loca
 join/quit trocam o Text do broadcast existente; liberar bridge ao parar o chat.
 
 
-0.13.0-dev, SQLite6, versões externas preservadas (INTEGRATIONS.md).
+0.13.1-dev, SQLite6, versões externas preservadas (INTEGRATIONS.md).
 0.11 já entregou presets estáticos persistidos, fallback que preserva ID, editor
 textual/convites enviados e administração inicial de clã. CUSTOMIZATION/CLANS definem
 contratos, não reaplique. 0.12 acrescenta listagem por viewer, nametags, BELOW_NAME

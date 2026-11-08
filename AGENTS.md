@@ -87,3 +87,6 @@ para destinatário filtrado ou máscara não-pass-through. Moderar também texto
 códigos para impedir bypass de filtro/duplicação. /g e /l compartilham o mesmo gate.
 Join/quit substituem apenas o broadcast vanilla existente, [+] verde/[-] vermelho;
 não duplicar avisos e liberar bridge no stop. Não confundir callback sintético com login real.
+
+Nick0.13.1: nick branco é componente separado em todos os canais/privado/avisos;
+não aplicar WHITE ao cabeçalho inteiro ou mudar cor de tags, indicador ou corpo.

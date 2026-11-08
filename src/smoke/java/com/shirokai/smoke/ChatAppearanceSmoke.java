@@ -59,11 +59,13 @@ public final class ChatAppearanceSmoke implements ModInitializer {
                 Text displayed=global.serializedParameters().applyChatDecoration(Text.literal(global.body().content()));
                 check(displayed.getString().equals("[G] LayoutAlice: Global"),"Global layout still has vanilla brackets or wrong prefix");
                 check(color(displayed,"[G]",0xaaaaaa)&&color(displayed,"Global",0xaaaaaa),"Global prefix/body not gray");
+                check(color(displayed,"LayoutAlice",0xffffff),"Global nickname not white");
                 check(global.unsignedContent()==null&&Objects.equals(global.signature(),incoming.signature()),"Default color changed signed fields");
             },server).thenComposeAsync(v->chat.select(a.getUuid(),Channel.LOCAL),server).thenRunAsync(()->{
                 clear.run();endpoint.signed(a,SignedMessage.ofUnsigned(a.getUuid(),"Local"));var local=packet(pb);
                 var displayed=local.serializedParameters().applyChatDecoration(Text.literal(local.body().content()));
                 check(displayed.getString().equals("[L] LayoutAlice: Local")&&color(displayed,"[L]",0xffff55)&&color(displayed,"Local",0xffff55),"Local layout/body not yellow");
+                check(color(displayed,"LayoutAlice",0xffffff),"Local nickname not white");
                 check(pc.isEmpty(),"Styled local escaped distance gate");
                 clear.run();String body="&aGreen &7Gray &rDefault <click:/op>literal</click>";
                 endpoint.signed(a,SignedMessage.ofUnsigned(a.getUuid(),body));var colored=packet(pb);
@@ -82,12 +84,22 @@ public final class ChatAppearanceSmoke implements ModInitializer {
                 endpoint.appearance(base);clear.run();chat.send(a.getUuid(),Channel.LOCAL,"&7Command body",endpoint::system);
                 var command=pb.stream().filter(GameMessageS2CPacket.class::isInstance).map(GameMessageS2CPacket.class::cast).findFirst().orElseThrow().content();
                 check(command.getString().equals("[L] LayoutAlice: Command body")&&color(command,"[L]",0xffff55)&&color(command,"Command body",0xaaaaaa),"Command path layout/colors differ");
+                check(color(command,"LayoutAlice",0xffffff),"Command nickname not white");
+                var visual=new com.shirokai.core.presentation.PresentationRuntime(server,new com.shirokai.core.presentation.PresentationPlan(com.shirokai.core.presentation.PresentationConfig.defaults(),new com.shirokai.core.styles.StyleEngine(com.shirokai.core.styles.StyleConfig.defaults()),config),permissions,null,()->List.of(a,b,c));
+                for(var channel:Channel.values()){
+                    var envelope=new ChatService.Envelope(a.getUuid(),"", "Body",channel,b.getGameProfile().getName());
+                    var header=visual.header(envelope);var decorated=endpoint.parameters(channel,header).applyChatDecoration(Text.literal("Body"));
+                    check(color(decorated,"LayoutAlice",0xffffff),"Styled nickname not white in "+channel);
+                    if(channel==Channel.PRIVATE)check(color(decorated,"LayoutBob",0xffffff),"Private target nickname not white");
+                }
                 try{
                     var arguments=new Arguments(Text.translatable("multiplayer.player.joined",a.getDisplayName()));
                     transformed(net.minecraft.server.PlayerManager.class,server.getPlayerManager(),"shirokai$join",arguments,null,a,null);
                     Text joined=arguments.get(0);check(joined.getString().equals("[+] LayoutAlice")&&color(joined,"[+]",0x55ff55),"Transformed join callback missing green prefix");
+                    check(color(joined,"LayoutAlice",0xffffff),"Join nickname not white");
                     Text quit=(Text)transformed(net.minecraft.server.network.ServerPlayNetworkHandler.class,a.networkHandler,"shirokai$quit",Text.translatable("multiplayer.player.left",a.getDisplayName()));
                     check(quit.getString().equals("[-] LayoutAlice")&&color(quit,"[-]",0xff5555),"Transformed quit callback missing red prefix");
+                    check(color(quit,"LayoutAlice",0xffffff),"Quit nickname not white");
                     Text custom=Text.literal("Other mod owns announcement");check(ConnectionAnnouncements.replace(custom,a,true)==custom,"Custom announcement overwritten");
                     endpoint.appearance(new ChatAppearanceConfig(1,true,true,"",false,base.bodyColors()));
                     Text vanilla=Text.translatable("multiplayer.player.left",a.getDisplayName());check(ConnectionAnnouncements.replace(vanilla,a,false)==vanilla,"Disabled announcement override still active");

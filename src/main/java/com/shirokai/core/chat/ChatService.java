@@ -87,6 +87,22 @@ public final class ChatService {
         }catch(RuntimeException error){rejected(sender,error);throw error;}
     }
     private void rejected(UUID sender,RuntimeException error){var session=sessions.get(sender);if(session!=null&&(session.lastLog==null||clock.millis()-session.lastLog>=5000)){session.lastLog=clock.millis();moderation.accept(sender,error.getMessage());}}
+    /** Plain fallback keeps nickname components distinct from channel/tag/body colors. */
+    public net.minecraft.text.Text header(Envelope message){
+        var author=participant(message.author());
+        var selected=tags.apply(author.id()).stream().limit(2).toList();
+        var values=Map.of("channel",message.channel().name(),"tags",selected.isEmpty()?"":String.join(" ",selected)+" ","name",author.name(),"target",message.target());
+        var template=config.nameFormats().get(message.channel());
+        var matcher=Pattern.compile("\\{(channel|tags|name|target)}").matcher(template);
+        var result=net.minecraft.text.Text.empty();int cursor=0;
+        while(matcher.find()){
+            result.append(net.minecraft.text.Text.literal(template.substring(cursor,matcher.start())));
+            var value=net.minecraft.text.Text.literal(values.get(matcher.group(1)));
+            if(matcher.group(1).equals("name")||matcher.group(1).equals("target"))value.formatted(net.minecraft.util.Formatting.WHITE);
+            result.append(value);cursor=matcher.end();
+        }
+        return result.append(net.minecraft.text.Text.literal(template.substring(cursor)));
+    }
     private String label(Participant author,Channel channel,String target){
         var selected=tags.apply(author.id()).stream().limit(2).toList();String identifications=selected.isEmpty()?"":String.join(" ",selected)+" ";
         var values=Map.of("channel",channel.name(),"tags",identifications,"name",author.name(),"target",target);

@@ -207,3 +207,9 @@ alcance, callbacks transformados de join/quit e preservação de anúncio/alias 
 ChatAliasSmoke exige /g e /l antes/depois de reload de datapacks. Runner também
 rejeita cor de configuração inválida dentro do reload atômico real. Não houve
 login/logout autenticado nem comprovação de assinatura criptográfica válida.
+
+## Correção0.13.1
+
+ChatAppearanceSmoke também exige nick branco nos componentes reais de global/local,
+caminho de comandos, templates dos cinco canais, alvo privado e avisos [+]/[-],
+sem alterar indicadores/corpo. Suítes existentes preservam as cores das tags.

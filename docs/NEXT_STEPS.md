@@ -2,7 +2,7 @@
 
 ## Estado atual
 
-0.13.0-dev acrescenta chat compacto [G]/[L], cores &, /g e /l e avisos [+]/[-].
+0.13.1-dev fixa nick branco sem outras mudanças; a0.13.0 acrescentou chat compacto [G]/[L], cores &, /g e /l e avisos [+]/[-].
 CHAT_APPEARANCE.md define configuração, assinatura e filtragem. Os extras0.12 já entregam listed por viewer, nametags de prefixo/sufixo/visibilidade,
 BELOW_NAME privado e bossbar pessoal, opt-in em tab-extras.json. APIs1.21.1 e
 ownership foram auditados/testados. Não reaplicar esses recursos nem a personalização,

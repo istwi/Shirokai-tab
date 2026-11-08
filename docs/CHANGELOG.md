@@ -1,3 +1,9 @@
+# 0.13.1-dev
+
+- Somente cor do nick: branco explícito no chat global/local/clã/staff/privado e
+  avisos de conexão, sem alterar cores de indicadores, tags, corpo, códigos & ou gates.
+- Caminhos com apresentação e fallback literal cobertos pelo smoke de cores existente.
+
 # 0.13.0-dev
 
 - Chat compacto [G] cinza/[L] amarelo, formato Nick: mensagem sem < > via tipos de

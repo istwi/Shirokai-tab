@@ -1,4 +1,4 @@
-# Chat compacto e cores — 0.13.0-dev
+# Chat compacto e cores — 0.13.1-dev
 
 Defaults solicitados:
 
@@ -11,7 +11,9 @@ Defaults solicitados:
 
 GLOBAL usa cinza e LOCAL amarelo no indicador e corpo. Tags selecionadas mantêm
 seus próprios estilos; não há cargo extra fora das duas identificações permitidas.
-Nome pode receber cor pelo template/regra administrativa, como antes. Não há os
+Nick do autor e do destinatário privado recebe branco explícito, separado das cores
+do canal, tags e corpo. O fallback sem apresentação também usa componentes de nick
+brancos. A correção0.13.1 muda somente essa cor, inclusive nos avisos de conexão. Não há os
 delimitadores vanilla `<nome>`; o tipo de chat sincronizado usa `%s: %s`.
 Sem tags selecionadas, não há espaço/identificação fictícia.
 
@@ -108,7 +110,7 @@ sincronizados de chat e mixins. SQLite continua schema6, sem migração de dados
 ## Entrada e saída
 
 O broadcast vanilla existente é reaproveitado, sem enviar aviso duplicado:
-[+] verde na entrada e [-] vermelho na saída, com nome literal cinza.
+[+] verde na entrada e [-] vermelho na saída, com nome literal branco.
 Inclui a variante vanilla de jogador renomeado, mostrando o nome atual.
 Os hooks são locais a PlayerManager.onPlayerConnect e ServerPlayNetworkHandler.cleanUp.
 Não interceptam anúncios arbitrários, nem reinterpretam nomes como tags.
