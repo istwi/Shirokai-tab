@@ -1,3 +1,6 @@
+> 0.14.1 corrige colisão de nomes de teams após liberação do jogador; RANKS.md
+> documenta migração manual dos vínculos antigos. Não reintroduzir nomes globais skn.
+
 > 0.14.0 substitui ROLE selecionável por cargo principal fixo. Não reaplicar
 > a regra antiga de título visual opcional. Consulte RANKS.md para migração.
 

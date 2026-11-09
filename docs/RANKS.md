@@ -81,3 +81,35 @@ A regressão Fabric inclui jogador que entra depois, recebe DEFAULT e passa para
 ADMIN, além de troca de peso que reordena os jogadores. Não reproduziu o relato
 com configuração padrão e sem outro controlador. Esse teste não comprova o
 comportamento do servidor do usuário nem autoriza apagar teams existentes.
+
+## Correção 0.14.1: colisão de teams antigos
+
+Foi reproduzida a falha de criar nametag depois que o administrador libera o
+jogador de um team antigo: o team vazio permanece no scoreboard, ocupa o nome
+skn e bloqueia o novo vínculo. Isso também impede o jogador de participar da
+ordenação atual por peso. A atualização periódica já existe; aumentar sua
+frequência não resolve esse bloqueio.
+
+O Core agora escolhe uma faixa de nomes de nametag livre no scoreboard para
+cada instância. Todos os teams próprios compartilham o prefixo da sessão e
+continuam ordenados por prioridade/peso e nome, com nomes de até16 caracteres.
+Não adota, remove ou altera teams antigos só porque o nome parece ser do Core.
+
+Instalação: substitua o JAR por0.14.1-dev e reinicie. Não apague os JSONs.
+Jogadores ainda presos a teams da sessão anterior precisam ser liberados pelo
+administrador uma vez, depois que o team correspondente tiver sido identificado.
+No caso investigado, os teams antigos mostrados foram skn0000000000000,
+skn0000000000001 e skn0000000000003. Para liberar somente os jogadores online
+esses teams, execute após a atualização:
+
+```
+team leave @a[team=skn0000000000000]
+team leave @a[team=skn0000000000001]
+team leave @a[team=skn0000000000003]
+```
+
+Esses comandos não excluem teams nem atingem membros de outros teams. Não os
+use como limpeza genérica em servidores diferentes. O Core atribui novamente
+nametag/ordenação dos jogadores liberados na próxima atualização.
+/shirokaicore tab agora inclui nametags=true/false para conferir a configuração.
+Se for false, habilite nametags.enabled em tab-extras.json e reinicie.

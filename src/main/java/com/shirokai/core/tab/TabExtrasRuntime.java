@@ -167,6 +167,6 @@ public final class TabExtrasRuntime implements AutoCloseable {
         if(plan.config().belowName().enabled())SidebarPackets.release(view.player.networkHandler);
         if(view.player.isDisconnected())TabExtrasPackets.forget(view.player.networkHandler);
     }
-    public String status(){return "extrasViewers="+views.size()+" extraPackets="+packets+" extraConflicts="+conflicts+" extraErrors="+errors;}
+    public String status(){return "nametags="+plan.config().nametags().enabled()+" extrasViewers="+views.size()+" extraPackets="+packets+" extraConflicts="+conflicts+" extraErrors="+errors;}
     @Override public void close(){if(closed)return;closed=true;for(UUID id:List.copyOf(views.keySet()))attempt(()->forget(id));subjects=Map.of();}
 }

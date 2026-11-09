@@ -1,3 +1,11 @@
+## Regressão0.14.1 — teams antigos
+
+Reproduzido antes do patch: team skn vazio bloqueia nova nametag após liberação
+explícita do membro. Depois do patch: nova faixa de nomes livre, prefixo correto,
+OWNER antes de ADMIN, teams externos/antigos preservados. Outra instância simula
+restart com teams salvos; não adota membros antigos, recupera após liberação
+administrativa e remove somente seus próprios teams no encerramento.
+
 ## Regressão 0.14.0 — cargos fixos
 
 - JUnit: seleção ROLE recusada, limpeza de escolhas legadas online, leitura offline

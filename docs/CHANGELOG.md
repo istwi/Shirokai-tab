@@ -1,3 +1,12 @@
+## 0.14.1-dev
+
+- Corrige colisão com teams antigos vazios/salvos após liberar jogador: namespace
+  de nametag livre por instância permite recuperar prefixo e ordenação.
+- Preserva teams antigos/externos e requer liberação administrativa explícita de
+  membros presos a teams anteriores. Não remove teams por prefixo.
+- Status TAB informa se nametags estão habilitadas.
+- Regressão Fabric reproduz bloqueio antigo e testa recuperação, pesos e reinício.
+
 ## 0.14.0-dev
 
 - Cargo fixo pelo grupo principal LuckPerms, aplicado sem equipar e atualizado

@@ -1,3 +1,29 @@
+# Estado atual — 0.14.1-dev
+
+Reproduzida colisão de teams antigos: após liberar membro com /team leave, o nome
+antigo continua ocupado e impede nova nametag/ordenação. Regressão falhava antes
+com "Stale team name blocked nametag after explicit release". Agora cada instância
+escolhe namespace de nametag livre, sem adotar/remover teams antigos por nome.
+Recupera prefixo e ordenação por prioridade/peso depois da liberação administrativa.
+Status TAB informa nametags=true/false. Não altera JSONs personalizados ou SQLite6.
+
+Validação: build/smokeClasses aprovados; 105 testes JUnit sem falhas/erros e
+48 verificações Fabric em três boots. Inclui team antigo vazio, rank OWNER
+antes de ADMIN, preservação externa, restart simulado com teams salvos, recuperação
+após liberação e cleanup próprio. Integrações opcionais:14 verificações históricas
+0.14.0, não repetidas; nenhum adaptador opcional foi alterado. Cliente real pendente.
+
+Instalação: substituir JAR e reiniciar; liberar uma vez os jogadores ainda presos
+nos teams antigos identificados. Depois a atualização periódica normal reassume
+nametags/ordenação. RANKS.md contém os comandos e os limites dessa migração.
+
+JAR: build/libs/shirokai-core-0.14.1-dev.jar
+SHA256: 94ce2130d9db276076183899b759ac111bd63d7af991061cb3c57ed64b0a664b
+Artefato inspecionado: versão correta/refmap e nenhuma fixture smoke.
+Base:3bc1c88. Histórico de versões anteriores abaixo.
+
+---
+
 # Estado real do projeto — 0.14.0-dev
 
 Cargo principal do LuckPerms agora é automático e fixo no TAB/sidebar/chat/nametag,

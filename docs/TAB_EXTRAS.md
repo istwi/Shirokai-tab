@@ -78,7 +78,9 @@ visibility aceita ALWAYS, NEVER, HIDE_FOR_OTHER_TEAMS e HIDE_FOR_OWN_TEAM.
 
 Teams são globais e alteram também a ordenação do TAB. Habilitar nametags já autoriza
 criar teams próprios, mesmo com manageTeams=false. Rank determinístico usa prioridade
-da nameRule/peso LP, nome sem caixa e UUID; nomes skn +13dígitos cabem em16caracteres.
+da nameRule/peso LP, nome sem caixa e UUID. Em0.14.1 os nomes usam namespace
+livre por instância (sn +6hex +8dígitos de rank,16caracteres); RANKS.md descreve
+a recuperação de jogadores presos a teams antigos.
 Um team por jogador permite prefixos independentes sem misturar estilos.
 Mudanças na lista/rank podem mover vários integrantes; frame inalterado não envia diffs.
 Espectadores ainda seguem a precedência do cliente vanilla.

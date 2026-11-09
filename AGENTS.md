@@ -90,3 +90,8 @@ não duplicar avisos e liberar bridge no stop. Não confundir callback sintétic
 
 Nick0.13.1: nick branco é componente separado em todos os canais/privado/avisos;
 não aplicar WHITE ao cabeçalho inteiro ou mudar cor de tags, indicador ou corpo.
+
+Correção0.14.1: nomes de nametag usam namespace livre por instância, não índices
+globais skn reutilizados entre sessões. Times antigos não são adotados por nome.
+Liberação administrativa de jogador deve permitir criar novo vínculo mesmo com
+team antigo vazio ou salvo após parada anormal. Preservar ordenação e ownership.

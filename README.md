@@ -1,4 +1,4 @@
-> 0.14.0-dev: [cargos automáticos LuckPerms e nametags](docs/RANKS.md).
+> 0.14.1-dev: [cargos automáticos LuckPerms e nametags](docs/RANKS.md).
 
 # Shirokai Core
 

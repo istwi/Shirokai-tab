@@ -10,6 +10,7 @@ public final class TeamOwnership implements AutoCloseable{
         public Player(UUID id,String name,int priority){this(id,name,priority,null,null,null);}
     }
     private final Scoreboard scoreboard;private final Consumer<String> warning;
+    private final String nametagNamespace;
     private final Map<String,Team> owned=new HashMap<>();private final Map<String,Team> assigned=new HashMap<>();private final Set<String> warned=new LinkedHashSet<>();
     private record Appearance(net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility,AbstractTeam.VisibilityRule death,AbstractTeam.CollisionRule collision,net.minecraft.util.Formatting color,boolean friendly,boolean invisibles){
         static Appearance of(Team team){return new Appearance(team.getPrefix().copy(),team.getSuffix().copy(),team.getNameTagVisibilityRule(),team.getDeathMessageVisibilityRule(),team.getCollisionRule(),team.getColor(),team.isFriendlyFireAllowed(),team.shouldShowFriendlyInvisibles());}
@@ -21,7 +22,15 @@ public final class TeamOwnership implements AutoCloseable{
         }
     }}
     private boolean closed;private long conflicts;
-    public TeamOwnership(Scoreboard scoreboard,Consumer<String> warning){this.scoreboard=Objects.requireNonNull(scoreboard);this.warning=warning;}
+    public TeamOwnership(Scoreboard scoreboard,Consumer<String> warning){this.scoreboard=Objects.requireNonNull(scoreboard);this.warning=warning;this.nametagNamespace=freeNametagNamespace(scoreboard);}
+    /** Reserve a free namespace for this manager; never identify ownership by a legacy name. */
+    private static String freeNametagNamespace(Scoreboard scoreboard){
+        for(int index=0;index<=0xffffff;index++){
+            String prefix=String.format(Locale.ROOT,"sn%06x",index);
+            if(scoreboard.getTeams().stream().noneMatch(team->team.getName().startsWith(prefix)))return prefix;
+        }
+        throw new IllegalStateException("Nenhum namespace livre para nametags");
+    }
     public static String teamName(int priority){int bounded=Math.max(-1000000,Math.min(1000000,priority));return String.format(Locale.ROOT,"sk%07d",1000000-bounded);}
     public boolean owns(Team team){return team!=null&&owned.get(team.getName())==team&&scoreboard.getTeam(team.getName())==team;}
     private void note(String key){if(warned.add(key)){conflicts++;warning.accept(key);if(warned.size()>128)warned.remove(warned.iterator().next());}}
@@ -32,7 +41,7 @@ public final class TeamOwnership implements AutoCloseable{
         for(var player:players.stream().sorted(Comparator.comparingInt(Player::priority).reversed().thenComparing(Player::name,String.CASE_INSENSITIVE_ORDER).thenComparing(Player::id)).toList())ranks.put(player.id(),rank++);
         for(var player:players){
             var current=scoreboard.getScoreHolderTeam(player.name());if(current!=null&&!owns(current)){assigned.remove(player.name());note("Jogador "+player.name()+" possui team externo "+current.getName());continue;}
-            String name=player.prefix()==null?teamName(player.priority()):String.format(Locale.ROOT,"skn%013d",ranks.get(player.id()));var desired=scoreboard.getTeam(name);
+            String name=player.prefix()==null?teamName(player.priority()):nametagNamespace+String.format(Locale.ROOT,"%08d",ranks.get(player.id()));var desired=scoreboard.getTeam(name);
             if(desired!=null&&!owns(desired)){note("Nome de team já ocupado: "+name);continue;}
             if(desired==null){desired=scoreboard.addTeam(name);desired.setShowFriendlyInvisibles(false);desired.setFriendlyFireAllowed(true);desired.setCollisionRule(AbstractTeam.CollisionRule.ALWAYS);owned.put(name,desired);}
             if(player.prefix()!=null){

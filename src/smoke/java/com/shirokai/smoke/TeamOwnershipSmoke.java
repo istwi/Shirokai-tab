@@ -11,9 +11,31 @@ import java.util.*;
 
 public final class TeamOwnershipSmoke implements ModInitializer{
     @Override public void onInitialize(){CommandRegistrationCallback.EVENT.register((dispatcher,registry,environment)->dispatcher.register(literal("shirokai-teams-smoke").requires(s->s.hasPermissionLevel(4)).executes(context->{
-        samePrioritySharesTeamAndForeignPlayersAreNeverMoved();foreignNameCollisionAndReplacementAreNotAdoptedOrDeleted();changedPriorityAndDisconnectPruneOnlyEmptyOwnedTeams();
+        staleNametagTeamsDoNotBlockReleasedPlayers();samePrioritySharesTeamAndForeignPlayersAreNeverMoved();foreignNameCollisionAndReplacementAreNotAdoptedOrDeleted();changedPriorityAndDisconnectPruneOnlyEmptyOwnedTeams();
         context.getSource().sendFeedback(()->Text.literal("TEAM_OWNERSHIP_SMOKE_PASS"),false);return 1;
     })));}
+    private static void staleNametagTeamsDoNotBlockReleasedPlayers(){
+        var board=new Scoreboard();var stale=board.addTeam("skn0000000000000");
+        stale.setPrefix(Text.literal("[DEFAULT] "));board.addScoreHolderToTeam("Alice",stale);
+        var manager=new TeamOwnership(board,message->{});
+        var alice=new TeamOwnership.Player(UUID.randomUUID(),"Alice",100,Text.literal("[OWNER] "),Text.empty(),net.minecraft.scoreboard.AbstractTeam.VisibilityRule.ALWAYS);
+        var bob=new TeamOwnership.Player(UUID.randomUUID(),"Bob",90,Text.literal("[ADMIN] "),Text.empty(),net.minecraft.scoreboard.AbstractTeam.VisibilityRule.ALWAYS);
+        manager.reconcile(List.of(alice,bob));assertSame(stale,board.getScoreHolderTeam("Alice"));
+        board.removeScoreHolderFromTeam("Alice",stale); // Explicit administrator /team leave.
+        manager.reconcile(List.of(alice,bob));
+        var owner=board.getScoreHolderTeam("Alice");var admin=board.getScoreHolderTeam("Bob");
+        if(owner==null||admin==null)throw new AssertionError("Stale team name blocked nametag after explicit release");
+        if(!owner.getPrefix().getString().equals("[OWNER] ")||owner.getName().compareTo(admin.getName())>=0)throw new AssertionError("LP weight order or nametag not restored");
+        manager.close();assertSame(stale,board.getTeam(stale.getName()));
+        // Simulate a saved team from an unclean previous session without claiming it by name.
+        var previous=new TeamOwnership(board,message->{});previous.reconcile(List.of(alice,bob));
+        var orphan=board.getScoreHolderTeam("Alice");var orphanBob=board.getScoreHolderTeam("Bob");
+        var restarted=new TeamOwnership(board,message->{});restarted.reconcile(List.of(alice,bob));assertSame(orphan,board.getScoreHolderTeam("Alice"));
+        board.removeScoreHolderFromTeam("Alice",orphan);board.removeScoreHolderFromTeam("Bob",orphanBob);
+        restarted.reconcile(List.of(alice,bob));
+        if(board.getScoreHolderTeam("Alice")==null||board.getScoreHolderTeam("Bob")==null)throw new AssertionError("Previous session prevented fresh nametags");
+        restarted.close();assertSame(orphan,board.getTeam(orphan.getName()));
+    }
     private static void assertSame(Object expected,Object actual){if(expected!=actual)throw new AssertionError("Identity mismatch");}
     private static void assertNull(Object actual){if(actual!=null)throw new AssertionError("Expected null");}
     private static void assertTrue(boolean value){if(!value)throw new AssertionError("Expected true");}

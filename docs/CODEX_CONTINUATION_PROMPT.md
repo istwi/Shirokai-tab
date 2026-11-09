@@ -1,3 +1,6 @@
+> 0.14.1 corrige colisão de teams antigos com namespace livre por instância.
+> Veja RANKS.md/PROJECT_STATUS.md; não adotar nem excluir teams por nome.
+
 > 0.14.0: cargo principal LuckPerms é fixo em TAB/sidebar/chat/nametag; ROLE não
 > é selecionável. Eventos/clã apenas no chat. RANKS.md substitui a política antiga.
 
