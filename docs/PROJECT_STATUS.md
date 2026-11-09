@@ -152,3 +152,11 @@ aprovadas; última tradução de menus verificada adicionalmente por quatro smok
 Fabric (perfil, menu de clã, estilos e apresentação), MESSAGES_NATIVE_SMOKE_PASS.
 Aparência em cliente real continua pendente.
 SHA256 do JAR local:06458291ac369fa3383116ce1e7f2d606a7c1783118a360b609fe17c9ed71c99.
+
+## Investigação: DEFAULT no TAB/nametag após promover novo jogador
+
+Regressão adicionada para entrada tardia, DEFAULT -> ADMIN e reordenação de vários
+jogadores por peso; TAB e prefixos globais acompanharam corretamente. Suite
+Fabric completa aprovada novamente:48 verificações em três inicializações.
+Não houve mudança de produção/JAR nesta investigação. Causa no servidor relatado
+ainda não confirmada; aguardando versão e status TAB do servidor afetado.

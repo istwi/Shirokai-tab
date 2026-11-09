@@ -55,11 +55,12 @@ public final class TabExtrasSmoke implements ModInitializer {
     }
     private static void testRanks(net.minecraft.server.MinecraftServer server){
         var packets=new ArrayList<Packet<?>>();var a=ProfileSmoke.player(server,"RankAlice",packets::add);
-        var group=new String[]{"owner"};
-        var permissions=new PermissionService(){public boolean allowed(UUID id,String node){return true;}public String provider(){return "test";}public Metadata metadata(UUID id){return new Metadata(group[0],"","",100);}};
+        var players=new ArrayList<>(List.of(a));
+        var groups=new HashMap<UUID,String>();groups.put(a.getUuid(),"owner");
+        var permissions=new PermissionService(){public boolean allowed(UUID id,String node){return true;}public String provider(){return "test";}public Metadata metadata(UUID id){String group=groups.get(id);return new Metadata(group,"","",group.equals("owner")?100:group.equals("admin")?90:0);}};
         var titles=new com.shirokai.core.titles.TitleService(null,com.shirokai.core.titles.TitleCatalog.defaults(),permissions::allowed,server,id->true,java.time.Clock.systemUTC(),(m,e)->{throw new AssertionError(m,e);});
         titles.bindRanks(permissions::metadata);var engine=new StyleEngine(StyleConfig.defaults());
-        var tab=new TabRuntime(server,new TabPlan(TabConfig.defaults(),engine),permissions,null,titles,null,null,()->"N/D",org.slf4j.LoggerFactory.getLogger("rank-smoke"),()->List.of(a));
+        var tab=new TabRuntime(server,new TabPlan(TabConfig.defaults(),engine),permissions,null,titles,null,null,()->"N/D",org.slf4j.LoggerFactory.getLogger("rank-smoke"),()->players);
         tab.configureExtras(new TabExtrasPlan(TabExtrasConfig.defaults(),engine));
         try{
             tab.update();
@@ -67,9 +68,17 @@ public final class TabExtrasSmoke implements ModInitializer {
             check(team!=null&&team.getPrefix().getString().equals("[OWNER] "),"Automatic primary rank missing from nametag");
             check(packets.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).anyMatch(e->e.displayName()!=null&&e.displayName().getString().equals("[OWNER] RankAlice")),"Automatic rank missing from TAB");
             check(titles.chatDefinitions(a.getUuid()).getFirst().display().equals("[OWNER]"),"Automatic chat rank missing before profile load");
-            packets.clear();group[0]="admin";tab.update();
+            packets.clear();groups.put(a.getUuid(),"admin");tab.update();
             check(server.getScoreboard().getScoreHolderTeam("RankAlice").getPrefix().getString().equals("[ADMIN] "),"Rank change did not update nametag");
             check(packets.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).anyMatch(e->e.displayName()!=null&&e.displayName().getString().equals("[ADMIN] RankAlice")),"Rank change did not update TAB");
+            var b=ProfileSmoke.player(server,"LateBob");groups.put(b.getUuid(),"default");players.add(b);tab.update();
+            check(server.getScoreboard().getScoreHolderTeam("LateBob").getPrefix().getString().equals("[DEFAULT] "),"Late default player has incorrect nametag");
+            packets.clear();groups.put(b.getUuid(),"admin");tab.update();
+            check(server.getScoreboard().getScoreHolderTeam("LateBob").getPrefix().getString().equals("[ADMIN] "),"Late player default-to-admin rank remained stale");
+            check(packets.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(p->p.getEntries().stream()).anyMatch(e->e.displayName()!=null&&e.displayName().getString().equals("[ADMIN] LateBob")),"Late player TAB rank remained stale");
+            groups.put(b.getUuid(),"owner");tab.update();
+            check(server.getScoreboard().getScoreHolderTeam("LateBob").getPrefix().getString().equals("[OWNER] "),"Rank reorder left stale owner nametag");
+            check(server.getScoreboard().getScoreHolderTeam("RankAlice").getPrefix().getString().equals("[ADMIN] "),"Rank reorder changed another player nametag");
         }finally{tab.close();}
         check(server.getScoreboard().getScoreHolderTeam("RankAlice")==null,"Rank nametag leaked on stop");
     }

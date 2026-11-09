@@ -67,3 +67,17 @@ cria texto flutuante em uma linha separada acima do nick.
 
 Testes automatizados e Fabric usam jogadores sintéticos. Renderização e troca de
 grupo com cliente autenticado ainda precisam de validação dentro do servidor.
+
+## Diagnóstico de cargos diferentes entre superfícies
+
+Se chat/sidebar exibem ADMIN e TAB/nametag ainda exibem DEFAULT, não conclua que
+o peso está errado: confirme primeiro a versão carregada com /shirokaicore version
+e o estado com /shirokaicore tab, com o jogador afetado online. conflicts/errors
+apontam disputas de ownership ou falhas de atualização; examine também avisos
+[tab]. O TAB pode ceder a getPlayerListName ou team de outro mod. Um layout com
+id default é apenas o identificador do layout, não um cargo fixo.
+
+A regressão Fabric inclui jogador que entra depois, recebe DEFAULT e passa para
+ADMIN, além de troca de peso que reordena os jogadores. Não reproduziu o relato
+com configuração padrão e sem outro controlador. Esse teste não comprova o
+comportamento do servidor do usuário nem autoriza apagar teams existentes.
