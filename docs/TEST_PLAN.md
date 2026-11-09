@@ -1,3 +1,14 @@
+## Regressão0.15.0 — menus JSON e pausa do clã
+
+JUnit valida round-trip/defaults, preservação do arquivo, colisão/faixa de slots,
+linhas, campos/tipos/ações desconhecidos, placeholders/markup seguros e valores
+literais. Fabric valida menu3linhas, itens/nomes/slotes alterados, paginação,
+remapeamento dos cliques, inventário preservado e snapshots após troca de layout.
+Clã/editor bloqueados por padrão e tela antiga bloqueia cliques quando desativada;
+fixtures habilitam explicitamente o legado para manter regressões de negócio.
+Runner valida atomicidade de reload com slot repetido/item não registrado, config
+ativa preservada, reload corrigido e arquivo menus.json preservado no reinício.
+
 ## Regressão0.14.1 — teams antigos
 
 Reproduzido antes do patch: team skn vazio bloqueia nova nametag após liberação

@@ -9,6 +9,7 @@ import java.util.function.*;
 public final class ClanService {
     private static final class State {
         ClanConfig config;
+        boolean menuEnabled;
         com.shirokai.core.presentation.SurfaceRenderer presentation=com.shirokai.core.presentation.SurfaceRenderer.literal();
         Predicate<UUID> cacheable=id->false;
         final Map<UUID,Optional<ClanSnapshot>> cache=new HashMap<>();
@@ -23,6 +24,8 @@ public final class ClanService {
     private ClanService(ClanRepository repository,PermissionService permissions,Executor server,State state){this.repository=repository;this.permissions=permissions;this.server=server;this.state=state;}
     public ClanService scoped(UUID expectedClan){return new ClanService(repository.scoped(expectedClan),permissions,server,state);}
     public void presentation(com.shirokai.core.presentation.SurfaceRenderer renderer){state.presentation=renderer;}
+    public boolean menuEnabled(){return state.menuEnabled;}
+    public void menuEnabled(boolean enabled){state.menuEnabled=enabled;}
     public boolean customizationEnabled(){return state.presentation.customizationEnabled();}
     public void openCustomization(net.minecraft.server.network.ServerPlayerEntity player,com.shirokai.core.presentation.Surface surface,UUID expectedClan){state.presentation.openCustomization(player,surface,expectedClan);}
     public boolean menuPresentationEnabled(){return state.presentation.menusEnabled();}

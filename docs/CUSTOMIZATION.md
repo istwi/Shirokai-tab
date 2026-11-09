@@ -1,3 +1,6 @@
+> 0.15.0: layout do /perfil em [MENUS.md](MENUS.md); menu/editor de clã
+> desativados por padrão. Os comandos e dados de clã continuam disponíveis.
+
 > Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
 > SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
 > As regras antigas de seleção visual abaixo são históricas e foram substituídas.

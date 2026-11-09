@@ -1,3 +1,6 @@
+> 0.15.0: layout do /perfil em [MENUS.md](MENUS.md); menu/editor de clã
+> desativados por padrão. Os comandos e dados de clã continuam disponíveis.
+
 # Clãs nativos — 0.5.0-dev
 
 Núcleo por comandos e menus nativos; sigla integrada ao /perfil como identificação CLAN.

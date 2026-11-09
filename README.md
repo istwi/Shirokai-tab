@@ -1,3 +1,6 @@
+> 0.15.0-dev: [menus configuráveis](docs/MENUS.md); menu/editor de clã pausados
+> por padrão. Exemplo completo em [examples/menus.json](examples/menus.json).
+
 > 0.14.1-dev: [cargos automáticos LuckPerms e nametags](docs/RANKS.md).
 
 # Shirokai Core

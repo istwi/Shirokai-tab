@@ -1,3 +1,11 @@
+## 0.15.0-dev
+
+- menus.json configura título, linhas, slots de tags, ícones, nomes e lore dos
+  botões/entradas do perfil, com cores e placeholders seguros.
+- Reload valida layout e IDs de itens antes de publicar; telas abertas conservam
+  seu layout e arquivos existentes não são sobrescritos. Ações/permissões são fixas.
+- Menu e editor de clã desativados por padrão; comandos e dados preservados.
+
 ## 0.14.1-dev
 
 - Corrige colisão com teams antigos vazios/salvos após liberar jogador: namespace

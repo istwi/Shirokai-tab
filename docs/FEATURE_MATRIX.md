@@ -1,3 +1,6 @@
+> 0.15.0: /perfil configurável em menus.json; menu/editor de clã pausados por
+> padrão, com comandos/dados preservados. Veja MENUS.md.
+
 > 0.14.0: ROLE é cargo principal automático e fixo (TAB/sidebar/chat/nametag);
 > eventos/clã são opcionais apenas no chat. Nametags padrão schema2. RANKS.md.
 

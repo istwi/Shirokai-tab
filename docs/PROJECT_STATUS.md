@@ -1,3 +1,35 @@
+# Estado atual — 0.15.0-dev
+
+menus.json configura o /perfil: título,1..6linhas, posições das tags e dos sete
+controles, itens, nomes, lore, cores/degradês e placeholders seguros. Ações são
+fixas no servidor; ícones não saem do menu, ROLE segue não selecionável e escolhas
+são revalidadas pelo TitleService. Planos são snapshots por tela, evitando que
+reload altere os cliques de um inventário já aberto. Fechar/reabrir usa o novo layout.
+
+Menu/editor de clã pausados por padrão (clanMenuEnabled=false). Comandos, dados,
+membros, identificações de clã e schema SQLite6 preservados. Aberturas assíncronas
+revalidam o bloqueio, cliques antigos são recusados e reload para false fecha as
+telas desses tipos. Fixtures de GUI habilitam explicitamente o legado para testes.
+
+Validação da entrega:
+- build/smokeClasses: 111 testes JUnit sem falhas/erros.
+- Fabric: 49 verificações em três boots; layout3linhas, ícones/nomes/slots
+  alterados, paginação, ações remapeadas, inventário preservado e snapshot de tela.
+- Reload: slots inválidos ou item inexistente rejeitam o reload inteiro, preservam
+  config ativa; configuração válida e pausa do clã sobrevivem ao reinício.
+- Integrações opcionais reais: 14 verificações aprovadas novamente.
+- JAR inspecionado: versão correta, MenuConfig e refmap, sem classes smoke.
+
+JAR: build/libs/shirokai-core-0.15.0-dev.jar
+SHA256: fb7c6c5517eb847ed4ad90391defc24539f21afeac1fd1d67a79416a24e96813
+Exemplo: examples/menus.json; documentação: MENUS.md. Arquivos existentes não são
+sobrescritos. Instalação exige substituir JAR/reiniciar; edição de menus aceita
+/shirokaicore reload e reabertura do perfil. Cliente real/visual ainda não certificado.
+A investigação de atualização de teams segue pausada; não houve mudança nessa área.
+Base:26432be. Histórico das versões anteriores abaixo.
+
+---
+
 # Estado atual — 0.14.1-dev
 
 Reproduzida colisão de teams antigos: após liberar membro com /team leave, o nome

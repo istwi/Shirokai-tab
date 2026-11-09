@@ -46,7 +46,7 @@ public final class PresentationSmoke implements ModInitializer {
         a.setPosition(0,100,0);b.setPosition(10,100,0);c.setPosition(300,100,0);var vip=new boolean[]{true};
         var permissions=new PermissionService(){public boolean allowed(UUID id,String node){return id.equals(a.getUuid())&&(node.equals("shirokaicore.clan.create")||node.equals("visual.vip")&&vip[0]);}public String provider(){return "test-only";}public Metadata metadata(UUID id){return new Metadata(id.equals(a.getUuid())?"vip":"member","","",0);}};
         var titles=new TitleService(storage,TitleCatalog.defaults(),permissions::allowed,server,id->true,Clock.systemUTC(),(message,error)->{});
-        var clans=new ClanService(new ClanRepository(storage,Clock.systemUTC()),permissions,server,ClanConfig.defaults());clans.cacheOnline(id->true);
+        var clans=new ClanService(new ClanRepository(storage,Clock.systemUTC()),permissions,server,ClanConfig.defaults());clans.menuEnabled(true);clans.cacheOnline(id->true);
         titles.bindClans(id->clans.cached(id).flatMap(ClanTitle::from),id->clans.membership(id).thenApply(v->null));
         var chatJson=new Gson().toJsonTree(ChatConfig.defaults()).getAsJsonObject();chatJson.addProperty("cooldownMillis",0);chatJson.addProperty("duplicateWindowSeconds",0);final ChatConfig chatConfig;
         try{chatConfig=ChatConfig.parse(chatJson.toString());}catch(Exception e){throw new CompletionException(e);}

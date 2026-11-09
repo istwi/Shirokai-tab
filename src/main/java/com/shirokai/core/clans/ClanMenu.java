@@ -41,9 +41,10 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                 .thenApply(sent->new Data(data.clan(),data.invitations(),data.transfer(),data.limit(),sent)),server);
     }
     public static void open(ServerPlayerEntity player,ClanService service){
+        if(!service.menuEnabled()){player.sendMessage(Text.literal("O menu de clã está temporariamente desativado. Use /clan info ou os demais comandos de clã."),false);return;}
         var previous=player.currentScreenHandler;
         load(player.getUuid(),service,player.getServer()).whenCompleteAsync((data,error)->{
-            if(player.isDisconnected()||player.currentScreenHandler!=previous)return;
+            if(!service.menuEnabled()||player.isDisconnected()||player.currentScreenHandler!=previous)return;
             if(error!=null){player.sendMessage(Text.literal("Não foi possível carregar o clã; tente novamente."),false);return;}
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId,inventory,ignored)->new ClanMenu(syncId,inventory,player,service,data),service.present(player.getUuid(),Surface.MENU_TITLE,"✦ CLÃ SHIROKAI")));
         },player.getServer());
@@ -126,7 +127,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
             data=value;page=Page.HOME;index=0;render();
         },owner.getServer());
     }
-    @Override public boolean canUse(PlayerEntity player){return !closed&&player==owner&&!owner.isDisconnected();}
+    @Override public boolean canUse(PlayerEntity player){return clans.menuEnabled()&&!closed&&player==owner&&!owner.isDisconnected();}
     @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}
     @Override public void onSlotClick(int slot,int button,SlotActionType type,PlayerEntity player){
         if(!canUse(player)||owner.currentScreenHandler!=this||busy||type!=SlotActionType.PICKUP||(button!=0&&button!=1))return;

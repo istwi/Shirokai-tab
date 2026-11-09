@@ -1,3 +1,6 @@
+> 0.15.0: menus.json configura perfil; menu/editor de clã pausados por padrão.
+> Não reativar sem pedido. Leia MENUS.md e o estado atual antes de continuar.
+
 > 0.14.1 corrige colisão de teams antigos com namespace livre por instância.
 > Veja RANKS.md/PROJECT_STATUS.md; não adotar nem excluir teams por nome.
 

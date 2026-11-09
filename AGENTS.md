@@ -95,3 +95,9 @@ Correção0.14.1: nomes de nametag usam namespace livre por instância, não ín
 globais skn reutilizados entre sessões. Times antigos não são adotados por nome.
 Liberação administrativa de jogador deve permitir criar novo vínculo mesmo com
 team antigo vazio ou salvo após parada anormal. Preservar ordenação e ownership.
+
+Menus0.15: leia docs/MENUS.md. Perfil usa menus.json com posições/itens/textos e
+ações fixas. Validar slots/tipos/templates na leitura e registries na thread do
+servidor ANTES de publicar reload. Telas guardam snapshot do layout exibido.
+Clã/editor desativados por padrão (clanMenuEnabled=false), sem apagar dados ou
+bloquear comandos de clã. Checar flag também após async/na ação de telas antigas.

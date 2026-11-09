@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.14.1-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.15.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
@@ -132,6 +132,29 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokaicore reload', 'Shirokai Core:')
         server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
         config_file.write_text(customized)
+        menus_file = runtime / 'config/shirokai-core/menus.json'
+        original_menus = menus_file.read_text()
+        (reports / "menus-default.json").write_text(original_menus)
+        menus = json.loads(original_menus)
+        assert menus['clanMenuEnabled'] is False
+        bad_menus = json.loads(original_menus)
+        bad_menus['profile']['buttons']['clear']['slot'] = bad_menus['profile']['buttons']['header']['slot']
+        menus_file.write_text(json.dumps(bad_menus))
+        bad_menu_core = dict(config)
+        bad_menu_core['unavailablePlaceholder'] = 'MUST_NOT_APPLY_MENU'
+        config_file.write_text(json.dumps(bad_menu_core))
+        server.command('shirokaicore reload', 'Slot fora do menu ou repetido')
+        server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
+        bad_menus = json.loads(original_menus)
+        bad_menus['profile']['buttons']['clear']['item'] = 'minecraft:missing_menu_item'
+        menus_file.write_text(json.dumps(bad_menus))
+        server.command('shirokaicore reload', 'Item de menu inexistente ou vazio')
+        server.command('shirokaicore placeholders %shirokai:dollars%', 'Unavailable')
+        config_file.write_text(customized)
+        menus['profile']['title'] = '<gold>Perfil configurado</gold>'
+        menus_file.write_text(json.dumps(menus))
+        server.command('shirokaicore reload', 'Configuração recarregada')
+        checks.append('menu slots and registry items validated with atomic reload and clans paused by default')
         titles_file = runtime / 'config/shirokai-core/titles.json'
         original_titles = titles_file.read_text()
         titles_file.write_text('{broken')
@@ -272,6 +295,8 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         assert connection.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
     server = Server(runtime, 'restart')
     try:
+        assert json.loads(menus_file.read_text())['profile']['title'] == '<gold>Perfil configurado</gold>'
+        assert json.loads(menus_file.read_text())['clanMenuEnabled'] is False
         server.wait('Done (')
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')

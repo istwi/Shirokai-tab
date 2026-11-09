@@ -84,6 +84,42 @@ public final class ProfileSmoke implements ModInitializer {
         player.networkHandler = new ServerPlayNetworkHandler(server, connection, player, ConnectedClientData.createDefault(profile, false));
         return player;
     }
+    private CompletableFuture<Void> configuredMenu(MinecraftServer server,ServerPlayerEntity owner,TitleService service){
+        final com.shirokai.core.menus.MenuPlan custom;
+        try{
+            var root=com.google.gson.JsonParser.parseString(com.shirokai.core.menus.MenuConfig.json(com.shirokai.core.menus.MenuConfig.defaults())).getAsJsonObject();
+            var p=root.getAsJsonObject("profile");p.addProperty("rows",3);p.addProperty("title","<red>Perfil de %menu:player%</red>");
+            p.add("tagSlots",com.google.gson.JsonParser.parseString("[10,12]"));
+            var buttons=p.getAsJsonObject("buttons");var slots=Map.of("header",0,"previous",18,"styles",19,"clear",20,"refresh",21,"back",22,"next",26);
+            slots.forEach((key,slot)->buttons.getAsJsonObject(key).addProperty("slot",slot));
+            buttons.getAsJsonObject("clear").addProperty("item","minecraft:blaze_rod");buttons.getAsJsonObject("clear").addProperty("name","<red>Limpar escolhas</red>");
+            p.getAsJsonObject("tags").addProperty("unlockedItem","minecraft:diamond");p.getAsJsonObject("tags").addProperty("name","Tag %menu:tag%");
+            custom=new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.parse(root.toString()));custom.validateItems();
+            buttons.getAsJsonObject("clear").addProperty("item","minecraft:missing_menu_item");
+            var invalid=new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.parse(root.toString()));
+            try{invalid.validateItems();throw new AssertionError("Unknown item accepted");}catch(IllegalArgumentException expected){}
+        }catch(Exception error){return CompletableFuture.failedFuture(error);}
+        service.menus(custom);ProfileMenu.open(owner,service);
+        return until(()->owner.currentScreenHandler instanceof ProfileMenu).thenComposeAsync(v->{
+            var menu=(ProfileMenu)owner.currentScreenHandler;
+            check(menu.getInventory().size()==27,"Configured row count ignored");
+            check(menu.getSlot(20).getStack().isOf(Items.BLAZE_ROD)&&menu.getSlot(20).getStack().get(net.minecraft.component.DataComponentTypes.CUSTOM_NAME).getString().equals("Limpar escolhas"),"Button item/name/slot ignored");
+            check(menu.getSlot(10).getStack().isOf(Items.DIAMOND)&&menu.getSlot(10).getStack().get(net.minecraft.component.DataComponentTypes.CUSTOM_NAME).getString().equals("Tag [a]"),"Tag item/name/slot ignored");
+            menu.onSlotClick(9,0,SlotActionType.PICKUP,owner);check(service.cached(owner.getUuid()).orElseThrow().chatIds().isEmpty(),"Old tag slot remained active");
+            menu.onSlotClick(26,0,SlotActionType.PICKUP,owner);check(menu.getSlot(10).getStack().get(net.minecraft.component.DataComponentTypes.CUSTOM_NAME).getString().equals("Tag [c]"),"Custom pagination ignored");
+            menu.onSlotClick(18,0,SlotActionType.PICKUP,owner);menu.onSlotClick(10,0,SlotActionType.PICKUP,owner);
+            return until(()->service.cached(owner.getUuid()).orElseThrow().chatIds().equals(List.of("a")));
+        },server).thenComposeAsync(v->{
+            service.menus(new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.defaults()));
+            ((ProfileMenu)owner.currentScreenHandler).onSlotClick(20,0,SlotActionType.PICKUP,owner);
+            return until(()->service.cached(owner.getUuid()).orElseThrow().chatIds().isEmpty());
+        },server).thenComposeAsync(v->{
+            owner.closeHandledScreen();ProfileMenu.open(owner,service);return until(()->owner.currentScreenHandler instanceof ProfileMenu);
+        },server).thenRunAsync(()->{
+            var menu=(ProfileMenu)owner.currentScreenHandler;check(menu.getInventory().size()==54&&menu.getSlot(48).getStack().isOf(Items.MILK_BUCKET),"Reopened menu did not pick up new config");
+            check(owner.getInventory().getStack(0).getCount()==5,"Configurable menu altered player items");
+        },server);
+    }
     private CompletableFuture<Void> test(MinecraftServer server) {
         var storage = new SqliteStorage(FabricLoader.getInstance().getGameDir().resolve("profile-smoke-" + UUID.randomUUID() + ".db"));
         var definitions = new HashMap<String, TitleDefinition>();
@@ -133,6 +169,7 @@ public final class ProfileSmoke implements ModInitializer {
             check(service.cached(id).orElseThrow().selectedVisual()==null,"Closed menu mutated selection");
             check(owner.getInventory().getStack(0).getCount()==5,"Player items changed");
         },server);
+        result=result.thenComposeAsync(v->configuredMenu(server,owner,service),server);
         return result.whenCompleteAsync((v,error) -> {
             owner.closeHandledScreen(); stranger.closeHandledScreen(); service.forget(id);
             try { storage.close(); } catch (Exception close) { throw new CompletionException(close); }

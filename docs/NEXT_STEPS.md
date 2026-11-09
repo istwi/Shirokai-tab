@@ -1,3 +1,6 @@
+> 0.15.0: perfil configurável em menus.json; menu/editor de clã pausados por
+> padrão até terminar essa área. Não reativar automaticamente. Consulte MENUS.md.
+
 > 0.14.1 corrige colisão de nomes de teams após liberação do jogador; RANKS.md
 > documenta migração manual dos vínculos antigos. Não reintroduzir nomes globais skn.
 

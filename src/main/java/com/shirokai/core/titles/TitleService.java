@@ -47,6 +47,9 @@ public final class TitleService {
         return List.copyOf(result);
     }
     public List<net.minecraft.text.Text> chatPresentation(UUID player){return chatDefinitions(player).stream().map(def->display(player,def)).toList();}
+    private com.shirokai.core.menus.MenuPlan menus=new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.defaults());
+    public com.shirokai.core.menus.MenuPlan menus(){return menus;}
+    public void menus(com.shirokai.core.menus.MenuPlan value){menus=Objects.requireNonNull(value);}
     private TitleCatalog catalog;
     private Consumer<UUID> changed = id -> {};
     public void onChange(Consumer<UUID> listener) { changed = changed.andThen(listener); }

@@ -28,6 +28,7 @@ public final class ClanIdentityEditor extends AnvilScreenHandler {
         input.setStack(0,paper);output.clear();sendContentUpdates();
     }
     public static void open(ServerPlayerEntity player,ClanService clans,ClanSnapshot expected,boolean tag){
+        if(!clans.menuEnabled()){player.sendMessage(Text.literal("O menu de clã está temporariamente desativado."),false);return;}
         try {
             ClanPolicy.require(expected,player.getUuid(),tag?"tag":"rename",clans.config());
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((sync,inventory,ignored)->
@@ -40,7 +41,7 @@ public final class ClanIdentityEditor extends AnvilScreenHandler {
     }
     @Override public void updateResult(){if(output!=null)output.clear();}
     @Override protected boolean canTakeOutput(PlayerEntity player,boolean present){return false;}
-    @Override public boolean canUse(PlayerEntity player){return !closed&&player==owner&&!owner.isDisconnected();}
+    @Override public boolean canUse(PlayerEntity player){return clans.menuEnabled()&&!closed&&player==owner&&!owner.isDisconnected();}
     @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}
     @Override public void onSlotClick(int slot,int button,SlotActionType type,PlayerEntity player){
         if(!canUse(player)||owner.currentScreenHandler!=this||busy||slot!=0||button!=0||type!=SlotActionType.PICKUP)return;
