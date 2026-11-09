@@ -1,3 +1,6 @@
+> 0.15.1 acrescenta cashCurrency e %shirokai:cash%, independentes de dollars/tokens.
+> JSONs antigos continuam válidos sem serem sobrescritos; detalhes abaixo.
+
 > Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
 > SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
 > As regras antigas de seleção visual abaixo são históricas e foram substituídas.
@@ -48,14 +51,15 @@ estrita e limite64KiB:
   "refreshTicks": 100,
   "dollarsCurrency": "impactor:dollars",
   "tokensCurrency": "impactor:tokens",
+  "cashCurrency": "impactor:cash",
   "gymsObjective": "gyms",
   "dexCollection": "national",
   "pokedexProvider": "cobblemon"
 }
 ```
 
-Moedas são IDs namespaced diferentes. Nunca usa moeda primária como fallback de dollars
-ou tokens. Objective usa nome real até16caracteres; collection segue o ID público do Dex.
+Moedas são IDs namespaced diferentes. Nunca usa moeda primária como fallback de
+dollars, tokens ou cash. Objective usa nome real até16caracteres; collection segue o ID público do Dex.
 refreshTicks20..1200 controla snapshots/consultas assíncronas; não é um polling por frame.
 Flags de ativação e modules.integrations exigem reinício. Mapeamentos/intervalo/source
 aceitam reload atômico; configuração candidata inválida preserva todos os snapshots.
@@ -67,6 +71,7 @@ Mudança de mapeamento descarta caches e respostas antigas de operações em and
 |---|---|
 | `%shirokai:dollars%` | Saldo da conta existente na moeda dollarsCurrency |
 | `%shirokai:tokens%` | Saldo da conta existente na moeda tokensCurrency |
+| `%shirokai:cash%` | Saldo da conta existente na moeda cashCurrency |
 | `%shirokai:pokedex_total%` | Número de espécies implementadas ou total da coleção Dex escolhida |
 | `%shirokai:pokedex_owned%` | Espécies obtidas oficialmente ou registered da coleção Dex |
 | `%shirokai:pokedex_seen%` | Espécies vistas oficialmente ou seen da coleção Dex |
@@ -172,3 +177,42 @@ Resultados da execução atual em PROJECT_STATUS.md e build/integration-smoke/re
 Não valida login/autenticação, renderização cliente, contextos LuckPerms de jogadores
 realmente conectados, carga ou compatibilidade com versões não auditadas. O authlib do
 runtime cloud pode falhar ao buscar chaves Yggdrasil por DNS; online-mode não é desativado.
+
+## Terceira moeda — cash (0.15.1)
+
+Use `%shirokai:cash%` no TAB/scoreboard do Core ou pelo handler shirokai:cash do
+Fabric Placeholder API em mods compatíveis. Configuração: cashCurrency aponta
+para impactor:cash por padrão. A moeda precisa estar registrada no Impactor e a
+conta deve existir; o Core não cria moedas/contas nem fabrica saldo. Saldo zero
+existente aparece como0; moeda/conta ausente retorna o fallback (normalmente N/D).
+Nunca usa dollars, tokens ou moeda primária como substituto.
+
+Exemplo completo: examples/integrations.json. No trecho das moedas:
+
+```json
+"dollarsCurrency": "impactor:dollars",
+"tokensCurrency": "impactor:tokens",
+"cashCurrency": "impactor:cash"
+```
+
+Trocar mapeamento aceita /shirokaicore reload; ativar/desativar o provider Impactor
+continua exigindo reinício. O refreshTicks controla a atualização dos três saldos.
+Reload limpa sessões para callbacks antigos não repopularem valores anteriores.
+
+Schema permanece1. Arquivos antigos sem cashCurrency recebem impactor:cash em
+memória, sem reescrita. Compatibilidade: se já tinham dollarsCurrency ou
+tokensCurrency apontando para impactor:cash, o novo alias cash fica desativado
+em vez de invalidar o arquivo ou duplicar as moedas. Para habilitar os três,
+configure três IDs distintos. cashCurrency:null desativa explicitamente só cash.
+Mapeamentos explícitos duplicados ou inválidos rejeitam o reload.
+
+Exemplo de linha da scoreboard:
+
+```json
+"text": "<gold>Cash: </gold><white>%shirokai:cash%</white>"
+```
+
+Novos testes usam Impactor5.3.5 real:125.25dollars,42.5tokens e0cash; exportação
+PAPI, remapeamento de cash para moeda inexistente, recuperação após reload e
+consulta de conta cash ausente sem criá-la. Nenhuma API nova foi presumida: usa o
+mesmo contrato balance/hasAccount/currency já auditado no adaptador.

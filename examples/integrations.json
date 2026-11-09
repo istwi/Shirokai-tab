@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "placeholderApi": true,
+  "cobblemon": true,
+  "impactor": true,
+  "shirokaiDex": true,
+  "refreshTicks": 100,
+  "dollarsCurrency": "impactor:dollars",
+  "tokensCurrency": "impactor:tokens",
+  "cashCurrency": "impactor:cash",
+  "gymsObjective": "gyms",
+  "dexCollection": "national",
+  "pokedexProvider": "cobblemon"
+}

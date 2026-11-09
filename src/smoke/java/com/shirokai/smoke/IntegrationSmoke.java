@@ -93,6 +93,7 @@ public final class IntegrationSmoke implements ModInitializer {
         // Actual API handlers: import arguments, export literal values, and preserve replacement ownership.
         var nativeProbe = new PlaceholderService((key, error) -> {});
         nativeProbe.register("shirokai:smoke_literal", c -> Optional.of("<click:run_command:/op>literal</click>"));
+        nativeProbe.register("shirokai:smoke_cash",c->service.resolve("shirokai:cash",c));
         bridge.export(nativeProbe);
         var exported = Placeholders.parsePlaceholder(Identifier.of("shirokai:smoke_literal"), null, PlaceholderContext.of(player));
         check(exported.isValid() && exported.text().getString().equals("<click:run_command:/op>literal</click>") && exported.text().getStyle().getClickEvent() == null, "Native export interpreted markup");
@@ -102,7 +103,7 @@ public final class IntegrationSmoke implements ModInitializer {
         var styles = new StyleEngine(StyleConfig.defaults());
         check(styles.render(styles.compile("Gyms %player:objective smoke_gyms%"), key -> service.render("%" + key + "%", context, "N/D"), 0, false).getString().equals("Gyms 7"), "StyleEngine did not import PAPI arguments");
         var api = LuckPermsProvider.get();
-        BigDecimal[] before = new BigDecimal[2];
+        BigDecimal[] before = new BigDecimal[3];
         var result = api.getGroupManager().createAndLoadGroup("smoke_owner")
             .thenCompose(group->{group.data().add(net.luckperms.api.node.types.WeightNode.builder(100).build());return api.getGroupManager().createAndLoadGroup("smoke_admin");})
             .thenCompose(group->{group.data().add(net.luckperms.api.node.types.WeightNode.builder(200).build());return api.getUserManager().loadUser(player.getUuid());}).thenComposeAsync(user -> {
@@ -129,12 +130,18 @@ public final class IntegrationSmoke implements ModInitializer {
         }, server).thenComposeAsync(dollars -> EconomyService.instance().account(dollars, player.getUuid()).thenAcceptAsync(account -> before[0] = account.balance(), server), server)
             .thenComposeAsync(v -> currency("impactor:tokens", new BigDecimal("42.5"), server), server)
             .thenComposeAsync(tokens -> EconomyService.instance().account(tokens, player.getUuid()).thenAcceptAsync(account -> before[1] = account.balance(), server), server)
+            .thenComposeAsync(v -> currency("impactor:cash", BigDecimal.ZERO, server), server)
+            .thenComposeAsync(cash -> EconomyService.instance().account(cash, player.getUuid()).thenAcceptAsync(account -> before[2] = account.balance(), server), server)
             .thenRunAsync(() -> { runtime.invalidate(player.getUuid()); runtime.tick(); }, server)
-            .thenComposeAsync(v -> until.apply(() -> { runtime.tick(); return !service.render("%shirokai:dollars%", context, "N/D").equals("N/D") && !service.render("%shirokai:tokens%", context, "N/D").equals("N/D"); }), server)
+            .thenComposeAsync(v -> until.apply(() -> { runtime.tick(); return !service.render("%shirokai:dollars%", context, "N/D").equals("N/D") && !service.render("%shirokai:tokens%", context, "N/D").equals("N/D") && !service.render("%shirokai:cash%",context,"N/D").equals("N/D"); }), server)
             .thenRunAsync(() -> {
                 check(new BigDecimal(service.render("%shirokai:dollars%", context, "N/D")).compareTo(before[0]) == 0, "Wrong dollars balance");
                 check(new BigDecimal(service.render("%shirokai:tokens%", context, "N/D")).compareTo(before[1]) == 0, "Wrong tokens balance");
                 check(before[0].compareTo(before[1]) != 0, "Currency fixture is not distinct");
+                check(new BigDecimal(service.render("%shirokai:cash%",context,"N/D")).compareTo(before[2])==0 && before[2].signum()==0,"Cash zero was missing or mixed with other currencies");
+                check(Placeholders.getPlaceholders().containsKey(Identifier.of("shirokai:cash")),"Native cash key not exported");
+                var exportedCash=Placeholders.parsePlaceholder(Identifier.of("shirokai:smoke_cash"),null,PlaceholderContext.of(player));
+                check(exportedCash.isValid()&&exportedCash.text().getString().equals("0"),"Cash value not exported through real PAPI");
                 int total = Integer.parseInt(service.render("%shirokai:pokedex_total%", context, "N/D"));
                 check(total > 800 && service.render("%shirokai:pokedex_owned%", context, "N/D").equals("0"), "Actual Cobblemon registry or fresh Pokédex unavailable");
                 check(service.render("%shirokai:pokedex_percent%", context, "N/D").equals("0"), "Empty official Pokédex not zero");
@@ -144,6 +151,15 @@ public final class IntegrationSmoke implements ModInitializer {
             .thenComposeAsync(v -> until.apply(() -> { runtime.tick(); return service.render("%shirokai:pokedex_owned%", context, "N/D").equals("1"); }), server)
             .thenRunAsync(() -> check(new BigDecimal(service.render("%shirokai:pokedex_percent%", context, "N/D")).compareTo(BigDecimal.ZERO) > 0, "Official acquisition did not update percent"), server)
             .thenComposeAsync(v -> until.apply(() -> positive(service.render("%shirokai:dex_percent%", context, "N/D"))), server)
+            .thenComposeAsync(v->{
+                runtime.replaceConfig(new IntegrationConfig(1,true,true,true,true,20,base.dollarsCurrency(),base.tokensCurrency(),"impactor:missing_cash","smoke_gyms","national","cobblemon"));
+                check(service.render("%shirokai:cash%",context,"N/D").equals("N/D"),"Cash reload retained previous balance");
+                return until.apply(()->{runtime.tick();return !service.render("%shirokai:dollars%",context,"N/D").equals("N/D")&&!service.render("%shirokai:tokens%",context,"N/D").equals("N/D");});
+            },server).thenComposeAsync(v->{
+                check(service.render("%shirokai:cash%",context,"N/D").equals("N/D"),"Missing cash fell back to another currency");
+                runtime.replaceConfig(config);
+                return until.apply(()->{runtime.tick();return service.render("%shirokai:cash%",context,"N/D").equals("0");});
+            },server)
             .thenRunAsync(() -> {
                 String dex = service.render("%shirokai:dex_percent%", context, "N/D");
                 check(dex.equals(bridge.resolve("shirokaidex:percent national", context).orElseThrow()), "Dex alias recalculated provider data");
@@ -160,12 +176,17 @@ public final class IntegrationSmoke implements ModInitializer {
                 return new ImpactorAccess(server).balance(absent, "impactor:dollars")
                     .thenComposeAsync(balance -> { check(balance.isEmpty(), "Missing account invented a balance"); return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:dollars")).orElseThrow(), absent); }, server)
                     .thenAccept(exists -> check(!exists, "Display created an absent economy account"));
+            }, server).thenComposeAsync(v->{
+                UUID absent=UUID.randomUUID();
+                return new ImpactorAccess(server).balance(absent,"impactor:cash")
+                    .thenComposeAsync(balance->{check(balance.isEmpty(),"Missing cash account invented a balance");return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:cash")).orElseThrow(),absent);},server)
+                    .thenAccept(exists->check(!exists,"Cash placeholder created an account"));
             }, server).thenRunAsync(() -> {
                 var replacement = (PlaceholderHandler)(c, arg) -> PlaceholderResult.value(Text.literal("replacement"));
                 Placeholders.register(Identifier.of("shirokai:smoke_literal"), replacement); bridge.close();
                 check(Placeholders.getPlaceholders().get(Identifier.of("shirokai:smoke_literal")) == replacement, "Replaced handler removed on close");
                 Placeholders.remove(Identifier.of("shirokai:smoke_literal"));
-                runtime.forget(player.getUuid()); check(service.render("%shirokai:dollars%", context, "N/D").equals("N/D"), "Disconnect left monetary cache");
+                runtime.forget(player.getUuid()); check(service.render("%shirokai:cash%",context,"N/D").equals("N/D"),"Disconnect left cash cache"); check(service.render("%shirokai:dollars%", context, "N/D").equals("N/D"), "Disconnect left monetary cache");
             }, server);
         return result.whenCompleteAsync((v, error) -> {
             runtime.close(); bridge.close(); board.removeObjective(objective);

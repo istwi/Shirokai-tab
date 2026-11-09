@@ -1,3 +1,11 @@
+## Regressão0.15.1 — cash
+
+JUnit: arquivo antigo recebe cash default em memória, não é reescrito, preserva
+alias legado já usando impactor:cash; rejeita duplicatas/IDs/tipos inválidos e
+permite cash null/remapeamento com reload. Impactor real: três saldos distintos
+incluindo zero, registro/exportação PAPI, remapeamento para moeda ausente e
+restauração sem cache antigo, conta cash ausente não criada e cleanup no disconnect.
+
 ## Regressão0.15.0 — menus JSON e pausa do clã
 
 JUnit valida round-trip/defaults, preservação do arquivo, colisão/faixa de slots,

@@ -1,3 +1,33 @@
+# Estado atual — 0.15.1-dev
+
+Terceira moeda independente: cashCurrency em integrations.json (impactor:cash por
+padrão) e %shirokai:cash%, exportado também pelo Fabric PAPI. Usa o mesmo adaptador
+Impactor5.3.5 auditado: sem criar contas/moedas, sem trocar por saldo de outra moeda,
+sem consultas SQL por render. Cash null desativa a terceira consulta. Mapeamento
+pode mudar por reload, que invalida sessões/callbacks antigos.
+
+JSON antigo sem cashCurrency continua válido e não é reescrito. Se já usa
+impactor:cash em dollarsCurrency/tokensCurrency, preserva esses aliases e deixa
+cash desativado, evitando conflito; configure três IDs distintos para habilitar
+todos. Schema JSON permanece1, SQLite6; menu de clã segue pausado.
+
+Validação atual:
+- build/smokeClasses aprovados; 113 testes JUnit sem falhas/erros.
+- 14 verificações de integração reais aprovadas:125.25dollars,42.5tokens e0cash,
+  chave/valor PAPI, reload para cash inexistente e restauração sem saldo antigo,
+  conta cash ausente não criada e cleanup no disconnect.
+- 49 verificações Fabric aprovadas em três boots, incluindo reinício/storage.
+- JAR inspecionado: versão correta e nenhuma classe smoke em produção.
+
+JAR: build/libs/shirokai-core-0.15.1-dev.jar
+SHA256: 2e6f0d32d90eadb59eaa18f686a1a5b3497d1142f3e5d3f759cd5f89b1d6da15
+Documentação: INTEGRATIONS.md; exemplo completo: examples/integrations.json.
+Instalação exige substituir JAR/reiniciar. Moeda cash deve existir no Impactor;
+configurar o ID não cria moeda. Cliente autenticado/renderização/carga pendentes.
+Base:9433297. Histórico das versões anteriores abaixo.
+
+---
+
 # Estado atual — 0.15.0-dev
 
 menus.json configura o /perfil: título,1..6linhas, posições das tags e dos sete

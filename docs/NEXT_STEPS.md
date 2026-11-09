@@ -1,3 +1,6 @@
+> 0.15.1 acrescenta terceira moeda cash independente; INTEGRATIONS.md documenta
+> defaults, compatibilidade e consulta sem criação de contas.
+
 > 0.15.0: perfil configurável em menus.json; menu/editor de clã pausados por
 > padrão até terminar essa área. Não reativar automaticamente. Consulte MENUS.md.
 

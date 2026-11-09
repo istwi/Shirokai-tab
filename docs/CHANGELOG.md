@@ -1,3 +1,11 @@
+## 0.15.1-dev
+
+- Terceira moeda independente: cashCurrency (padrão impactor:cash) e placeholder
+  %shirokai:cash%, também exportado para Fabric PAPI.
+- JSON antigo preservado; alias cash desativado se impactor:cash já era usado em
+  outro alias legado. Null desativa cash; mapeamentos explícitos devem ser distintos.
+- Reload limpa saldos antigos, sem fallback entre moedas ou criação de contas.
+
 ## 0.15.0-dev
 
 - menus.json configura título, linhas, slots de tags, ícones, nomes e lore dos

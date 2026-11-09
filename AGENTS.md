@@ -101,3 +101,8 @@ ações fixas. Validar slots/tipos/templates na leitura e registries na thread d
 servidor ANTES de publicar reload. Telas guardam snapshot do layout exibido.
 Clã/editor desativados por padrão (clanMenuEnabled=false), sem apagar dados ou
 bloquear comandos de clã. Checar flag também após async/na ação de telas antigas.
+
+Cash0.15.1: cashCurrency opcional e %shirokai:cash% independentes de dollars/tokens.
+Nunca criar conta/moeda ao consultar saldo. Legacy sem campo usa impactor:cash;
+se ID já mapeado em dollars/tokens, cash=null preserva o mapeamento legado.
+Mapeamentos explícitos não podem duplicar IDs. Preservar arquivos e schema1.

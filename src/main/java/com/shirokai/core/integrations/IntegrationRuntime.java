@@ -39,7 +39,7 @@ public final class IntegrationRuntime implements AutoCloseable {
         if (supported("placeholder-api", config.placeholderApi(), "2.4.2+1.21")) attempt("placeholder-api", () -> papi = new PapiAccess(server, fallback, logger));
         var dex = FabricLoader.getInstance().getModContainer("shirokaidex");
         providers.put("shirokaidex", !config.shirokaiDex() ? "DISABLED" : dex.isEmpty() ? "ABSENT" : papi == null ? "PAPI_UNAVAILABLE" : "INSTALLED " + dex.get().getMetadata().getVersion().getFriendlyString());
-        for (String key : List.of("dollars", "tokens", "pokedex_percent", "pokedex_total", "pokedex_owned", "pokedex_seen", "dex_percent", "gyms", "world", "ping", "group", "clan", "clan_tag", "clan_members", "clan_limit")) {
+        for (String key : List.of("dollars", "tokens", "cash", "pokedex_percent", "pokedex_total", "pokedex_owned", "pokedex_seen", "dex_percent", "gyms", "world", "ping", "group", "clan", "clan_tag", "clan_members", "clan_limit")) {
             String id = "shirokai:" + key;
             placeholders.register(id, context -> nativeValue(id, context));
         }
@@ -93,6 +93,7 @@ public final class IntegrationRuntime implements AutoCloseable {
         if (impactor != null) {
             balance(player, session, "shirokai:dollars", config.dollarsCurrency());
             balance(player, session, "shirokai:tokens", config.tokensCurrency());
+            if(config.cashCurrency()!=null)balance(player,session,"shirokai:cash",config.cashCurrency());
         }
     }
     private void balance(ServerPlayerEntity player, Session session, String key, String currency) {
@@ -139,6 +140,6 @@ public final class IntegrationRuntime implements AutoCloseable {
         var session = sessions.get(context.playerId());
         return session == null ? Optional.empty() : Optional.ofNullable(session.values.get(key));
     }
-    public String status() { return providers + " sessions=" + sessions.size() + " queued=" + pending.size() + " failures=" + failures + " pokedex=" + config.pokedexProvider() + " currencies=" + config.dollarsCurrency() + "," + config.tokensCurrency(); }
+    public String status() { return providers + " sessions=" + sessions.size() + " queued=" + pending.size() + " failures=" + failures + " pokedex=" + config.pokedexProvider() + " currencies=" + config.dollarsCurrency() + "," + config.tokensCurrency() + "," + Objects.toString(config.cashCurrency(),"DISABLED"); }
     @Override public void close() { if (closed) return; closed = true; sessions.clear(); pending.clear(); placeholders.external((key, context) -> Optional.empty()); if (papi != null) papi.close(); if (cobblemon != null) cobblemon.close(); }
 }

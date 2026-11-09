@@ -1,3 +1,6 @@
+> 0.15.1-dev: terceira moeda independente [cash](docs/INTEGRATIONS.md), com
+> `%shirokai:cash%` e `cashCurrency` em integrations.json.
+
 > 0.15.0-dev: [menus configuráveis](docs/MENUS.md); menu/editor de clã pausados
 > por padrão. Exemplo completo em [examples/menus.json](examples/menus.json).
 

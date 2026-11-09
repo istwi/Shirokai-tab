@@ -1,3 +1,6 @@
+> 0.15.1 acrescenta cashCurrency/%shirokai:cash%; não misturar moedas nem criar
+> contas para exibir saldos. Compatibilidade de JSON em INTEGRATIONS.md.
+
 > 0.15.0: menus.json configura perfil; menu/editor de clã pausados por padrão.
 > Não reativar sem pedido. Leia MENUS.md e o estado atual antes de continuar.
 
