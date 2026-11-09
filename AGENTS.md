@@ -99,8 +99,13 @@ team antigo vazio ou salvo após parada anormal. Preservar ordenação e ownersh
 Menus0.15: leia docs/MENUS.md. Perfil usa menus.json com posições/itens/textos e
 ações fixas. Validar slots/tipos/templates na leitura e registries na thread do
 servidor ANTES de publicar reload. Telas guardam snapshot do layout exibido.
-Clã/editor desativados por padrão (clanMenuEnabled=false), sem apagar dados ou
-bloquear comandos de clã. Checar flag também após async/na ação de telas antigas.
+0.16 reativa clã/editor por padrão em arquivos novos; preservar false em arquivos
+existentes. Checar flag também após async/na ação de telas antigas. Histórico
+exige associação atual ao UUID exibido. Reparos exigem prévia/token/CAS/auditoria;
+nunca mover líder, apagar membros ou contornar confirmação de transferência/exclusão.
+Personalização por área: personalization.json; frames guardam IDs, não Text/markup
+no SQL. ROLE fixo continua administrativo. Vanish opcional: docs/VANISH.md; auditar
+versão exata e ordem actor/viewer. Não afirmar vanish sem provider instalado.
 
 Cash0.15.1: cashCurrency opcional e %shirokai:cash% independentes de dollars/tokens.
 Nunca criar conta/moeda ao consultar saldo. Legacy sem campo usa impactor:cash;

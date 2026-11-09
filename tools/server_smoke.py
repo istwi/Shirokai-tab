@@ -72,10 +72,13 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.15.2-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.16.0-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')
+        server.command('shirokaicore clans diagnose', 'SQLite: ok')
+        server.command('shirokaicore clans history 11111111-1111-1111-1111-111111111111', 'Clãs: []')
+        checks.append('clan maintenance database diagnostics and deleted-clan history commands')
         checks += ['real Fabric startup', 'module status', 'version', 'permission fallback', 'literal placeholders', 'SQLite integrity']
         server.command('shirokai-profile-smoke', 'PROFILE_GUI_SMOKE_PASS')
         checks.append('native menu server-side interactions with synthetic players')
@@ -97,6 +100,8 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.command('shirokaicore scoreboard', 'viewers=')
         server.command('shirokai-style-smoke', 'STYLE_CHOICE_SMOKE_PASS')
         checks.append('persisted style native menu fallback recovery independent clan choices and stale authorization')
+        server.command('shirokai-animated-style-smoke', 'ANIMATED_STYLE_SMOKE_PASS')
+        checks.append('animated personal and clan presets per-area controls live menu and immutable chat snapshots')
         server.command('shirokai-presentation-smoke', 'PRESENTATION_SMOKE_PASS')
         checks.append('rich chat menu title clan presentation permission fallback and filtered mention routing')
         server.command('shirokai-chat-smoke', 'CHAT_SMOKE_PASS')
@@ -136,7 +141,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         original_menus = menus_file.read_text()
         (reports / "menus-default.json").write_text(original_menus)
         menus = json.loads(original_menus)
-        assert menus['clanMenuEnabled'] is False
+        assert menus['clanMenuEnabled'] is True
         bad_menus = json.loads(original_menus)
         bad_menus['profile']['buttons']['clear']['slot'] = bad_menus['profile']['buttons']['header']['slot']
         menus_file.write_text(json.dumps(bad_menus))
@@ -154,7 +159,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         menus['profile']['title'] = '<gold>Perfil configurado</gold>'
         menus_file.write_text(json.dumps(menus))
         server.command('shirokaicore reload', 'Configuração recarregada')
-        checks.append('menu slots and registry items validated with atomic reload and clans paused by default')
+        checks.append('menu slots and registry items validated with atomic reload and clan menu setting preserved')
         titles_file = runtime / 'config/shirokai-core/titles.json'
         original_titles = titles_file.read_text()
         titles_file.write_text('{broken')
@@ -296,7 +301,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
     server = Server(runtime, 'restart')
     try:
         assert json.loads(menus_file.read_text())['profile']['title'] == '<gold>Perfil configurado</gold>'
-        assert json.loads(menus_file.read_text())['clanMenuEnabled'] is False
+        assert json.loads(menus_file.read_text())['clanMenuEnabled'] is True
         server.wait('Done (')
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')

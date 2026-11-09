@@ -63,7 +63,7 @@ public final class ChatCommands {
         else chat.service().send(sender,channel,body,chat::system);
     });}
     private UUID target(ServerCommandSource source,String value){
-        try{return UUID.fromString(value);}catch(IllegalArgumentException invalid){var player=source.getServer().getPlayerManager().getPlayer(value);if(player==null)throw new IllegalArgumentException("Jogador offline: informe UUID para ignore");return player.getUuid();}
+        try{return UUID.fromString(value);}catch(IllegalArgumentException invalid){var player=source.getServer().getPlayerManager().getPlayer(value);if(player==null||!com.shirokai.core.visibility.VisibilityService.canSee(source.getServer(),source.getPlayer(),player))throw new IllegalArgumentException("Jogador offline: informe UUID para ignore");return player.getUuid();}
     }
     public int privateMessage(ServerCommandSource source,String player,String body){return execute(source,chat->chat.service().privateMessage(source.getPlayer().getUuid(),target(source,player),body,chat::system));}
     private int reply(ServerCommandSource source,String body){return execute(source,chat->chat.service().privateMessage(source.getPlayer().getUuid(),chat.service().replyTarget(source.getPlayer().getUuid()),body,chat::system));}

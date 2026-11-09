@@ -50,7 +50,10 @@ public final class ChatService {
     public Channel selected(UUID player){return session(player).profile.channel();}
     public UUID replyTarget(UUID player){UUID target=session(player).reply;if(target==null)throw new IllegalStateException("Nenhuma conversa recente disponível");return target;}
     private Participant participant(UUID player){return audience.online().stream().filter(p->p.id().equals(player)).findFirst().orElseThrow(()->new IllegalStateException("Jogador indisponível"));}
+    private java.util.function.BiPredicate<UUID,UUID> visible=(viewer,actor)->true;
+    public void visibility(java.util.function.BiPredicate<UUID,UUID> policy){visible=java.util.Objects.requireNonNull(policy);}
     private boolean accepts(Participant recipient,Participant sender,Channel channel){
+        if(!visible.test(recipient.id(),sender.id()))return false;
         var session=sessions.get(recipient.id());if(session==null||session.profile==null||!permitted(recipient.id(),channel))return false;
         if(session.profile.ignored().contains(sender.id())&&!permissions.allowed(sender.id(),"shirokaicore.chat.bypass.ignore"))return false;
         return switch(channel){
@@ -81,7 +84,7 @@ public final class ChatService {
             if(sender.equals(target))throw new IllegalArgumentException("Escolha outro jogador");var source=session(sender);session(target);
             if(!permitted(sender,Channel.PRIVATE)||!permitted(target,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
             var author=participant(sender);var recipient=participant(target);
-            if(source.profile.ignored().contains(target)||!accepts(recipient,author,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
+            if(!visible.test(sender,target)||source.profile.ignored().contains(target)||!accepts(recipient,author,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
             gate(sender,body);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE,recipient.name());
             sink.deliver(target,envelope);sink.deliver(sender,envelope);source.reply=target;session(target).reply=sender;
         }catch(RuntimeException error){rejected(sender,error);throw error;}

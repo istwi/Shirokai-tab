@@ -108,6 +108,7 @@ public final class TabExtrasRuntime implements AutoCloseable {
         var scores=new LinkedHashMap<String,Integer>();
         var roster=TabExtrasPackets.state(view.player.networkHandler).listed();
         for(var subject:players){
+            if(!com.shirokai.core.visibility.VisibilityService.canSee(server,view.player,subject))continue;
             var listing=roster.get(subject.getUuid());var own=view.listings.get(subject.getUuid());
             // Do not reintroduce a player removed from the viewer's roster by another mod.
             if(listing!=null&&(listing.removed()||!listing.value())||own!=null&&!own.sent())continue;

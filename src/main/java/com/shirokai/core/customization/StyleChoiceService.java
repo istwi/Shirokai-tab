@@ -88,9 +88,18 @@ public final class StyleChoiceService {
         return catalog.resolve(choices==null?null:choices.selections().get(surface),surface,
             node->clan.map(c->permissions.allowed(c.leader(),node)).orElse(false));
     }
-    public Optional<Text> render(UUID subject,Surface surface,String literal) {
+    private PersonalizationConfig policy=PersonalizationConfig.defaults();
+    private Predicate<UUID> animations=id->false;
+    public void policy(PersonalizationConfig value){policy=Objects.requireNonNull(value);}
+    public void animationPreference(Predicate<UUID> preference){animations=preference;}
+    public boolean animates(UUID subject,Surface surface,VisualTarget target){var rule=policy.surfaces().get(target);UUID owner=surface==Surface.TITLE?subject:clans==null?subject:clans.cached(subject).map(ClanSnapshot::leader).orElse(subject);return rule.enabled()&&rule.animated()&&animations.test(subject)&&(rule.permission().isEmpty()||permissions.allowed(owner,rule.permission()));}
+    public Optional<Text> render(UUID subject,Surface surface,String literal){return render(subject,surface,literal,VisualTarget.MENU,0,false);}
+    public Optional<Text> render(UUID subject,Surface surface,String literal,VisualTarget target,long tick,boolean animate) {
         if(!PresetCatalog.SURFACES.contains(surface))return Optional.empty();
+        var rule=policy.surfaces().get(target);
+        UUID entitlement=surface==Surface.TITLE?subject:clans==null?subject:clans.cached(subject).map(ClanSnapshot::leader).orElse(subject);
+        if(!rule.enabled()||!rule.permission().isEmpty()&&!permissions.allowed(entitlement,rule.permission()))return Optional.empty();
         var selected=resolution(subject,surface);
-        return selected.template()==null?Optional.empty():Optional.of(catalog.styles().render(selected.template(),key->literal,0,false));
+        return selected.template()==null?Optional.empty():Optional.of(catalog.render(selected,literal,tick,animate&&rule.animated()&&animations.test(subject)));
     }
 }

@@ -1,3 +1,13 @@
+## 0.16.0-dev
+
+- Clãs: histórico paginado por GUI/comando, diagnóstico SQLite/relacional e reparo
+  explícito transacional com prévia, expiração, CAS e auditoria.
+- Menu/editor de clã habilitados em configurações novas; false existente preservado.
+- Presets pessoais/clã com quadros, permissões e políticas por área; previews vivos.
+- Integração opcional auditada Drex Vanish1.5.9+1.21.1: visibilidade em chat, TAB,
+  contadores e seletores. Ocultação de entidades pertence ao provider externo.
+- Sem alteração de schema SQL6 ou reescrita de JSONs existentes.
+
 ## 0.15.2-dev
 
 - Evita persistir teams temporários de TAB/nametag durante saves do mundo.

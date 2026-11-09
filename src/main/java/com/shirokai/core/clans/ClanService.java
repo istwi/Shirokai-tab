@@ -10,6 +10,8 @@ public final class ClanService {
     private static final class State {
         ClanConfig config;
         boolean menuEnabled;
+        java.util.function.LongSupplier frameTick=()->0;
+        Predicate<UUID> animations=id->false;
         com.shirokai.core.presentation.SurfaceRenderer presentation=com.shirokai.core.presentation.SurfaceRenderer.literal();
         Predicate<UUID> cacheable=id->false;
         final Map<UUID,Optional<ClanSnapshot>> cache=new HashMap<>();
@@ -22,15 +24,24 @@ public final class ClanService {
     private final State state;
     public ClanService(ClanRepository repository,PermissionService permissions,Executor server,ClanConfig config){this(repository,permissions,server,new State(config));}
     private ClanService(ClanRepository repository,PermissionService permissions,Executor server,State state){this.repository=repository;this.permissions=permissions;this.server=server;this.state=state;}
+    public ClanMaintenance maintenance(){return repository.maintenance();}
+    public CompletableFuture<ClanMaintenance.Result> adminRepair(UUID actor,ClanMaintenance.Plan plan){
+        return maintenance().repair(actor,plan).thenComposeAsync(result->{
+            var refreshes=result.affected().stream().filter(state.cacheable).map(this::membership).toArray(CompletableFuture[]::new);
+            return CompletableFuture.allOf(refreshes).thenApplyAsync(v->{for(var listener:state.listeners)try{listener.accept(result.affected());}catch(RuntimeException error){org.slf4j.LoggerFactory.getLogger("shirokai-core").error("[clans] Falha ao atualizar cache após reparo",error);}return result;},server);
+        },server);
+    }
     public ClanService scoped(UUID expectedClan){return new ClanService(repository.scoped(expectedClan),permissions,server,state);}
+    public void frameSource(java.util.function.LongSupplier tick,Predicate<UUID> animations){state.frameTick=tick;state.animations=animations;}
     public void presentation(com.shirokai.core.presentation.SurfaceRenderer renderer){state.presentation=renderer;}
     public boolean menuEnabled(){return state.menuEnabled;}
     public void menuEnabled(boolean enabled){state.menuEnabled=enabled;}
     public boolean customizationEnabled(){return state.presentation.customizationEnabled();}
     public void openCustomization(net.minecraft.server.network.ServerPlayerEntity player,com.shirokai.core.presentation.Surface surface,UUID expectedClan){state.presentation.openCustomization(player,surface,expectedClan);}
     public boolean menuPresentationEnabled(){return state.presentation.menusEnabled();}
-    public net.minecraft.text.Text present(UUID subject,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.render(subject,surface,value);}
-    public net.minecraft.text.Text presentClan(UUID viewer,ClanSnapshot clan,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.renderClan(viewer,clan.leader(),surface,value);}
+    public net.minecraft.text.Text present(UUID subject,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.renderAt(subject,surface,value,com.shirokai.core.customization.VisualTarget.MENU,state.frameTick.getAsLong(),state.animations.test(subject));}
+    public net.minecraft.text.Text present(UUID subject,com.shirokai.core.presentation.Surface surface,String value,com.shirokai.core.customization.VisualTarget target,long tick,boolean animate){return state.presentation.renderAt(subject,surface,value,target,tick,animate);}
+    public net.minecraft.text.Text presentClan(UUID viewer,ClanSnapshot clan,com.shirokai.core.presentation.Surface surface,String value){return state.presentation.renderClanAt(viewer,clan.leader(),surface,value,com.shirokai.core.customization.VisualTarget.MENU,state.frameTick.getAsLong(),state.animations.test(viewer));}
     public ClanConfig config(){return state.config;}
     public void replaceConfig(ClanConfig value){state.config=value;}
     public void cacheOnline(Predicate<UUID> predicate){state.cacheable=predicate;}

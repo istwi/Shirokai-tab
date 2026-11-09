@@ -54,9 +54,11 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
         stack.set(DataComponentTypes.CUSTOM_NAME,plan.text(name,values));
         stack.set(DataComponentTypes.LORE,new LoreComponent(lore.stream().map(line->plan.text(line,values)).toList()));return stack;
     }
-    private void render(){
+    public void refreshVisuals(){if(!closed&&!busy&&owner.currentScreenHandler==this)render(false);}
+    private void render(){render(true);}
+    private void render(boolean refreshEntries){
         display.clear();
-        entries=titles.catalog(owner.getUuid()).definitions().values().stream().filter(t->t.category()!=TitleDefinition.Category.ROLE&&t.chat())
+        if(refreshEntries)entries=titles.catalog(owner.getUuid()).definitions().values().stream().filter(t->t.category()!=TitleDefinition.Category.ROLE&&t.chat())
             .sorted(Comparator.comparing(TitleDefinition::category).thenComparing(Comparator.comparingInt(TitleDefinition::priority).reversed()).thenComparing(TitleDefinition::id)).toList();
         int size=layout.tagSlots().size();page=Math.min(page,Math.max(0,(entries.size()-1)/size));
         var common=context(owner,titles,state,page);var active=titles.chatDefinitions(owner.getUuid()).stream().map(TitleDefinition::id).collect(java.util.stream.Collectors.toSet());

@@ -1,3 +1,16 @@
+## Regressão0.16
+
+- ClanMaintenanceTest: líder sem associação, líder de outro clã, histórico após
+  disband, consulta só por membro, prévia obsoleta e rollback por falha de auditoria.
+- PresetFramesTest/PersonalizationConfigTest: quadros/tempo, permissão/fallback,
+  ID preservado, validação de templates/políticas e preservação do arquivo existente.
+- Smoke Fabric: histórico GUI sem extração de itens; mensagens capturam quadro,
+  preview atualiza e MENU/TAB/SCOREBOARD respeitam políticas independentes.
+- `python3 tools/prepare_vanish.py` seguido de
+  `python3 tools/vanish_smoke.py --accept-eula`: provider auditado real, mixins de
+  entidade, roster, chat, autocomplete de clã, contagens/caches por observador e
+  unvanish. Clientes sintéticos; ainda validar renderização e login reais.
+
 ## Regressão0.15.2 — persistência de teams
 
 Antes: assertion Temporary Core team leaked into world save. Depois: hook real

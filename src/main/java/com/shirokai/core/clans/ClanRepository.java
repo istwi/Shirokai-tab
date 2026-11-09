@@ -13,6 +13,7 @@ public final class ClanRepository {
     private final UUID expectedClan;
     public ClanRepository(SqliteStorage storage,Clock clock) { this(storage,clock,null); }
     private ClanRepository(SqliteStorage storage,Clock clock,UUID expectedClan){this.storage=storage;this.clock=clock;this.expectedClan=expectedClan;}
+    public ClanMaintenance maintenance(){return new ClanMaintenance(storage,clock);}
     public ClanRepository scoped(UUID id){return new ClanRepository(storage,clock,Objects.requireNonNull(id));}
     private <T> CompletableFuture<T> mutation(UUID actor,SqliteStorage.DatabaseWork<T> work){
         return storage.transact(c->{

@@ -1,3 +1,9 @@
+> 0.16 entregou as três etapas solicitadas: histórico/diagnóstico/reparos seguros
+> de clãs, presets animados/políticas por área e integração opcional Drex Vanish.
+> As etapas1..3 listadas abaixo são o plano histórico, não tarefas a refazer.
+> Próximo: cliente real, carga, reconexões e conflitos de mods. Não afirmar
+> vanish com Core sozinho nem ampliar versões do provider sem auditoria.
+
 > 0.15.2 evita gravar teams efêmeros próprios no save; RANKS.md documenta os
 > critérios de ownership e a liberação única dos vínculos antigos já persistidos.
 

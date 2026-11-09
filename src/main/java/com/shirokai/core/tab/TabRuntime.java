@@ -29,7 +29,7 @@ public final class TabRuntime implements AutoCloseable{
     }
     public TabExtrasPlan extrasPlan(){return extras==null?null:extras.plan();}
     public void configureExtras(TabExtrasPlan candidate){
-        if(extras==null)extras=new TabExtrasRuntime(server,candidate,permissions,(key,subject,viewer)->resolveRich(key,subject,viewer,permissions.metadata(subject.getUuid()),online.get().size()),this::animationsEnabled,logger);
+        if(extras==null)extras=new TabExtrasRuntime(server,candidate,permissions,(key,subject,viewer)->resolveRich(key,subject,viewer,permissions.metadata(subject.getUuid()),com.shirokai.core.visibility.VisibilityService.count(server,viewer,List.copyOf(online.get())),com.shirokai.core.customization.VisualTarget.NAMETAG,animationsEnabled(subject.getUuid())),this::animationsEnabled,logger);
         else extras.replacePlan(candidate);
     }
     public TabPlan plan(){return plan;}
@@ -60,12 +60,13 @@ public final class TabRuntime implements AutoCloseable{
             default->placeholders==null?fallback.get():placeholders.render("%"+key+"%",new PlaceholderService.Context(subject.getUuid(),subject.getGameProfile().getName(),count),fallback.get());
         };
     }
-    private Text resolveRich(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count){
+    private Text resolveRich(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count){return resolveRich(key,subject,viewer,metadata,count,com.shirokai.core.customization.VisualTarget.TAB,animationsEnabled(subject.getUuid())&&animationsEnabled(viewer.getUuid()));}
+    private Text resolveRich(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count,com.shirokai.core.customization.VisualTarget target,boolean animate){
         if(titles!=null&&(key.equals("shirokai:selected_title")||key.equals("shirokai:title_prefix"))){
-            Text title=titles.visualPresentation(subject.getUuid());return key.equals("shirokai:title_prefix")&&!title.getString().isEmpty()?Text.empty().append(title).append(Text.literal(" ")):title;
+            Text title=titles.visualPresentation(subject.getUuid(),target,tick,animate);return key.equals("shirokai:title_prefix")&&!title.getString().isEmpty()?Text.empty().append(title).append(Text.literal(" ")):title;
         }
         if(clans!=null&&(key.equals("shirokai:clan")||key.equals("shirokai:clan_tag"))&&clans.cached(subject.getUuid()).isPresent())
-            return clans.present(subject.getUuid(),key.equals("shirokai:clan")?com.shirokai.core.presentation.Surface.CLAN_NAME:com.shirokai.core.presentation.Surface.CLAN_TAG,resolve(key,subject,viewer,metadata,count));
+            return clans.present(subject.getUuid(),key.equals("shirokai:clan")?com.shirokai.core.presentation.Surface.CLAN_NAME:com.shirokai.core.presentation.Surface.CLAN_TAG,resolve(key,subject,viewer,metadata,count),target,tick,animate);
         return Text.literal(resolve(key,subject,viewer,metadata,count));
     }
     private Text lines(List<StyleEngine.Compiled> templates,Function<String,Text> resolver,boolean animate){
@@ -87,24 +88,25 @@ public final class TabRuntime implements AutoCloseable{
         if(extras!=null)extras.update(players,tick);
         boolean nametags=extras!=null&&extras.plan().config().nametags().enabled();
         if(plan.config().manageTeams()||nametags)try{
-            var desired=players.stream().map(p->{int priority=rules.get(p.getUuid()).map(n->n.definition().priority()).orElse(metadata.get(p.getUuid()).weight());
+            var desired=players.stream().filter(p->!com.shirokai.core.visibility.VisibilityService.isHidden(server,p)).map(p->{int priority=rules.get(p.getUuid()).map(n->n.definition().priority()).orElse(metadata.get(p.getUuid()).weight());
                 return nametags?extras.nametag(p,priority,tick):new TeamOwnership.Player(p.getUuid(),p.getGameProfile().getName(),priority);}).toList();
             teams.reconcile(desired);
         }catch(RuntimeException failure){failedUpdates++;if(globalErrorTick==null||tick-globalErrorTick>=200){globalErrorTick=tick;logger.warn("[tab] Nametags anteriores preservadas",failure);}}
         var values=new HashMap<UUID,Map<String,Text>>();var commonNames=new HashMap<UUID,Text[]>();
         for(var subject:players)values.put(subject.getUuid(),new HashMap<>());
         for(var viewer:players)try{
-            var view=views.computeIfAbsent(viewer.getUuid(),id->new View());var meta=metadata.get(viewer.getUuid());boolean animate=animations.getOrDefault(viewer.getUuid(),false);
-            var header=plan.header(meta,viewer.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(viewer.getUuid(),node));Function<String,Text> resolver=key->key.equals("shirokai:viewer")?Text.literal(viewer.getGameProfile().getName()):values.get(viewer.getUuid()).computeIfAbsent(key,k->resolveRich(k,viewer,viewer,meta,players.size()));
+            var view=views.computeIfAbsent(viewer.getUuid(),id->new View());var meta=metadata.get(viewer.getUuid());int visibleCount=com.shirokai.core.visibility.VisibilityService.count(server,viewer,players);boolean animate=animations.getOrDefault(viewer.getUuid(),false);
+            var header=plan.header(meta,viewer.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(viewer.getUuid(),node));Function<String,Text> resolver=key->key.equals("shirokai:viewer")?Text.literal(viewer.getGameProfile().getName()):values.get(viewer.getUuid()).computeIfAbsent((animate?"a:":"s:")+key,k->resolveRich(key,viewer,viewer,meta,visibleCount));
             Text top=lines(header.header(),resolver,animate),bottom=lines(header.footer(),resolver,animate);
             var changed=new ArrayList<PlayerListS2CPacket.Entry>();var desired=new HashMap<UUID,Text>();
             if(plan.config().managePlayerNames())for(var subject:players){
+                if(!com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,subject))continue;
                 var foreignTeam=server.getScoreboard().getScoreHolderTeam(subject.getGameProfile().getName());boolean foreign=subject.getPlayerListName()!=null||foreignTeam!=null&&!teams.owns(foreignTeam);
                 if(foreign){if(view.names.containsKey(subject.getUuid()))changed.add(entry(subject,subject.getPlayerListName()));continue;}
                 var subjectMeta=metadata.get(subject.getUuid());var template=rules.get(subject.getUuid()).map(TabPlan.Name::template).orElse(plan.defaultName());
-                boolean moving=animate&&animations.getOrDefault(subject.getUuid(),false);Text[] shared=commonNames.computeIfAbsent(subject.getUuid(),id->new Text[2]);int variant=moving?1:0;
-                Function<String,Text> nameResolver=key->key.equals("shirokai:viewer")?Text.literal(viewer.getGameProfile().getName()):values.get(subject.getUuid()).computeIfAbsent(key,k->resolveRich(k,subject,viewer,subjectMeta,players.size()));
-                Text name=template.variables().contains("shirokai:viewer")?plan.styles().renderRich(template,nameResolver,tick,moving):shared[variant];
+                boolean privateContext=com.shirokai.core.visibility.VisibilityService.active(server);boolean moving=animate&&animations.getOrDefault(subject.getUuid(),false);Text[] shared=commonNames.computeIfAbsent(subject.getUuid(),id->new Text[2]);int variant=moving?1:0;
+                Function<String,Text> nameResolver=key->key.equals("shirokai:viewer")?Text.literal(viewer.getGameProfile().getName()):values.get(subject.getUuid()).computeIfAbsent((moving?"a:":"s:")+(privateContext?viewer.getUuidAsString()+":":"")+key,k->resolveRich(key,subject,viewer,subjectMeta,visibleCount));
+                Text name=privateContext||template.variables().contains("shirokai:viewer")?plan.styles().renderRich(template,nameResolver,tick,moving):shared[variant];
                 if(name==null){name=plan.styles().renderRich(template,nameResolver,tick,moving);shared[variant]=name;}
                 if(name.getString().codePointCount(0,name.getString().length())>256)throw new IllegalArgumentException("Nome no TAB excede256 caracteres");desired.put(subject.getUuid(),name);
                 if(!Objects.equals(view.names.get(subject.getUuid()),name))changed.add(entry(subject,name));

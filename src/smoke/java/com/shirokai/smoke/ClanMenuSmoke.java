@@ -57,6 +57,12 @@ public final class ClanMenuSmoke implements ModInitializer {
                 click(member,22);check(menu(member).page()==shownPage,"Disabled screen changed pages");
                 clans.menuEnabled(true);click(member,22);check(menu(member).page()==ClanMenu.Page.INVITES,"Invite page missing");click(member,9);return until.apply(()->clans.cached(b).isPresent()&&menu(member).page()==ClanMenu.Page.HOME);},server)
             .thenComposeAsync(v->{ClanMenu.open(leader,clans);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);},server)
+            .thenComposeAsync(v->{click(leader,33);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanHistoryMenu);},server)
+            .thenComposeAsync(v->{
+                var history=(com.shirokai.core.clans.ClanHistoryMenu)leader.currentScreenHandler;
+                check(!history.canUse(member)&&history.quickMove(leader,9).isEmpty(),"History menu ownership/inventory leak");
+                check(!history.getSlot(9).getStack().isEmpty(),"Clan history missing");history.onSlotClick(50,0,SlotActionType.PICKUP,leader);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);
+            },server)
             .thenComposeAsync(v->clans.invite(a,UUID.fromString("33333333-3333-3333-3333-333333333333")),server)
             .thenComposeAsync(v->{click(leader,49);return until.apply(()->menu(leader).getSlot(31).getStack().get(net.minecraft.component.DataComponentTypes.LORE).lines().getFirst().getString().equals("1"));},server)
             .thenComposeAsync(v->{click(leader,31);check(menu(leader).page()==ClanMenu.Page.SENT_INVITES,"Sent invites page missing");click(leader,9);return until.apply(()->menu(leader).getSlot(9).getStack().isEmpty());},server)

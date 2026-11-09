@@ -1,3 +1,8 @@
+> 0.16.0-dev: histórico, diagnóstico e reparos de [clãs](docs/CLANS.md),
+> [presets animados e controles por área](docs/CUSTOMIZATION.md) e integração
+> opcional de [Vanish](docs/VANISH.md). Configurações existentes são preservadas.
+> Para reabrir o menu de clã antes pausado, defina `clanMenuEnabled: true` em menus.json.
+
 > 0.15.2-dev: evita persistência de teams temporários entre saves/reinícios;
 > [instalação e recuperação de vínculos antigos](docs/RANKS.md).
 

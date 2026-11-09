@@ -11,15 +11,17 @@ import java.util.function.Predicate;
 /** Administrator-owned, fully compiled catalog. Player input is always an ID. */
 public final class PresetCatalog {
     public static final Set<Surface> SURFACES = Set.of(Surface.TITLE, Surface.CLAN_NAME, Surface.CLAN_TAG);
-    public record Definition(String permission, Set<Surface> surfaces, String template) {
+    public record Definition(String permission, Set<Surface> surfaces, String template,List<String> frames,int frameTicks) {
+        public Definition(String permission,Set<Surface> surfaces,String template){this(permission,surfaces,template,List.of(),20);}
         public Definition {
-            surfaces = Set.copyOf(surfaces);
+            surfaces = Set.copyOf(surfaces);frames=frames==null?List.of():List.copyOf(frames);
+            if(frameTicks<5||frameTicks>1200||frames.size()>100)throw new IllegalArgumentException("Frames de preset inválidos");
             if (permission == null || !permission.matches("[a-zA-Z0-9_.-]{0,128}") ||
                 surfaces.isEmpty() || !SURFACES.containsAll(surfaces)) throw new IllegalArgumentException("Preset inválido");
         }
     }
     private record Document(int schemaVersion, String fallback, Map<String,Definition> presets) {}
-    public record Preset(Definition definition, StyleEngine.Compiled template) {}
+    public record Preset(Definition definition, StyleEngine.Compiled template,List<StyleEngine.Compiled> frames) {}
     public enum Status { ADMINISTRATIVE, ACTIVE, UNAVAILABLE, REMOVED }
     public record Resolution(Status status, String saved, StyleEngine.Compiled template) {}
     private final Map<String,Preset> presets;
@@ -37,10 +39,12 @@ public final class PresetCatalog {
             if (!template.variables().equals(Set.of("visual:value")) || occurrences != 1 ||
                 !template.animations().isEmpty() || styles.literalSize(template) > 128)
                 throw new IllegalArgumentException("Preset exige um único %visual:value%, sem animação");
-            compiled.put(id,new Preset(definition,template));
+            var frames=new ArrayList<StyleEngine.Compiled>();
+            for(String source:definition.frames()){var frame=styles.compile(source);if(!frame.variables().equals(Set.of("visual:value"))||count(frame.nodes())!=1||!frame.animations().isEmpty()||styles.literalSize(frame)>128)throw new IllegalArgumentException("Frame exige um único %visual:value%, sem animação aninhada");frames.add(frame);}
+            compiled.put(id,new Preset(definition,template,List.copyOf(frames)));
         });
         var basic = compiled.get(fallback);
-        if (basic == null || !basic.definition().permission().isEmpty() ||
+        if (basic == null || !basic.frames().isEmpty() || !basic.definition().permission().isEmpty() ||
             !basic.definition().surfaces().containsAll(SURFACES) ||
             basic.definition().template().contains("<#") || basic.definition().template().contains("<gradient:"))
             throw new IllegalArgumentException("Fallback deve ser básico, gratuito e cobrir todas as superfícies");
@@ -54,6 +58,7 @@ public final class PresetCatalog {
         }
         return result;
     }
+    public boolean hasAnimations(){return presets.values().stream().anyMatch(p->!p.frames().isEmpty());}
     public Map<String,Preset> presets() { return presets; }
     public StyleEngine styles() { return styles; }
     public boolean allowed(String id, Surface surface, Predicate<String> permission) {
@@ -61,11 +66,19 @@ public final class PresetCatalog {
         if (preset==null || !preset.definition().surfaces().contains(surface)) return false;
         var def=preset.definition();
         if (!def.permission().isEmpty() && !permission.test(def.permission())) return false;
+        if(!def.frames().isEmpty()&&!permission.test(surface==Surface.TITLE?"shirokaicore.style.animation":"shirokaicore.clan.animation"))return false;
+        String sources=def.template()+String.join("",def.frames());
         if (surface!=Surface.TITLE) {
-            if (def.template().contains("<gradient:") && !permission.test("shirokaicore.clan.color.gradient")) return false;
-            if (def.template().contains("<#") && !permission.test("shirokaicore.clan.color.hex")) return false;
+            if (sources.contains("<gradient:") && !permission.test("shirokaicore.clan.color.gradient")) return false;
+            if (sources.contains("<#") && !permission.test("shirokaicore.clan.color.hex")) return false;
         }
         return true;
+    }
+    public net.minecraft.text.Text render(Resolution resolution,String literal,long tick,boolean animate){
+        if(resolution.template()==null)return net.minecraft.text.Text.literal(literal);
+        var preset=presets.get(resolution.status()==Status.ACTIVE?resolution.saved():fallback);
+        var template=animate&&!preset.frames().isEmpty()?preset.frames().get((int)Math.floorMod(tick/preset.definition().frameTicks(),preset.frames().size())):preset.template();
+        return styles.render(template,key->literal,0,false);
     }
     public Resolution resolve(String id, Surface surface, Predicate<String> permission) {
         if (id==null) return new Resolution(Status.ADMINISTRATIVE,null,null);
@@ -95,7 +108,8 @@ public final class PresetCatalog {
         if (!root.has("presets") || !root.get("presets").isJsonObject()) throw new IllegalArgumentException("presets deve ser objeto");
         for (var entry:root.getAsJsonObject("presets").entrySet()) {
             if (!entry.getValue().isJsonObject()) throw new IllegalArgumentException("Preset deve ser objeto");
-            var p=entry.getValue().getAsJsonObject(); JsonValidation.fields(p,Set.of("permission","surfaces","template"));
+            var p=entry.getValue().getAsJsonObject(); JsonValidation.fields(p,Set.of("permission","surfaces","template","frames","frameTicks"));
+            if(p.has("frames"))JsonValidation.strings(p,"frames");if(p.has("frameTicks"))JsonValidation.integer(p,"frameTicks");else p.addProperty("frameTicks",20);
             JsonValidation.string(p,"permission",false);JsonValidation.string(p,"template",false);JsonValidation.strings(p,"surfaces");
             for(var s:p.getAsJsonArray("surfaces")) Surface.valueOf(s.getAsString());
         }

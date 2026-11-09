@@ -30,6 +30,7 @@ public final class ProfileSmoke implements ModInitializer {
     private long tick;
     private boolean running;
     @Override public void onInitialize() {
+        if(net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("vanish")||net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("melius-vanish"))new VanishSmoke(this::until).onInitialize();
         new ClanSmoke().onInitialize();
         new ChatSmoke().onInitialize();
         new ChatAppearanceSmoke().onInitialize();
@@ -38,6 +39,7 @@ public final class ProfileSmoke implements ModInitializer {
         new ScoreboardSmoke().onInitialize();
         new PresentationSmoke(this::until).onInitialize();
         new StyleChoiceSmoke(this::until).onInitialize();
+        new AnimatedStyleSmoke().onInitialize();
         if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("cobblemon") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("impactor") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("shirokaidex") && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("luckperms")) new IntegrationSmoke(this::until).onInitialize();
         new TeamOwnershipSmoke().onInitialize();
         new ClanMenuSmoke(this::until).onInitialize();

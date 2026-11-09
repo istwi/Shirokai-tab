@@ -1,3 +1,11 @@
+> Continuidade0.16: clãs têm histórico GUI/CLI, diagnose e repair com prévia/token,
+> TTL120s, CAS/auditoria. Nunca mover líder ou excluir membros. Presets possuem
+> frames/frameTicks e personalization.json por área. Escolhas continuam IDs SQL6.
+> Menu clã padrão true só em arquivo novo; preservar false existente.
+> Integração real Drex Vanish1.5.9+1.21.1 opcional: VANISH.md. Sem provider não há
+> vanish de entidades. Os itens históricos pendentes abaixo sobre essas três
+> etapas foram atendidos; cliente real/carga/compatibilidade continuam pendentes.
+
 > 0.15.2: teams efêmeros próprios filtrados do save via mixin NBT auditado;
 > não apagar/adotar teams por nome e não remover membros durante autosave. RANKS.md.
 

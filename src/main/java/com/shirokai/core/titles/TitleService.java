@@ -22,7 +22,11 @@ public final class TitleService {
     public void openCustomization(net.minecraft.server.network.ServerPlayerEntity player){presentation.openCustomization(player,com.shirokai.core.presentation.Surface.TITLE,null);}
     public boolean menuPresentationEnabled(){return presentation.menusEnabled();}
     public net.minecraft.text.Text present(UUID player,com.shirokai.core.presentation.Surface surface,String value){return presentation.render(player,surface,value);}
-    public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return presentation.renderTitle(player,definition);}
+    private java.util.function.LongSupplier frameTick=()->0;
+    private java.util.function.Predicate<UUID> animationPreference=id->false;
+    public void frameSource(java.util.function.LongSupplier tick,java.util.function.Predicate<UUID> animations){frameTick=tick;animationPreference=animations;}
+    public net.minecraft.text.Text display(UUID player,TitleDefinition definition){return display(player,definition,com.shirokai.core.customization.VisualTarget.MENU,frameTick.getAsLong(),animationPreference.test(player));}
+    public net.minecraft.text.Text display(UUID player,TitleDefinition definition,com.shirokai.core.customization.VisualTarget target,long tick,boolean animate){return presentation.renderTitleAt(player,definition,target,tick,animate);}
     private Function<UUID,com.shirokai.core.permissions.PermissionService.Metadata> metadata = id -> com.shirokai.core.permissions.PermissionService.Metadata.unavailable();
     public void bindRanks(Function<UUID,com.shirokai.core.permissions.PermissionService.Metadata> provider){metadata=Objects.requireNonNull(provider);}
     /** Live context-aware metadata: no saved rank, SQL query or player selection. */
@@ -40,13 +44,14 @@ public final class TitleService {
         String label=group.codePoints().filter(c->!Character.isISOControl(c)).limit(32).collect(StringBuilder::new,StringBuilder::appendCodePoint,StringBuilder::append).toString();
         return Optional.of(new TitleDefinition(safeId,label,"["+label.toUpperCase(Locale.ROOT)+"]","Cargo fixo LuckPerms",TitleDefinition.Category.ROLE,0,"group."+safeId,false,true,true,true));
     }
-    public net.minecraft.text.Text visualPresentation(UUID player){return rank(player).map(def->display(player,def)).orElseGet(net.minecraft.text.Text::empty);}
+    public net.minecraft.text.Text visualPresentation(UUID player){return visualPresentation(player,com.shirokai.core.customization.VisualTarget.TAB,frameTick.getAsLong(),animationPreference.test(player));}
+    public net.minecraft.text.Text visualPresentation(UUID player,com.shirokai.core.customization.VisualTarget target,long tick,boolean animate){return rank(player).map(def->display(player,def,target,tick,animate)).orElseGet(net.minecraft.text.Text::empty);}
     public List<TitleDefinition> chatDefinitions(UUID player){
         var result=new ArrayList<TitleDefinition>();rank(player).ifPresent(result::add);
         cached(player).ifPresent(state->state.chatIds().stream().limit(2-result.size()).map(catalog(player).definitions()::get).filter(Objects::nonNull).forEach(result::add));
         return List.copyOf(result);
     }
-    public List<net.minecraft.text.Text> chatPresentation(UUID player){return chatDefinitions(player).stream().map(def->display(player,def)).toList();}
+    public List<net.minecraft.text.Text> chatPresentation(UUID player){return chatDefinitions(player).stream().map(def->display(player,def,com.shirokai.core.customization.VisualTarget.CHAT,frameTick.getAsLong(),animationPreference.test(player))).toList();}
     private com.shirokai.core.menus.MenuPlan menus=new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.defaults());
     public com.shirokai.core.menus.MenuPlan menus(){return menus;}
     public void menus(com.shirokai.core.menus.MenuPlan value){menus=Objects.requireNonNull(value);}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "surfaces": {
+    "TAB": {"enabled": true, "animated": true, "permission": ""},
+    "SCOREBOARD": {"enabled": true, "animated": true, "permission": ""},
+    "NAMETAG": {"enabled": true, "animated": true, "permission": ""},
+    "CHAT": {"enabled": true, "animated": true, "permission": ""},
+    "MENU": {"enabled": true, "animated": true, "permission": ""}
+  }
+}

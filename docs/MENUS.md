@@ -8,9 +8,10 @@ completo gerado pelo mod.
 ## Campos
 
 - schemaVersion:1.
-- clanMenuEnabled:false mantém o menu /clan e seu editor textual desativados por
-  enquanto. /clan e /clan menu informam a pausa; /clan info e os comandos de clã
-  continuam funcionando, sem apagar clãs/membros/dados. Não é necessário reativar.
+- clanMenuEnabled:true é o padrão de arquivos novos na0.16. Reabre /clan, editor
+  e histórico. Arquivos existentes com false são preservados; altere para true e
+  use /shirokaicore reload. false continua bloqueando as telas, inclusive antigas,
+  sem apagar dados nem bloquear os comandos textuais de clã.
 - profile.rows:1..6, cada linha tem nove slots.
 - profile.title: título do inventário, com cores/HEX/degradês seguros.
 - profile.tagSlots: posições das tags, na ordem da paginação. Pelo menos uma posição.

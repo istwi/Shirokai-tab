@@ -1,3 +1,14 @@
+## Permissões0.16
+
+`shirokaicore.command.clans.history`, `shirokaicore.command.clans.diagnose` e
+`shirokaicore.command.clans.repair` controlam os novos subcomandos administrativos
+(console/OP4 como fallback, conforme os demais comandos administrativos).
+`/clan history` exige jogador, módulo ativo e associação atual ao clã.
+Presets animados exigem `shirokaicore.style.animation` (pessoal) ou
+`shirokaicore.clan.animation` (líder), além das permissões do preset/cores.
+Políticas opcionais de área em personalization.json não concedem essas permissões.
+Vanish tem permissões próprias do provider: VANISH.md.
+
 # Permissões 0.11.0-dev
 
 LuckPerms é a fonte de verdade quando presente e inicializado. O adaptador usa API 5.4,
@@ -114,7 +125,7 @@ premium automático; básicos vazios funcionam para jogador/líder.
 shirokaicore.command.clans.inspect permite list/inspect;
 shirokaicore.command.clans.identity permite correção administrativa rename/tag.
 Permissões administrativas não autorizam escolhas pessoais arbitrárias, transferência
-forçada ou remoção de clãs. clan.animation permanece pendente; clan.tag.edit pode ser
+forçada ou remoção de clãs. clan.animation controla os presets animados0.16; clan.tag.edit pode ser
 configurado como requisito de preset, não é um bypass da política de cargos.
 
 ## Extras0.12

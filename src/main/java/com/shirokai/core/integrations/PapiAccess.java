@@ -33,7 +33,7 @@ public final class PapiAccess implements PlaceholderBridge {
             PlaceholderHandler handler = (context, argument) -> {
                 if (context == null || context.server() != server || !server.isOnThread() || argument != null && !argument.isBlank()) return PlaceholderResult.invalid();
                 var player = context.player();
-                var nativeContext = new PlaceholderService.Context(player == null ? null : player.getUuid(), player == null ? null : player.getGameProfile().getName(), server.getCurrentPlayerCount());
+                var nativeContext = new PlaceholderService.Context(player == null ? null : player.getUuid(), player == null ? null : player.getGameProfile().getName(), player==null?server.getCurrentPlayerCount():com.shirokai.core.visibility.VisibilityService.count(server,player,server.getPlayerManager().getPlayerList()));
                 return PlaceholderResult.value(Text.literal(service.resolve(key, nativeContext).orElseGet(fallback)));
             };
             owned.put(id, handler); Placeholders.register(id, handler);

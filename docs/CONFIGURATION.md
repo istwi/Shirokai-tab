@@ -1,3 +1,7 @@
+> 0.16: personalization.json controla presets/animações por área (CUSTOMIZATION.md).
+> menus.json novo habilita o menu de clã; false existente permanece até alteração
+> explícita. Presets aceitam frames/frameTicks sem mudar schema1. SQLite continua6.
+
 # Configuração 0.11.0-dev
 
 Arquivo real: `config/shirokai-core/core.json`, relativo ao diretório do servidor.

@@ -19,6 +19,7 @@ public final class ClanCommands {
     public void register(CommandDispatcher<ServerCommandSource> dispatcher){
         if(dispatcher.getRoot().getChild("clan")!=null){org.slf4j.LoggerFactory.getLogger("shirokai-core").warn("[clans] /clan já existe; comando do Core não registrado");return;}
         var root=literal("clan").executes(c->openMenu(c.getSource()));
+        root.then(literal("history").executes(c->history(c.getSource(),0)).then(argument("page",com.mojang.brigadier.arguments.IntegerArgumentType.integer(1,1000000)).executes(c->history(c.getSource(),com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(c,"page")-1))));
         root.then(literal("menu").executes(c->openMenu(c.getSource())));
         root.then(literal("chat").executes(c->new com.shirokai.core.chat.ChatCommands(runtime).channel(c.getSource(),com.shirokai.core.chat.Channel.CLAN,null))
             .then(argument("message",StringArgumentType.greedyString()).executes(c->new com.shirokai.core.chat.ChatCommands(runtime).channel(c.getSource(),com.shirokai.core.chat.Channel.CLAN,StringArgumentType.getString(c,"message")))));
@@ -35,10 +36,10 @@ public final class ClanCommands {
                 case "accept" -> service.accept(id,value);default -> service.decline(id,value);};
         }))));
         for(String action:new String[]{"invite","cancel","kick","promote","demote","transfer"})root.then(literal(action).then(argument("player",StringArgumentType.word()).suggests((c,b)->{
-            for(var player:c.getSource().getServer().getPlayerManager().getPlayerList())if(player.getGameProfile().getName().toLowerCase(java.util.Locale.ROOT).startsWith(b.getRemainingLowerCase()))b.suggest(player.getGameProfile().getName());return b.buildFuture();
+            for(var player:c.getSource().getServer().getPlayerManager().getPlayerList())if((c.getSource().getPlayer()==null||com.shirokai.core.visibility.VisibilityService.canSee(c.getSource().getServer(),c.getSource().getPlayer(),player))&&player.getGameProfile().getName().toLowerCase(java.util.Locale.ROOT).startsWith(b.getRemainingLowerCase()))b.suggest(player.getGameProfile().getName());return b.buildFuture();
         }).executes(c->execute(c.getSource(),success(action),(service,id)->{
             String value=StringArgumentType.getString(c,"player");UUID target;
-            try{target=UUID.fromString(value);}catch(IllegalArgumentException invalid){var player=c.getSource().getServer().getPlayerManager().getPlayer(value);if(player==null)throw new IllegalArgumentException("Jogador offline: informe seu UUID");target=player.getUuid();}
+            try{target=UUID.fromString(value);}catch(IllegalArgumentException invalid){var player=c.getSource().getServer().getPlayerManager().getPlayer(value);if(player==null||!com.shirokai.core.visibility.VisibilityService.canSee(c.getSource().getServer(),c.getSource().getPlayer(),player))throw new IllegalArgumentException("Jogador offline: informe seu UUID");target=player.getUuid();}
             var result = switch(action){case "invite"->service.invite(id,target);case "cancel"->service.cancel(id,target);case "transfer"->service.transfer(id,target);default->service.memberAction(id,target,action);};
             UUID recipient = target;
             return result.thenApplyAsync(clan -> {
@@ -65,6 +66,14 @@ public final class ClanCommands {
         }));
         dispatcher.register(root);
     }
+    private int history(ServerCommandSource source,int page){
+        var core=runtime.get();if(source.getPlayer()==null||core==null||!core.running("clans")){source.sendError(Messages.error("Histórico exige jogador e clãs ativos"));return 0;}
+        var actor=source.getPlayer().getUuid();
+        core.clans().membership(actor).thenComposeAsync(clan->core.clans().maintenance().memberHistory(actor,clan.orElseThrow(()->new IllegalStateException("Você não pertence a um clã")).id(),page),source.getServer()).whenCompleteAsync((events,error)->{
+            if(error!=null){failure(source,error);return;}
+            source.sendFeedback(()->{var out=Messages.info("Histórico • página "+(page+1));for(var e:events)out.append(Text.literal("\n#"+e.id()+" "+e.action()+" • "+e.details()).formatted(Formatting.GRAY));return out;},false);
+        },source.getServer());return 1;
+    }
     private int openMenu(ServerCommandSource source){
         var core=runtime.get();if(source.getPlayer()==null){source.sendError(Messages.error("/clan exige um jogador"));return 0;}
         if(core==null||!core.running("clans")){source.sendError(Messages.error("Clãs indisponíveis"));return 0;}
@@ -88,10 +97,10 @@ public final class ClanCommands {
                 return core.clans().currentLimit(clan).thenApplyAsync(limit->{
                     var card=Messages.info(Text.literal(clan.name()).formatted(Formatting.YELLOW,Formatting.BOLD));
                     card.append(Text.literal("\n")).append(Messages.field("Sigla",Text.literal(clan.tag()==null?"Não definida • /clan tag <sigla>":clan.tag()).formatted(Formatting.WHITE)));
-                    card.append(Text.literal("\n")).append(Messages.field("Líder",Messages.player(source.getServer(),clan.leader())));
+                    card.append(Text.literal("\n")).append(Messages.field("Líder",Messages.player(source.getServer(),source.getPlayer(),clan.leader())));
                     card.append(Text.literal("\n")).append(Messages.field("Membros",Text.literal(clan.members().size()+"/"+limit).formatted(Formatting.AQUA)));
                     clan.members().entrySet().stream().sorted(java.util.Comparator.comparingInt(e->e.getValue().ordinal())).limit(10).forEach(entry->
-                        card.append(Text.literal("\n  • ").formatted(Formatting.DARK_GRAY)).append(Messages.player(source.getServer(),entry.getKey()))
+                        card.append(Text.literal("\n  • ").formatted(Formatting.DARK_GRAY)).append(Messages.player(source.getServer(),source.getPlayer(),entry.getKey()))
                             .append(Text.literal(" — "+Messages.role(entry.getValue())).formatted(Formatting.GRAY)));
                     if(clan.members().size()>10)card.append(Text.literal("\nVeja todos os membros em /clan menu.").formatted(Formatting.GRAY));
                     source.sendFeedback(()->card,false);return clan;

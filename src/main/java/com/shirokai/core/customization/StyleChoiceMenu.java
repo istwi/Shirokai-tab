@@ -43,6 +43,7 @@ public final class StyleChoiceMenu extends GenericContainerScreenHandler {
         var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,name);
         stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(Text::literal).map(t->(Text)t).toList()));display.setStack(slot,stack);
     }
+    public void refreshVisuals(){if(!closed&&!busy&&owner.currentScreenHandler==this)render();}
     private void render(){
         display.clear();
         var saved=view.choices().selections().get(view.surface());
@@ -55,7 +56,7 @@ public final class StyleChoiceMenu extends GenericContainerScreenHandler {
         page=Math.min(page,Math.max(0,(entries.size()-1)/36));
         for(int i=0;i<36&&page*36+i<entries.size();i++){
             String id=entries.get(page*36+i);var preset=view.catalog().presets().get(id);
-            var preview=view.catalog().styles().render(preset.template(),key->id,0,false);
+            var preview=view.catalog().render(new PresetCatalog.Resolution(PresetCatalog.Status.ACTIVE,id,preset.template()),id,owner.getServer().getTicks(),service.animates(owner.getUuid(),view.surface(),VisualTarget.MENU)&&service.allowed(owner.getUuid(),view.surface(),id));
             item(9+i,service.allowed(owner.getUuid(),view.surface(),id)?Items.NAME_TAG:Items.BARRIER,preview,
                 "Acesso: "+(service.allowed(owner.getUuid(),view.surface(),id)?"Disponível":"Bloqueado"),"Seleção: "+(id.equals(saved)?"Escolhido":"Não selecionado"),"Clique para escolher");
         }

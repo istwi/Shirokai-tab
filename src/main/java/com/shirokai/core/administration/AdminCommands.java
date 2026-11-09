@@ -50,7 +50,7 @@ public final class AdminCommands {
                         player == null ? null : player.getGameProfile().getName(), source.getServer().getCurrentPlayerCount());
                 return feedback(source, core.placeholders().render(StringArgumentType.getString(c, "template"), context, core.config().unavailablePlaceholder()));
             })));
-        root.then(literal("tab").requires(s->allowed(s,"tab.inspect")).executes(c->feedback(c.getSource(),runtime.get().tab().status())));
+        root.then(literal("tab").requires(s->allowed(s,"tab.inspect")).executes(c->feedback(c.getSource(),runtime.get().tab().status()+" vanish="+runtime.get().vanishStatus())));
         root.then(literal("integrations").requires(s->allowed(s,"integrations.inspect")).executes(c->feedback(c.getSource(),runtime.get().integrations().status())));
         root.then(literal("scoreboard").requires(s->allowed(s,"scoreboard.inspect")).executes(c->feedback(c.getSource(),runtime.get().scoreboard().status())));
         root.then(new ChatAdminCommands(runtime,this::allowed).node());
@@ -59,7 +59,7 @@ public final class AdminCommands {
         dispatcher.register(root);
     }
     private boolean canSeeAny(ServerCommandSource source) {
-        for (String node : new String[]{"status", "version", "modules", "permissions", "reload", "debug", "backup", "placeholders", "titles.inspect", "titles.grant", "titles.revoke", "chat.mute", "chat.unmute", "chat.inspect", "tab.inspect", "scoreboard.inspect", "integrations.inspect", "clans.inspect", "clans.identity"})
+        for (String node : new String[]{"status", "version", "modules", "permissions", "reload", "debug", "backup", "placeholders", "titles.inspect", "titles.grant", "titles.revoke", "chat.mute", "chat.unmute", "chat.inspect", "tab.inspect", "scoreboard.inspect", "integrations.inspect", "clans.inspect", "clans.identity", "clans.history", "clans.diagnose", "clans.repair"})
             if (allowed(source, node)) return true;
         return false;
     }

@@ -29,6 +29,7 @@ public final class MinecraftChat {
                 return new ChatService.Participant(player.getUuid(),player.getGameProfile().getName(),player.getWorld().getRegistryKey().getValue().toString(),player.getX(),player.getY(),player.getZ(),clan);
             }).toList(),id->titles==null?List.of():titles.chatDefinitions(id).stream().map(def->def.display()).toList(),
             Clock.systemUTC(),config,(id,reason)->logger.warn("[chat] Mensagem rejeitada de {}: {}",id,reason));
+        service.visibility((viewer,actor)->com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,actor));
     }
     private com.shirokai.core.presentation.PresentationRuntime presentation;
     public void presentation(com.shirokai.core.presentation.PresentationRuntime value){presentation=value;}
@@ -40,10 +41,10 @@ public final class MinecraftChat {
                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,"/chat msg "+name+" ")));
     }
     private boolean colors(UUID author){return appearance.enabled()&&appearance.legacyColors()&&(appearance.colorPermission().isEmpty()||permissions.allowed(author,appearance.colorPermission()));}
-    private Text body(ChatService.Envelope message){
+    private Text body(ChatService.Envelope message,UUID viewer){
         var base=appearance.enabled()?appearance.color(message.channel()):net.minecraft.util.Formatting.WHITE;
         if(colors(message.author())&&LegacyChatColors.changes(message.body()))return LegacyChatColors.render(message.body(),base);
-        return (presentation==null?Text.literal(message.body()):presentation.body(message.author(),message.body())).copy().formatted(base);
+        return (presentation==null?Text.literal(message.body()):presentation.body(message.author(),viewer,message.body())).copy().formatted(base);
     }
     private void mention(ChatService.Envelope message,ServerPlayerEntity recipient){
         if(presentation==null)return;
@@ -55,7 +56,7 @@ public final class MinecraftChat {
         return MessageType.params(key,server.getRegistryManager(),name);
     }
     public void system(UUID target,ChatService.Envelope message){var recipient=player(target);if(recipient!=null){
-        var name=label(message).copy().formatted(appearance.enabled()?appearance.color(message.channel()):net.minecraft.util.Formatting.WHITE);var body=body(message);
+        var name=label(message).copy().formatted(appearance.enabled()?appearance.color(message.channel()):net.minecraft.util.Formatting.WHITE);var body=body(message,recipient.getUuid());
         recipient.sendMessage(Text.empty().append(name).append(Text.empty().append(Text.literal(": ").formatted(appearance.enabled()?appearance.color(message.channel()):net.minecraft.util.Formatting.WHITE)).append(body)),false);
         mention(message,recipient);
     }}
@@ -70,7 +71,7 @@ public final class MinecraftChat {
                     var outgoing=sent;
                     // User-requested & colors decorate only unfiltered recipients; signed body/signature remain unchanged.
                     if(colors(sender.getUuid())&&LegacyChatColors.changes(envelope.body())&&!filtered&&incoming.filterMask().isPassThrough())
-                        outgoing=SentMessage.of(incoming.withoutUnsigned().withUnsignedContent(body(envelope)));
+                        outgoing=SentMessage.of(incoming.withoutUnsigned().withUnsignedContent(body(envelope,recipient.getUuid())));
                     recipient.sendChatMessage(outgoing,filtered,parameters(envelope.channel(),label(envelope)));
                     // Do not reveal a mention hidden by filtering. Notification is a separate overlay, never unsigned chat decoration.
                     if(!filtered)mention(envelope,recipient);

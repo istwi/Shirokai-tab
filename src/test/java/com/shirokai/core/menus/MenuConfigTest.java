@@ -11,9 +11,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class MenuConfigTest {
     @TempDir Path directory;
     private JsonObject defaults(){return JsonParser.parseString(MenuConfig.json(MenuConfig.defaults())).getAsJsonObject();}
-    @Test void defaultLayoutRoundTripsAndClansArePaused()throws Exception{
+    @Test void defaultLayoutRoundTripsAndClansAreAvailable()throws Exception{
         var config=MenuConfig.parse(MenuConfig.json(MenuConfig.defaults()));assertEquals(MenuConfig.defaults(),config);
-        assertFalse(config.clanMenuEnabled());assertEquals(36,config.profile().tagSlots().size());
+        assertTrue(config.clanMenuEnabled());assertEquals(36,config.profile().tagSlots().size());
         assertEquals(48,config.profile().buttons().get("clear").slot());new MenuPlan(config);
     }
     @Test void existingFilesAreNeverOverwrittenAndInvalidFilesFail()throws Exception{

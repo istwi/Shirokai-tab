@@ -1,3 +1,7 @@
+> 0.16: Drex Vanish1.5.9+1.21.1 auditado por artefato/bytecode e smoke real;
+> API, hash, dependências e limites em VANISH.md. Reflection opcional não inclui
+> provider no JAR de produção. Versões novas exigem nova auditoria.
+
 # Auditoria de compatibilidade
 
 ## Confirmado por consulta a fontes

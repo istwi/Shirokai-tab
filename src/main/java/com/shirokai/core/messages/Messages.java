@@ -23,7 +23,11 @@ public final class Messages {
         return Text.literal(label + ": ").formatted(Formatting.GRAY).append(value);
     }
     public static Text player(MinecraftServer server, UUID id) {
+        return player(server,null,id);
+    }
+    public static Text player(MinecraftServer server, net.minecraft.server.network.ServerPlayerEntity viewer, UUID id) {
         var online=server.getPlayerManager().getPlayer(id);
+        if(online!=null&&viewer!=null&&!com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,online))online=null;
         return Text.literal(online==null?"Jogador offline":online.getGameProfile().getName())
             .formatted(Formatting.WHITE).styled(style->style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal(id.toString()))));
     }

@@ -42,7 +42,7 @@ public record MenuConfig(int schemaVersion, boolean clanMenuEnabled, Profile pro
         buttons.put("back",button(50,"arrow","<yellow><bold>VOLTAR AO MENU</bold></yellow>","<gray>Retornar ao menu principal.</gray>","","<yellow>➜ Clique para voltar!</yellow>"));
         buttons.put("next",button(53,"arrow","<aqua>Próxima página</aqua>"));
         var slots=new ArrayList<Integer>();for(int slot=9;slot<45;slot++)slots.add(slot);
-        return new MenuConfig(1,false,new Profile(6,"<gold><bold>✦ PERFIL SHIROKAI</bold></gold>",slots,buttons,
+        return new MenuConfig(1,true,new Profile(6,"<gold><bold>✦ PERFIL SHIROKAI</bold></gold>",slots,buttons,
             new Tags("minecraft:name_tag","minecraft:barrier","%menu:tag%",List.of("<gray>%menu:description%</gray>","<gray>Estado: %menu:availability%</gray>","<gray>Categoria: %menu:category%</gray>","<gray>Exclusiva do chat</gray>","<gray>Chat: %menu:selection%</gray>"))));
     }
     private static final Gson GSON=new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();

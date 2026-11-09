@@ -53,10 +53,11 @@ public final class ClanMenu extends GenericContainerScreenHandler {
         var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,clans.present(owner.getUuid(),Surface.MENU_NAME,name).copy().formatted(Formatting.AQUA));
         stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(line->(Text)clans.present(owner.getUuid(),Surface.MENU_LORE,line).copy().formatted(Formatting.GRAY)).toList()));display.setStack(slot,stack);
     }
-    private String name(UUID player){var online=owner.getServer().getPlayerManager().getPlayer(player);return online==null?"Offline • "+player.toString().substring(0,8):online.getGameProfile().getName();}
+    private String name(UUID player){var online=owner.getServer().getPlayerManager().getPlayer(player);return online==null||!com.shirokai.core.visibility.VisibilityService.canSee(owner.getServer(),owner,online)?"Offline • "+player.toString().substring(0,8):online.getGameProfile().getName();}
     private ClanSnapshot own(){return data.clan().orElseThrow(()->new IllegalStateException("Você não pertence a um clã"));}
     private ClanService scoped(){return clans.scoped(own().id());}
     public Page page(){return page;}
+    public void refreshVisuals(){if(!closed&&!busy&&page==Page.HOME&&owner.currentScreenHandler==this)render();}
     private void render(){
         if(data.clan().isEmpty() && page!=Page.HOME && page!=Page.INVITES)page=Page.HOME;
         display.clear();targets.clear();invitations.clear();
@@ -79,7 +80,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     item(30,Items.NAME_TAG,"Editar nome e sigla","Escolha o nome ou a sigla do seu clã.","Alterações gratuitas, com intervalo entre edições.");
                     item(31,Items.PAPER,"Convites enviados",Integer.toString(data.sent().size()),"Clique em um convite para cancelar.");
                     if(clans.customizationEnabled()&&own().leader().equals(owner.getUuid())){item(28,Items.PAINTING,"Estilo do nome");item(29,Items.PAINTING,"Estilo da sigla");}
-                    item(32,Items.OAK_DOOR,"Sair do clã");
+                    item(32,Items.OAK_DOOR,"Sair do clã");item(33,Items.WRITTEN_BOOK,"Histórico do clã","Consultar alterações e ações registradas.");
                     if(own().leader().equals(owner.getUuid()))item(40,Items.TNT,"Excluir clã","Exige confirmação em outra tela.");
                 }
                 if(data.transfer().isPresent()){item(46,Items.EMERALD,"Aceitar liderança","Confirme a solicitação recebida.");item(47,Items.BARRIER,"Recusar liderança");}
@@ -91,7 +92,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
             }
             case MEMBERS,INVITE_PLAYER->{
                 var entries=page==Page.MEMBERS?own().members().keySet().stream().sorted().toList():owner.getServer().getPlayerManager().getPlayerList().stream()
-                    .map(ServerPlayerEntity::getUuid).filter(id->!own().members().containsKey(id)).sorted().toList();
+                    .map(ServerPlayerEntity::getUuid).filter(id->!own().members().containsKey(id)&&com.shirokai.core.visibility.VisibilityService.canSee(owner.getServer(),owner.getUuid(),id)).sorted().toList();
                 index=Math.min(index,Math.max(0,(entries.size()-1)/36));
                 for(int i=0;i<36&&index*36+i<entries.size();i++){UUID player=entries.get(index*36+i);targets.put(9+i,player);
                     item(9+i,Items.PLAYER_HEAD,name(player),page==Page.MEMBERS?"Cargo: "+Messages.role(own().members().get(player)):"Clique para convidar");}
@@ -143,6 +144,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     else if(slot==31&&data.clan().isPresent())navigate(Page.SENT_INVITES);
                     else if(slot==20&&data.clan().isPresent())navigate(Page.MEMBERS);
                     else if(slot==24&&data.clan().isPresent())navigate(Page.INVITE_PLAYER);
+                    else if(slot==33&&data.clan().isPresent())ClanHistoryMenu.open(owner,clans,own().id(),0);
                     else if(slot==32&&data.clan().isPresent())action(()->scoped().leave(owner.getUuid()),Page.HOME);
                     else if(slot==40&&data.clan().isPresent())action(()->scoped().disband(owner.getUuid(),false),Page.DISBAND);
                     else if(slot==46&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),true),Page.HOME);

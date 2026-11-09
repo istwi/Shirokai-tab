@@ -45,16 +45,22 @@ public final class CoreRuntime implements AutoCloseable {
     private ScoreboardRuntime scoreboard;
     private IntegrationRuntime integrations;
     private com.shirokai.core.menus.MenuPlan menus;
+    private com.shirokai.core.visibility.VisibilityService visibility;
+    public String vanishStatus(){return visibility==null?"DISABLED":visibility.status();}
     private int titleTicks;
+    private long visualTicks;
+    private com.shirokai.core.customization.PersonalizationConfig personalization;
     private final Path dataDirectory;
 
     public CoreRuntime(MinecraftServer server, Logger logger) throws Exception {
         this.server = server; this.logger = logger;
+        visibility=new com.shirokai.core.visibility.VisibilityService(server,logger);
         dataDirectory = FabricLoader.getInstance().getGameDir().resolve("shirokai-core");
         configs = new ConfigService(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/core.json"));
         config = configs.load();
         menus=new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/menus.json")));
         menus.validateItems();
+        personalization=com.shirokai.core.customization.PersonalizationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/personalization.json"));
         modules = new ModuleManager((id, error) -> logger.error("[{}] Lifecycle falhou", id, error));
         modules.register(module("storage", Set.of(), () -> {
             storage = new SqliteStorage(dataDirectory.resolve(config.databaseFile()));
@@ -87,6 +93,7 @@ public final class CoreRuntime implements AutoCloseable {
                     (message, error) -> logger.warn("[titles] " + message, error));
             titles.bindRanks(permissions::metadata);
             titles.menus(menus);
+            titles.frameSource(server::getTicks,id->tab!=null&&tab.animationsEnabled(id));
             if (placeholders != null) {
                 for (String key : java.util.List.of("shirokai:selected_title", "shirokai:chat_tag_1", "shirokai:chat_tag_2"))
                     placeholders.register(key, context -> titles.placeholder(context.playerId(), key));
@@ -97,6 +104,7 @@ public final class CoreRuntime implements AutoCloseable {
             ClanConfig clanConfig = ClanConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/clans.json"));
             clans = new ClanService(new ClanRepository(storage, java.time.Clock.systemUTC()), permissions, server, clanConfig);
             clans.menuEnabled(menus.config().clanMenuEnabled());
+            clans.frameSource(server::getTicks,id->tab!=null&&tab.animationsEnabled(id));
             clans.cacheOnline(id->server.getPlayerManager().getPlayer(id)!=null);
             if(titles!=null){
                 titles.bindClans(id->clans.cached(id).flatMap(ClanTitle::from),id->clans.membership(id).thenApply(value->null),id->clans.cached(id).map(ClanSnapshot::name));
@@ -123,6 +131,7 @@ public final class CoreRuntime implements AutoCloseable {
             var presets=PresetCatalog.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presets.json"),styles);
             if(running("storage")&&running("permissions")) {
                 customization=new StyleChoiceService(new StyleChoiceRepository(storage),presets,permissions,running("clans")?clans:null,server,id->server.getPlayerManager().getPlayer(id)!=null);
+                customization.policy(personalization);customization.animationPreference(id->tab!=null&&tab.animationsEnabled(id));
                 customization.onChange(id->{if(scoreboard!=null)scoreboard.invalidate();});
                 presentation.customization(customization);
                 if(clans!=null)clans.onChange(affected->affected.forEach(id->{if(server.getPlayerManager().getPlayer(id)!=null)customization.join(id).whenComplete((v,e)->{if(e!=null)logger.warn("[styles] Refresh falhou "+id,e);});}));
@@ -188,6 +197,11 @@ public final class CoreRuntime implements AutoCloseable {
     }
     public void playerLeft(java.util.UUID player) { if(customization!=null)customization.forget(player); if (titles != null) titles.forget(player); if(clans!=null)clans.forget(player); if(chat!=null)chat.service().leave(player);if(tab!=null)tab.forget(player);if(scoreboard!=null)scoreboard.forget(player);if(integrations!=null)integrations.forget(player); }
     public void tick() {
+        if(++visualTicks%5==0&&customization!=null&&customization.catalog().hasAnimations())for(var player:server.getPlayerManager().getPlayerList()){
+            if(player.currentScreenHandler instanceof com.shirokai.core.profiles.ProfileMenu menu)menu.refreshVisuals();
+            else if(player.currentScreenHandler instanceof com.shirokai.core.customization.StyleChoiceMenu menu)menu.refreshVisuals();
+            else if(player.currentScreenHandler instanceof com.shirokai.core.clans.ClanMenu menu)menu.refreshVisuals();
+        }
         if(running("integrations"))integrations.tick();
         if(running("tab"))tab.tick();
         if(running("scoreboard"))scoreboard.tick();
@@ -216,6 +230,7 @@ public final class CoreRuntime implements AutoCloseable {
         CompletableFuture.supplyAsync(() -> {
             try {
                 CoreConfig core = configs.load();
+                var personalConfig=com.shirokai.core.customization.PersonalizationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/personalization.json"));
                 var menuPlan=new com.shirokai.core.menus.MenuPlan(com.shirokai.core.menus.MenuConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/menus.json")));
                 TitleCatalog catalog = titles == null ? null : TitleCatalog.load(
                         FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/titles.json"));
@@ -230,7 +245,7 @@ public final class CoreRuntime implements AutoCloseable {
                 var presentationPlan=presentation==null?null:new PresentationPlan(PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json")),candidateStyles,chatConfig==null?ChatConfig.defaults():chatConfig);
                 var presetCatalog=presentation==null?null:PresetCatalog.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presets.json"),candidateStyles);
                 var integrationConfig=integrations==null?null:IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
-                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog,extrasPlan,chatAppearance,menuPlan);
+                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog,extrasPlan,chatAppearance,menuPlan,personalConfig);
             } catch (Exception failure) { throw new CompletionException(failure); }
         }, io).whenComplete((candidate, error) -> {
             if (closed) { reloading.set(false); result.completeExceptionally(new IllegalStateException("Servidor encerrando")); return; }
@@ -246,11 +261,11 @@ public final class CoreRuntime implements AutoCloseable {
                     if(tab!=null&&candidate.extras().config().requiresRestartComparedTo(tab.extrasPlan().config()))throw new IllegalStateException("Ownership de extras do TAB exige reinício");
                     if(integrations!=null&&candidate.integrations().requiresRestartComparedTo(integrations.config()))throw new IllegalStateException("Ativação de integrações exige reinício");
                     candidate.menus().validateItems();
-                    menus=candidate.menus();
+                    menus=candidate.menus();personalization=candidate.personalization();if(customization!=null)customization.policy(personalization);
                     if(titles!=null)titles.menus(menus);
                     if(clans!=null)clans.menuEnabled(menus.config().clanMenuEnabled());
                     if(!menus.config().clanMenuEnabled())for(var player:server.getPlayerManager().getPlayerList())
-                        if(player.currentScreenHandler instanceof com.shirokai.core.clans.ClanMenu || player.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor)player.closeHandledScreen();
+                        if(player.currentScreenHandler instanceof com.shirokai.core.clans.ClanMenu || player.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor || player.currentScreenHandler instanceof com.shirokai.core.clans.ClanHistoryMenu)player.closeHandledScreen();
                     config = candidate.core();
                     if (titles != null) titles.replaceCatalog(candidate.titles());
                     if (clans != null) clans.replaceConfig(candidate.clans());
@@ -267,10 +282,11 @@ public final class CoreRuntime implements AutoCloseable {
         });
         return result;
     }
-    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras,ChatAppearanceConfig chatAppearance,com.shirokai.core.menus.MenuPlan menus) {}
+    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras,ChatAppearanceConfig chatAppearance,com.shirokai.core.menus.MenuPlan menus,com.shirokai.core.customization.PersonalizationConfig personalization) {}
     public void prepareStop(){try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;
+        if(visibility!=null)visibility.close();
         io.shutdown();
         modules.close();
         if (!io.awaitTermination(10, TimeUnit.SECONDS)) logger.warn("[core] Worker de configuração ainda encerrando");

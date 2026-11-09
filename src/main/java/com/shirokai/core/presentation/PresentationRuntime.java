@@ -21,15 +21,17 @@ public final class PresentationRuntime implements SurfaceRenderer {
     public void customization(com.shirokai.core.customization.StyleChoiceService service){customization=service;}
     @Override public boolean customizationEnabled(){return customization!=null;}
     @Override public void openCustomization(ServerPlayerEntity player,Surface surface,UUID expectedClan){if(customization!=null)com.shirokai.core.customization.StyleChoiceMenu.open(player,customization,surface,expectedClan);}
-    @Override public Text renderClan(UUID viewer,UUID leader,Surface surface,String value){
+    @Override public Text renderClan(UUID viewer,UUID leader,Surface surface,String value){return renderClanAt(viewer,leader,surface,value,com.shirokai.core.customization.VisualTarget.MENU,0,false);}
+    @Override public Text renderClanAt(UUID viewer,UUID leader,Surface surface,String value,com.shirokai.core.customization.VisualTarget target,long tick,boolean animate){
         if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
-        if(customization!=null){var selected=customization.render(viewer,surface,value);if(selected.isPresent())return selected.get();}
-        return render(leader,surface,value);
+        if(customization!=null){var selected=customization.render(viewer,surface,value,target,tick,animate);if(selected.isPresent())return selected.get();}
+        return renderAt(leader,surface,value,target,tick,animate);
     }
     public PresentationPlan plan(){return plan;}public void replacePlan(PresentationPlan candidate){plan=candidate;}
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(p->p.getUuid().equals(id)&&!p.isDisconnected()).findFirst().orElse(null);}
     @Override public boolean menusEnabled(){return plan.config().menusEnabled();}
-    @Override public Text renderTitle(UUID subject,com.shirokai.core.titles.TitleDefinition definition){
+    @Override public Text renderTitle(UUID subject,com.shirokai.core.titles.TitleDefinition definition){return renderTitleAt(subject,definition,com.shirokai.core.customization.VisualTarget.MENU,0,false);}
+    @Override public Text renderTitleAt(UUID subject,com.shirokai.core.titles.TitleDefinition definition,com.shirokai.core.customization.VisualTarget target,long tick,boolean animate){
         if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
         if(definition.category()!=com.shirokai.core.titles.TitleDefinition.Category.CLAN){
             var fixed=plan.titleTemplate(definition.id());
@@ -39,12 +41,13 @@ public final class PresentationRuntime implements SurfaceRenderer {
             var p=player(subject);var template=plan.template(Surface.TITLE,permissions.metadata(subject),p==null?"":p.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(subject,node));
             return plan.styles().render(template,key->definition.display(),0,false);
         }
-        return SurfaceRenderer.super.renderTitle(subject,definition);
+        return renderAt(subject,definition.category()==com.shirokai.core.titles.TitleDefinition.Category.CLAN?Surface.CLAN_TAG:Surface.TITLE,definition.display(),target,tick,animate);
     }
-    @Override public Text render(UUID subject,Surface surface,String value){
+    @Override public Text render(UUID subject,Surface surface,String value){return renderAt(subject,surface,value,com.shirokai.core.customization.VisualTarget.MENU,0,false);}
+    @Override public Text renderAt(UUID subject,Surface surface,String value,com.shirokai.core.customization.VisualTarget target,long tick,boolean animate){
         if(!server.isOnThread())throw new IllegalStateException("Apresentação exige thread do servidor");
         if(surface.name().startsWith("MENU_")&&!plan.config().menusEnabled())return Text.literal(value);
-        if(customization!=null){var selected=customization.render(subject,surface,value);if(selected.isPresent())return selected.get();}
+        if(customization!=null){var selected=customization.render(subject,surface,value,target,tick,animate);if(selected.isPresent())return selected.get();}
         var p=player(subject);String world=p==null?"":p.getWorld().getRegistryKey().getValue().toString();
         var template=plan.template(surface,permissions.metadata(subject),world,node->permissions.allowed(subject,node));
         return plan.styles().render(template,key->value,0,false);
@@ -60,13 +63,14 @@ public final class PresentationRuntime implements SurfaceRenderer {
     }
     private boolean mentions(UUID author){return plan.config().chatEnabled()&&plan.config().mentionsEnabled()&&(plan.config().mentionPermission().isEmpty()||permissions.allowed(author,plan.config().mentionPermission()));}
     public boolean mentioned(UUID author,ServerPlayerEntity recipient,String body){
-        if(!mentions(author)||author.equals(recipient.getUuid()))return false;
+        if(!mentions(author)||author.equals(recipient.getUuid())||!com.shirokai.core.visibility.VisibilityService.canSee(server,author,recipient.getUuid()))return false;
         var matcher=MENTION.matcher(body);while(matcher.find())if(matcher.group(1).equalsIgnoreCase(recipient.getGameProfile().getName()))return true;return false;
     }
     /** Commands/system only. Normal SignedMessage bodies are never sent through this renderer. */
-    public Text body(UUID author,String body){
+    public Text body(UUID author,String body){return body(author,author,body);}
+    public Text body(UUID author,UUID viewer,String body){
         if(!mentions(author))return Text.literal(body);
-        var known=new HashSet<String>();for(var p:online.get())if(!p.isDisconnected())known.add(p.getGameProfile().getName().toLowerCase(Locale.ROOT));
+        var known=new HashSet<String>();for(var p:online.get())if(!p.isDisconnected()&&com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,p.getUuid()))known.add(p.getGameProfile().getName().toLowerCase(Locale.ROOT));
         var output=Text.empty();var matcher=MENTION.matcher(body);int cursor=0;
         while(matcher.find()){
             output.append(Text.literal(body.substring(cursor,matcher.start())));

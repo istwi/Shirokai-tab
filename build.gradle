@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '2.2.20'
 }
-version = '0.15.2-dev'
+version = '0.16.0-dev'
 group = 'com.shirokai'
 base { archivesName = 'shirokai-core' }
 repositories {
@@ -29,6 +29,13 @@ dependencies {
     modCompileOnly('eu.pb4:placeholder-api:2.4.2+1.21') { transitive = false }
     modCompileOnly('com.cobblemon:fabric:1.8.3+1.21.1') { transitive = false }
     compileOnly('net.impactdev.impactor.api:economy:5.3.5') { exclude group: 'net.kyori', module: 'event-api' }
+    if (project.hasProperty('vanishSmoke')) {
+        modLocalRuntime 'net.fabricmc:fabric-loader:0.17.2'
+        modLocalRuntime('eu.pb4:placeholder-api:2.4.2+1.21') { transitive = false }
+        modLocalRuntime files('build/vanish-mod/vanish-1.5.9+1.21.1.jar')
+        modLocalRuntime fileTree(dir: 'build/vanish-deps-1.5.9/mods', include: '*.jar')
+        runtimeOnly fileTree(dir: 'build/vanish-deps-1.5.9/libraries', include: '*.jar')
+    }
     if (project.hasProperty('integrationSmoke')) {
         modLocalRuntime 'net.fabricmc:fabric-loader:0.17.2'
         modLocalRuntime fileTree(dir: 'build/integration-mods', include: '*.jar')

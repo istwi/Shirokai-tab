@@ -1,3 +1,47 @@
+## Atualização0.16 — quadros e políticas por área
+
+ROLE fixo continua definido pelo LuckPerms/presentation.json; presets pessoais
+estilizam tags opcionais, sem mudar cargos. As regras históricas abaixo sobre
+ROLE selecionável foram substituídas por RANKS.md.
+
+`presets.json` mantém schema1. Cada definição aceita `frames` (0..100 templates)
+e `frameTicks` (5..1200, padrão20). Campos ausentes continuam estáticos. Cada
+quadro deve conter exatamente um `%visual:value%`, com as mesmas restrições do
+template: sem ações, placeholders extras ou animações aninhadas. O fallback
+continua gratuito, estático e válido nas três superfícies semânticas. Exemplo:
+
+```json
+{
+  "permission": "shirokai.preset.pulse",
+  "surfaces": ["TITLE", "CLAN_NAME", "CLAN_TAG"],
+  "template": "<white>%visual:value%</white>",
+  "frames": [
+    "<gradient:#FFFFFF:#A9DFFF>%visual:value%</gradient>",
+    "<gradient:#A9DFFF:#FFFFFF>%visual:value%</gradient>"
+  ],
+  "frameTicks": 20
+}
+```
+
+Adicione essa definição sob um ID em `presets`, preservando `basic` e o restante
+do catálogo. Exige a permissão própria e `shirokaicore.style.animation` para TITLE;
+para clã, `shirokaicore.clan.animation` e permissões de cor correspondentes do líder.
+Perda de permissão usa fallback e preserva o ID. `/tab animations` alterna a preferência
+pessoal (começa desligada); desligada usa o template estático. Em HUDs, o intervalo de atualização
+pode saltar quadros: comece com frameTicks20 e updateTicks20.
+
+Novo `personalization.json` (exemplo em examples/personalization.json): todas as
+áreas TAB, SCOREBOARD, NAMETAG, CHAT e MENU são obrigatórias. Cada uma define
+`enabled`, `animated` e `permission` (vazia significa sem gate adicional).
+`enabled:false` suprime o preset nessa área, voltando à apresentação administrativa;
+`animated:false` usa o template estático. Não desativa o módulo nem apaga escolhas.
+Gate de clã considera o líder atual. Reload é validado antes de publicar.
+
+Chat captura o quadro ao enviar; mensagens antigas não se animam. Menus abertos
+atualizam previews a cada5ticks se houver presets animados, preservando o layout
+exibido. Nametags usam teams globais e a preferência do sujeito; não podem ter
+aparência individual para cada observador. Não há JDBC por renderização.
+
 > 0.15.0: layout do /perfil em [MENUS.md](MENUS.md); menu/editor de clã
 > desativados por padrão. Os comandos e dados de clã continuam disponíveis.
 
@@ -111,10 +155,10 @@ styles/storage/permissions ativos; módulo clans só é necessário para os dois
 
 ## Limites
 
-Esta entrega seleciona presets estáticos de títulos e identidades de clã.
-Animação de presets, personalização separada do nome de conta/cabeçalho/menu,
-transições e edição arbitrária de cores não foram implementadas. A animação existente
-dos layouts de TAB/sidebar continua disponível. Não se reescreve histórico do chat.
+Desde0.16, presets de títulos opcionais e identidades de clã podem ser animados,
+com controles por área descritos acima. Edição arbitrária de cores, nome de conta
+e transições avançadas não foram implementadas. A animação dos layouts de TAB/sidebar
+continua disponível. Não se reescreve histórico do chat.
 Testes em servidor usam jogadores/conexões sintéticos; cliente real, autenticação,
 assinatura criptográfica, escala e carga continuam pendentes.
 

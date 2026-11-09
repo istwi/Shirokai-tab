@@ -1,3 +1,5 @@
+> 0.16: integração opcional de entidades [Drex Vanish](VANISH.md), versão auditada1.5.9+1.21.1. Core sozinho não fornece vanish.
+
 > 0.15.1 acrescenta cashCurrency e %shirokai:cash%, independentes de dollars/tokens.
 > JSONs antigos continuam válidos sem serem sobrescritos; detalhes abaixo.
 

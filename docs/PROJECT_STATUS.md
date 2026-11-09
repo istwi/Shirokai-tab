@@ -1,3 +1,42 @@
+# Estado atual — 0.16.0-dev
+
+Clãs: histórico paginado GUI/CLI, diagnóstico SQLite/FKs e de relações, reparos
+seguros com prévia/token120s, fingerprint dos dados, transação e auditoria. Nunca
+muda líder, move membros ou exclui clãs por reparo. Problemas inseguros são MANUAL.
+Menu/editor ativos por padrão em arquivos novos; false existente é preservado.
+Para reativar uma instalação antes pausada, menus.json clanMenuEnabled=true e reload.
+
+Presets pessoais/clã: frames/frameTicks, permissão de animação, previews vivos e
+personalization.json para TAB/SCOREBOARD/NAMETAG/CHAT/MENU. ID preservado no SQL6;
+ROLE fixo permanece administrativo. Chat captura um quadro sem reescrever histórico.
+
+Vanish: integração opcional real Drex Vanish1.5.9+1.21.1, entidade/tracking a cargo
+do provider externo. Sem esse mod, Core não oferece vanish. Visibilidade respeitada
+em chat/privado/menções, TAB/contagem por observador e seletores/autocomplete de clã.
+Não há garantia de privacidade em outros mods, ping ou comandos vanilla. VANISH.md
+contém instalação, hash, API e limitações. Provider não é empacotado no Core.
+
+Validação local:
+- build/smokeClasses:123 testes JUnit, zero falhas/erros.
+- 51 verificações Fabric em três boots: inclui histórico GUI sem extração,
+  frames/snapshot de chat, políticas independentes e regressão de teams/saves.
+- 14 verificações com mods opcionais reais: LuckPerms, PAPI, Impactor, Cobblemon e Dex.
+- 7 grupos de verificações com Vanish real: API/mixins de entidade, roster, chat,
+  autocomplete, contagens/caches por observador, teams e unvanish.
+- JAR de produção: versão/refmap conferidos, sem fixtures smoke.
+
+Fixtures usam jogadores/conexões sintéticos. Login autenticado, renderização real,
+contextos LP multijogador, carga e conflitos universais continuam pendentes.
+Logs/resultados locais: build/server-smoke, build/integration-smoke, build/vanish-smoke.
+
+JAR: build/libs/shirokai-core-0.16.0-dev.jar
+SHA256: 77953848d9159f1dd352aaef4edefd1a4fbeb3583ddb7ee80aebb1f4f8625913
+Base:2431883. Sem mudança de SQL6 nem reescrita dos JSONs existentes.
+0.15.2-dev foi publicada antes desta etapa em releases/tag/v0.15.2-dev.
+Histórico de versões anteriores abaixo.
+
+---
+
 # Estado atual — 0.15.2-dev
 
 Corrigida persistência de teams efêmeros durante save da scoreboard. Reproduzido

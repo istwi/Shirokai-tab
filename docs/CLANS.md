@@ -1,10 +1,42 @@
+## Atualização0.16 — histórico e manutenção
+
+Menu/editor disponíveis por padrão em menus.json novo. Em instalação existente,
+altere `clanMenuEnabled` de false para true e execute `/shirokaicore reload`.
+O botão Histórico no menu abre dez eventos por página. `/clan history [página]`
+consulta o clã atual por texto mesmo com a GUI desativada. Ambas as consultas
+revalidam associação ao UUID do clã no SQL; sair/trocar de clã invalida a tela.
+Transferência continua exigindo aceitação, exclusão continua exigindo confirmação.
+
+Administração (permissões independentes em PERMISSIONS.md):
+
+- `/shirokaicore clans history <nomeOuUUID> [página]`: histórico persistido;
+  use UUID para clã já excluído.
+- `/shirokaicore clans diagnose`: quick_check e foreign_key_check do SQLite.
+- `/shirokaicore clans diagnose <nomeOuUUID>`: integridade relacional do clã.
+- `/shirokaicore clans repair <nomeOuUUID>`: somente prévia, sem alterações.
+- `/shirokaicore clans repair <mesmoNomeOuUUID> confirm <token>`: aplica a prévia
+  do mesmo administrador em até120s, se os dados ainda forem iguais.
+
+Reparos seguros: restaurar associação do líder já registrado quando ele não
+pertence a nenhum clã, limpar convites/transferências/confirmações expirados ou
+inválidos e remover identificações desse clã sem associação válida. Tudo na mesma
+transação com histórico/auditoria e atualização das associações online. Falha de
+auditoria desfaz a operação. Mudança dos dados após prévia exige nova prévia.
+
+Problemas sem reparo seguro são marcados MANUAL: líder associado a outro clã,
+UUID inválido ou membros órfãos. Nunca se escolhe outro líder nem se excluem
+membros/clãs automaticamente. O diagnóstico global verifica SQLite/FKs; não é
+uma ferramenta genérica de recuperação de arquivos danificados.
+
+Presets animados de nome/sigla e controles por área: CUSTOMIZATION.md.
+
 > 0.15.0: layout do /perfil em [MENUS.md](MENUS.md); menu/editor de clã
 > desativados por padrão. Os comandos e dados de clã continuam disponíveis.
 
 # Clãs nativos — 0.5.0-dev
 
 Núcleo por comandos e menus nativos; sigla integrada ao /perfil como identificação CLAN.
-Presets estáticos, editor textual e administração inicial estão descritos na atualização0.11 abaixo; animações e reparos relacionais avançados seguem pendentes. Chat de clã está integrado ao módulo chat0.6.
+Presets, editor textual e administração inicial estão descritos na atualização0.11 abaixo; animações e manutenção foram ampliadas na0.16 acima. Chat de clã está integrado ao módulo chat0.6.
 
 ## Regras implementadas
 
