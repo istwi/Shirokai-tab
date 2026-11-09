@@ -1,3 +1,12 @@
+## 0.15.2-dev
+
+- Evita persistir teams temporários de TAB/nametag durante saves do mundo.
+  Mantém a aparência dos jogadores online e permite recriar vínculos após restart.
+- Ownership validado por instância, aparência completa e membros conhecidos;
+  teams externos, modificados ou mistos continuam persistidos. Sem adoção por nome.
+- Regressão com serialização/restauração de NBT e troca OWNER -> ADMIN após restart.
+- Vínculos antigos já salvos exigem liberação administrativa uma vez; JSONs preservados.
+
 ## 0.15.1-dev
 
 - Terceira moeda independente: cashCurrency (padrão impactor:cash) e placeholder

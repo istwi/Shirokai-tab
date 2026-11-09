@@ -1,3 +1,6 @@
+> 0.15.2-dev: evita persistência de teams temporários entre saves/reinícios;
+> [instalação e recuperação de vínculos antigos](docs/RANKS.md).
+
 > 0.15.1-dev: terceira moeda independente [cash](docs/INTEGRATIONS.md), com
 > `%shirokai:cash%` e `cashCurrency` em integrations.json.
 

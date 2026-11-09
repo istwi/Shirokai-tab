@@ -113,3 +113,28 @@ use como limpeza genérica em servidores diferentes. O Core atribui novamente
 nametag/ordenação dos jogadores liberados na próxima atualização.
 /shirokaicore tab agora inclui nametags=true/false para conferir a configuração.
 Se for false, habilite nametags.enabled em tab-extras.json e reinicie.
+
+## Correção0.15.2 — save e reinício
+
+Reproduzido que teams temporários do Core entravam no NBT da scoreboard durante
+save enquanto o servidor estava ligado. Se carregados por outra instância, esses
+objetos não têm ownership em memória e são preservados como externos. Isso pode
+prender a tag ao cargo anterior após restart e exigir team leave novamente.
+
+O hook de ScoreboardState.teamsToNbt (Minecraft1.21.1/Yarn fixado) agora exclui
+somente teams comprovadamente controlados pela instância ativa, com aparência
+inalterada e sem integrantes externos. A mudança é só no NBT gerado: não remove
+teams nem jogadores do servidor enquanto salva, evitando piscadas na nametag.
+Teams externos, substituídos ou alterados (incluindo displayName), ou com membros
+externos, continuam sendo gravados. Não decide ownership por prefixo do nome.
+
+Instalação: substituir JAR/reiniciar, preservando JSONs. Vínculos antigos que já
+estão no save não são adotados automaticamente; liberar uma vez cada jogador
+afetado com /team leave Nick após identificar o team antigo. Depois os novos
+teams próprios não voltam a ser persistidos pelos saves normais. Alteração real
+de outro mod no team ainda revoga ownership e exige diagnóstico desse conflito.
+
+O teste Fabric serializa com jogador online, verifica ausência só dos teams
+próprios no NBT e sua presença intacta no scoreboard ativo, restaura o save em
+outro scoreboard e muda OWNER para ADMIN sem team leave. Também confirma save de
+teams externos, modificados e com membros estrangeiros. Não simula login real.

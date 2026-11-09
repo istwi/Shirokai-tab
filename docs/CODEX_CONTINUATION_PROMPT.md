@@ -1,3 +1,6 @@
+> 0.15.2: teams efêmeros próprios filtrados do save via mixin NBT auditado;
+> não apagar/adotar teams por nome e não remover membros durante autosave. RANKS.md.
+
 > 0.15.1 acrescenta cashCurrency/%shirokai:cash%; não misturar moedas nem criar
 > contas para exibir saldos. Compatibilidade de JSON em INTEGRATIONS.md.
 

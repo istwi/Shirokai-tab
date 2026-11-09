@@ -11,9 +11,38 @@ import java.util.*;
 
 public final class TeamOwnershipSmoke implements ModInitializer{
     @Override public void onInitialize(){CommandRegistrationCallback.EVENT.register((dispatcher,registry,environment)->dispatcher.register(literal("shirokai-teams-smoke").requires(s->s.hasPermissionLevel(4)).executes(context->{
-        staleNametagTeamsDoNotBlockReleasedPlayers();samePrioritySharesTeamAndForeignPlayersAreNeverMoved();foreignNameCollisionAndReplacementAreNotAdoptedOrDeleted();changedPriorityAndDisconnectPruneOnlyEmptyOwnedTeams();
+        temporaryTeamsAreNotSaved(context.getSource().getServer());staleNametagTeamsDoNotBlockReleasedPlayers();samePrioritySharesTeamAndForeignPlayersAreNeverMoved();foreignNameCollisionAndReplacementAreNotAdoptedOrDeleted();changedPriorityAndDisconnectPruneOnlyEmptyOwnedTeams();
         context.getSource().sendFeedback(()->Text.literal("TEAM_OWNERSHIP_SMOKE_PASS"),false);return 1;
     })));}
+    private static void temporaryTeamsAreNotSaved(net.minecraft.server.MinecraftServer server){
+        var board=new Scoreboard();var foreign=board.addTeam("external_saved");board.addScoreHolderToTeam("Foreign",foreign);
+        var manager=new TeamOwnership(board,message->{});UUID id=UUID.randomUUID();
+        var owner=new TeamOwnership.Player(id,"SaveAlice",100,Text.literal("[OWNER] "),Text.empty(),net.minecraft.scoreboard.AbstractTeam.VisibilityRule.ALWAYS);
+        manager.reconcile(List.of(owner));var live=board.getScoreHolderTeam("SaveAlice");
+        var saved=new net.minecraft.scoreboard.ScoreboardState(board).writeNbt(new net.minecraft.nbt.NbtCompound(),server.getRegistryManager());
+        var teams=saved.getList("Teams",net.minecraft.nbt.NbtElement.COMPOUND_TYPE);
+        for(int i=0;i<teams.size();i++)if(teams.getCompound(i).getString("Name").equals(live.getName()))throw new AssertionError("Temporary Core team leaked into world save");
+        assertSame(live,board.getScoreHolderTeam("SaveAlice")); // Saving must never flicker live teams.
+        var restored=new Scoreboard();new net.minecraft.scoreboard.ScoreboardState(restored).readNbt(saved,server.getRegistryManager());
+        assertNull(restored.getScoreHolderTeam("SaveAlice"));assertTrue(restored.getTeam("external_saved")!=null);
+        var restarted=new TeamOwnership(restored,message->{});
+        var admin=new TeamOwnership.Player(id,"SaveAlice",99,Text.literal("[ADMIN] "),Text.empty(),net.minecraft.scoreboard.AbstractTeam.VisibilityRule.ALWAYS);
+        restarted.reconcile(List.of(owner));restarted.reconcile(List.of(admin));assertTrue(restored.getScoreHolderTeam("SaveAlice").getPrefix().getString().equals("[ADMIN] "));
+        restarted.close();
+        var originalDisplay=live.getDisplayName().copy();live.setDisplayName(Text.literal("External display name"));
+        var renamedSave=new net.minecraft.scoreboard.ScoreboardState(board).writeNbt(new net.minecraft.nbt.NbtCompound(),server.getRegistryManager()).getList("Teams",net.minecraft.nbt.NbtElement.COMPOUND_TYPE);
+        boolean renamedKept=false;for(int i=0;i<renamedSave.size();i++)if(renamedSave.getCompound(i).getString("Name").equals(live.getName()))renamedKept=true;
+        assertTrue(renamedKept);live.setDisplayName(originalDisplay);
+        live.setPrefix(Text.literal("External replacement"));
+        var changed=new net.minecraft.scoreboard.ScoreboardState(board).writeNbt(new net.minecraft.nbt.NbtCompound(),server.getRegistryManager());
+        boolean preserved=false;var rows=changed.getList("Teams",net.minecraft.nbt.NbtElement.COMPOUND_TYPE);
+        for(int i=0;i<rows.size();i++)if(rows.getCompound(i).getString("Name").equals(live.getName()))preserved=true;
+        assertTrue(preserved);manager.close();assertSame(live,board.getScoreHolderTeam("SaveAlice"));
+        var mixedBoard=new Scoreboard();var mixedManager=new TeamOwnership(mixedBoard,message->{});mixedManager.reconcile(List.of(owner));
+        var mixed=mixedBoard.getScoreHolderTeam("SaveAlice");mixedBoard.addScoreHolderToTeam("ExternalHolder",mixed);
+        var mixedSave=new net.minecraft.scoreboard.ScoreboardState(mixedBoard).writeNbt(new net.minecraft.nbt.NbtCompound(),server.getRegistryManager());
+        assertTrue(mixedSave.getList("Teams",net.minecraft.nbt.NbtElement.COMPOUND_TYPE).size()==1);mixedManager.close();
+    }
     private static void staleNametagTeamsDoNotBlockReleasedPlayers(){
         var board=new Scoreboard();var stale=board.addTeam("skn0000000000000");
         stale.setPrefix(Text.literal("[DEFAULT] "));board.addScoreHolderToTeam("Alice",stale);

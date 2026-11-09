@@ -1,3 +1,6 @@
+> 0.15.2: teams próprios temporários não são gravados no NBT do mundo durante
+> saves; externos/modificados/mistos são preservados. RANKS.md explica migração.
+
 > 0.14.0: schema2 habilita nametags por padrão e promove o padrão schema1 antigo
 > em memória. Demais extras continuam opcionais. Veja [RANKS.md](RANKS.md).
 

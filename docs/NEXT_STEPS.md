@@ -1,3 +1,6 @@
+> 0.15.2 evita gravar teams efêmeros próprios no save; RANKS.md documenta os
+> critérios de ownership e a liberação única dos vínculos antigos já persistidos.
+
 > 0.15.1 acrescenta terceira moeda cash independente; INTEGRATIONS.md documenta
 > defaults, compatibilidade e consulta sem criação de contas.
 

@@ -1,3 +1,11 @@
+## Regressão0.15.2 — persistência de teams
+
+Antes: assertion Temporary Core team leaked into world save. Depois: hook real
+NBT omite team próprio inalterado sem alterar players/prefixos ao vivo, restaura
+save sem vínculo antigo e permite OWNER -> ADMIN sem team leave. Preserva team
+externo e alterações externas em prefixo/displayName, membros desconhecidos e
+cleanup conservador. Mixin método/field auditados no JAR Yarn1.21.1+build.3.
+
 ## Regressão0.15.1 — cash
 
 JUnit: arquivo antigo recebe cash default em memória, não é reescrito, preserva

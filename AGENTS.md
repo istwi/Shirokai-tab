@@ -106,3 +106,8 @@ Cash0.15.1: cashCurrency opcional e %shirokai:cash% independentes de dollars/tok
 Nunca criar conta/moeda ao consultar saldo. Legacy sem campo usa impactor:cash;
 se ID já mapeado em dollars/tokens, cash=null preserva o mapeamento legado.
 Mapeamentos explícitos não podem duplicar IDs. Preservar arquivos e schema1.
+
+Teams0.15.2: ScoreboardTeamPersistence filtra apenas NBT de teams ativos comprovados
+por TeamOwnership (instância/aparência/membros), nunca por prefixo. Não remover
+players durante save nem omitir teams externos/modificados/mistos. LIVE usa weak
+references e libera managers fechados. Testar save + restore + troca de cargo.

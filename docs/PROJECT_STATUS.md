@@ -1,3 +1,39 @@
+# Estado atual — 0.15.2-dev
+
+Corrigida persistência de teams efêmeros durante save da scoreboard. Reproduzido
+antes do patch: Temporary Core team leaked into world save. Teams salvos podem
+voltar sem ownership na nova instância e manter prefixos/ordenação antigos.
+ScoreboardTeamPersistence filtra exclusivamente o NBT de teams ainda controlados
+por TeamOwnership, com aparência completa inalterada e sem integrantes externos.
+Não altera times/jogadores ao vivo durante save, não adota por prefixo e preserva
+teams externos, substituídos, modificados ou mistos. Trackers usam weak references.
+
+Contrato Minecraft1.21.1/Yarn1.21.1+build.3 auditado por javap: ScoreboardState,
+field scoreboard, método privado teamsToNbt(RegistryWrapper.WrapperLookup):NbtList.
+Mixin server-only/refmap verificados no JAR; hook executado na regressão Fabric.
+
+Validação atual:
+- build/smokeClasses: 113 testes JUnit aprovados, sem falhas/erros.
+- 49 verificações Fabric em três boots. Save de team próprio com jogador
+  online não inclui o team no NBT nem altera a aparência atual; restore do save
+  e OWNER -> ADMIN funcionam sem team leave. Teams externos, alterações externas
+  de prefixo/displayName e integrantes estrangeiros permanecem persistidos.
+- 14 verificações com mods opcionais reais aprovadas novamente.
+- JAR: versão/refmap/novo mixin corretos, sem fixtures smoke.
+
+Instalação: substituir JAR/reiniciar sem apagar JSONs. Para membros ainda presos
+a teams antigos já gravados, liberação administrativa uma vez (/team leave Nick).
+Os novos teams próprios não serão persistidos por saves normais. Conflitos reais
+de ownership causados por outro sistema continuam sendo preservados/diagnosticados.
+Sem mudanças em SQL6, configurações de moedas ou menus; menu de clã segue pausado.
+Cliente autenticado/renderização real ainda não certificados. RANKS.md detalha limites.
+
+JAR: build/libs/shirokai-core-0.15.2-dev.jar
+SHA256: d215fc746fe6d45a2ae49f255ed4c4b1fb816d3220f522ff61bf96212a8dee4a
+Base:9ec8a67. Histórico das versões anteriores abaixo.
+
+---
+
 # Estado atual — 0.15.1-dev
 
 Terceira moeda independente: cashCurrency em integrations.json (impactor:cash por

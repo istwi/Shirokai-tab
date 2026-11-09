@@ -9,11 +9,12 @@ public final class TeamOwnership implements AutoCloseable{
     public record Player(UUID id,String name,int priority,net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility){
         public Player(UUID id,String name,int priority){this(id,name,priority,null,null,null);}
     }
+    private static final List<java.lang.ref.WeakReference<TeamOwnership>> LIVE=new ArrayList<>();
     private final Scoreboard scoreboard;private final Consumer<String> warning;
     private final String nametagNamespace;
     private final Map<String,Team> owned=new HashMap<>();private final Map<String,Team> assigned=new HashMap<>();private final Set<String> warned=new LinkedHashSet<>();
-    private record Appearance(net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility,AbstractTeam.VisibilityRule death,AbstractTeam.CollisionRule collision,net.minecraft.util.Formatting color,boolean friendly,boolean invisibles){
-        static Appearance of(Team team){return new Appearance(team.getPrefix().copy(),team.getSuffix().copy(),team.getNameTagVisibilityRule(),team.getDeathMessageVisibilityRule(),team.getCollisionRule(),team.getColor(),team.isFriendlyFireAllowed(),team.shouldShowFriendlyInvisibles());}
+    private record Appearance(net.minecraft.text.Text displayName,net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility,AbstractTeam.VisibilityRule death,AbstractTeam.CollisionRule collision,net.minecraft.util.Formatting color,boolean friendly,boolean invisibles){
+        static Appearance of(Team team){return new Appearance(team.getDisplayName().copy(),team.getPrefix().copy(),team.getSuffix().copy(),team.getNameTagVisibilityRule(),team.getDeathMessageVisibilityRule(),team.getCollisionRule(),team.getColor(),team.isFriendlyFireAllowed(),team.shouldShowFriendlyInvisibles());}
     }
     private final Map<Team,Appearance> appearances=new IdentityHashMap<>();
     private void revokeChanged(){for(var entry:List.copyOf(appearances.entrySet())){
@@ -22,7 +23,7 @@ public final class TeamOwnership implements AutoCloseable{
         }
     }}
     private boolean closed;private long conflicts;
-    public TeamOwnership(Scoreboard scoreboard,Consumer<String> warning){this.scoreboard=Objects.requireNonNull(scoreboard);this.warning=warning;this.nametagNamespace=freeNametagNamespace(scoreboard);}
+    public TeamOwnership(Scoreboard scoreboard,Consumer<String> warning){this.scoreboard=Objects.requireNonNull(scoreboard);this.warning=warning;this.nametagNamespace=freeNametagNamespace(scoreboard);LIVE.removeIf(ref->ref.get()==null);LIVE.add(new java.lang.ref.WeakReference<>(this));}
     /** Reserve a free namespace for this manager; never identify ownership by a legacy name. */
     private static String freeNametagNamespace(Scoreboard scoreboard){
         for(int index=0;index<=0xffffff;index++){
@@ -30,6 +31,17 @@ public final class TeamOwnership implements AutoCloseable{
             if(scoreboard.getTeams().stream().noneMatch(team->team.getName().startsWith(prefix)))return prefix;
         }
         throw new IllegalStateException("Nenhum namespace livre para nametags");
+    }
+    /** Only current, unchanged, exclusively owned teams are ephemeral. Never infer ownership from names. */
+    public static boolean temporaryForSave(Scoreboard scoreboard,Team team){
+        if(team==null)return false;
+        LIVE.removeIf(ref->ref.get()==null);
+        for(var ref:LIVE){
+            var owner=ref.get();if(owner==null||owner.closed||owner.scoreboard!=scoreboard||!owner.owns(team))continue;
+            var expected=owner.appearances.get(team);
+            if(expected!=null&&expected.equals(Appearance.of(team))&&team.getPlayerList().stream().allMatch(member->owner.assigned.get(member)==team))return true;
+        }
+        return false;
     }
     public static String teamName(int priority){int bounded=Math.max(-1000000,Math.min(1000000,priority));return String.format(Locale.ROOT,"sk%07d",1000000-bounded);}
     public boolean owns(Team team){return team!=null&&owned.get(team.getName())==team&&scoreboard.getTeam(team.getName())==team;}
@@ -53,6 +65,7 @@ public final class TeamOwnership implements AutoCloseable{
                 if(desired.getNameTagVisibilityRule()!=player.visibility())desired.setNameTagVisibilityRule(player.visibility());
                 appearances.put(desired,Appearance.of(desired));
             }
+            appearances.putIfAbsent(desired,Appearance.of(desired));
             if(current!=desired){if(current!=null)scoreboard.removeScoreHolderFromTeam(player.name(),current);scoreboard.addScoreHolderToTeam(player.name(),desired);}assigned.put(player.name(),desired);
         }
         prune();
@@ -63,5 +76,5 @@ public final class TeamOwnership implements AutoCloseable{
         if(entry.getValue().getPlayerList().isEmpty()){scoreboard.removeTeam(entry.getValue());owned.remove(entry.getKey());appearances.remove(entry.getValue());}
     }}
     public int ownedTeams(){return owned.size();}public long conflicts(){return conflicts;}
-    @Override public void close(){if(closed)return;revokeChanged();for(String name:List.copyOf(assigned.keySet()))release(name);prune();for(var team:owned.values())note("Team com integrantes externos preservado: "+team.getName());owned.clear();appearances.clear();closed=true;}
+    @Override public void close(){if(closed)return;revokeChanged();for(String name:List.copyOf(assigned.keySet()))release(name);prune();for(var team:owned.values())note("Team com integrantes externos preservado: "+team.getName());owned.clear();appearances.clear();closed=true;LIVE.removeIf(ref->ref.get()==null||ref.get()==this);}
 }
