@@ -50,8 +50,24 @@ public final class ClanMenu extends GenericContainerScreenHandler {
         },player.getServer());
     }
     private void item(int slot,Item type,String name,String...lore){
-        var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,clans.present(owner.getUuid(),Surface.MENU_NAME,name).copy().formatted(Formatting.AQUA));
-        stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(line->(Text)clans.present(owner.getUuid(),Surface.MENU_LORE,line).copy().formatted(Formatting.GRAY)).toList()));display.setStack(slot,stack);
+        var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,clans.present(owner.getUuid(),Surface.MENU_NAME,name).copy().formatted(Formatting.AQUA).styled(style->style.withItalic(false)));
+        stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(line->(Text)clans.present(owner.getUuid(),Surface.MENU_LORE,line).copy().formatted(Formatting.GRAY).styled(style->style.withItalic(false))).toList()));display.setStack(slot,stack);
+    }
+    private void decoration(int slot,Item type){
+        var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,Text.literal(" "));display.setStack(slot,stack);
+    }
+    private boolean paged(){return page==Page.MEMBERS||page==Page.INVITES||page==Page.INVITE_PLAYER||page==Page.SENT_INVITES;}
+    private void frame(){
+        for(int slot=0;slot<9;slot++)decoration(slot,Items.BLACK_STAINED_GLASS_PANE);
+        for(int slot=45;slot<54;slot++)decoration(slot,Items.BLACK_STAINED_GLASS_PANE);
+        for(int slot:new int[]{0,8,45,53})decoration(slot,Items.CYAN_STAINED_GLASS_PANE);
+        if(page==Page.HOME)for(int slot:new int[]{9,17,18,26,27,35,36,44})decoration(slot,Items.GRAY_STAINED_GLASS_PANE);
+        item(49,Items.COMPASS,"Atualizar painel","Recarregar os dados do seu clã.");
+        item(50,page==Page.HOME?Items.BARRIER:Items.ARROW,page==Page.HOME?"Fechar painel":"Voltar ao painel");
+        if(paged()){
+            item(4,Items.MAP,switch(page){case MEMBERS->"Membros do clã";case INVITES->"Convites recebidos";case INVITE_PLAYER->"Convidar jogador";default->"Convites enviados";},"Página "+(index+1));
+            if(index>0)item(45,Items.ARROW,"Página anterior");
+        }
     }
     private String name(UUID player){var online=owner.getServer().getPlayerManager().getPlayer(player);return online==null||!com.shirokai.core.visibility.VisibilityService.canSee(owner.getServer(),owner,online)?"Offline • "+player.toString().substring(0,8):online.getGameProfile().getName();}
     private ClanSnapshot own(){return data.clan().orElseThrow(()->new IllegalStateException("Você não pertence a um clã"));}
@@ -61,11 +77,10 @@ public final class ClanMenu extends GenericContainerScreenHandler {
     private void render(){
         if(data.clan().isEmpty() && page!=Page.HOME && page!=Page.INVITES)page=Page.HOME;
         display.clear();targets.clear();invitations.clear();
-        item(49,Items.CLOCK,"Atualizar");item(50,Items.ARROW,"Voltar");
-        item(45,Items.ARROW,"Página anterior");item(53,Items.ARROW,"Próxima página");
+        frame();
         switch(page){
             case HOME->{
-                item(4,Items.BOOK,data.clan().map(ClanSnapshot::name).orElse("Sem clã"),data.clan().map(clan->"Sigla: "+Objects.toString(clan.tag(),"Não definida")).orElse("Criação gratuita: /clan create <nome>"),
+                item(4,Items.NETHER_STAR,data.clan().map(ClanSnapshot::name).orElse("Sem clã"),data.clan().map(clan->"Sigla: "+Objects.toString(clan.tag(),"Não definida")).orElse("Criação gratuita: /clan create <nome>"),
                     data.clan().map(clan->"Membros: "+clan.members().size()+"/"+data.limit()).orElse("Você pode aceitar um convite abaixo."),
                     data.clan().map(clan->"Seu cargo: "+Messages.role(clan.members().get(owner.getUuid()))).orElse(""));
                 if(clans.menuPresentationEnabled())data.clan().ifPresent(clan->{
@@ -74,14 +89,14 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     lore.set(0,Text.literal("Sigla: ").formatted(Formatting.GRAY).append(clans.presentClan(owner.getUuid(),clan,Surface.CLAN_TAG,Objects.toString(clan.tag(),"Não definida"))));
                     card.set(DataComponentTypes.LORE,new LoreComponent(lore));
                 });
-                item(22,Items.PAPER,"Convites recebidos",Integer.toString(data.invitations().size()));
+                item(22,Items.WRITABLE_BOOK,"Convites recebidos",Integer.toString(data.invitations().size()),"Convites de outros clãs para você.","Clique para aceitar ou recusar.");
                 if(data.clan().isPresent()){
-                    item(20,Items.PLAYER_HEAD,"Membros e cargos");item(24,Items.WRITABLE_BOOK,"Convidar jogador");
-                    item(30,Items.NAME_TAG,"Editar nome e sigla","Escolha o nome ou a sigla do seu clã.","Alterações gratuitas, com intervalo entre edições.");
-                    item(31,Items.PAPER,"Convites enviados",Integer.toString(data.sent().size()),"Clique em um convite para cancelar.");
-                    if(clans.customizationEnabled()&&own().leader().equals(owner.getUuid())){item(28,Items.PAINTING,"Estilo do nome");item(29,Items.PAINTING,"Estilo da sigla");}
-                    item(32,Items.OAK_DOOR,"Sair do clã");item(33,Items.WRITTEN_BOOK,"Histórico do clã","Consultar alterações e ações registradas.");
-                    if(own().leader().equals(owner.getUuid()))item(40,Items.TNT,"Excluir clã","Exige confirmação em outra tela.");
+                    item(20,Items.PLAYER_HEAD,"Membros e cargos","Conheça os membros da sua equipe.","Clique para consultar e gerenciar.");item(24,Items.EMERALD,"Convidar jogador","Convide novos aliados para o clã.","Clique para ver jogadores disponíveis.");
+                    item(29,Items.NAME_TAG,"Editar nome e sigla","Escolha o nome ou a sigla do seu clã.","Alterações gratuitas, com intervalo entre edições.");
+                    item(33,Items.PAPER,"Convites enviados",Integer.toString(data.sent().size()),"Clique em um convite para cancelar.");
+                    if(clans.customizationEnabled()&&own().leader().equals(owner.getUuid())){item(38,Items.PAINTING,"Estilo do nome","Personalize a identidade do seu clã.");item(39,Items.GLOW_INK_SAC,"Estilo da sigla","Escolha as cores e os efeitos da sigla.");}
+                    item(41,Items.OAK_DOOR,"Sair do clã","Encerrar sua participação neste clã.");item(31,Items.WRITTEN_BOOK,"Histórico do clã","Consultar alterações e ações registradas.");
+                    if(own().leader().equals(owner.getUuid()))item(43,Items.BARRIER,"Excluir clã","Exige confirmação em outra tela.");
                 }
                 if(data.transfer().isPresent()){item(46,Items.EMERALD,"Aceitar liderança","Confirme a solicitação recebida.");item(47,Items.BARRIER,"Recusar liderança");}
             }
@@ -108,6 +123,16 @@ public final class ClanMenu extends GenericContainerScreenHandler {
             case DISBAND->{item(4,Items.TNT,"EXCLUIR "+own().name(),"Todos os membros serão desvinculados.","Somente confirme se deseja excluir este clã.");item(22,Items.REDSTONE_BLOCK,"CONFIRMAR EXCLUSÃO");item(24,Items.EMERALD_BLOCK,"Cancelar");}
             case TRANSFER->{item(4,Items.NETHER_STAR,"TRANSFERIR LIDERANÇA",name(target),"O destinatário ainda precisará aceitar.");item(22,Items.EMERALD_BLOCK,"Confirmar solicitação");item(24,Items.BARRIER,"Cancelar");}
         }
+        if(paged()){
+            int count=switch(page){case MEMBERS->own().members().size();case INVITES->data.invitations().size();case SENT_INVITES->data.sent().size();default->(int)owner.getServer().getPlayerManager().getPlayerList().stream().filter(p->!own().members().containsKey(p.getUuid())&&com.shirokai.core.visibility.VisibilityService.canSee(owner.getServer(),owner,p)).count();};
+            if((index+1)*36<count)item(53,Items.ARROW,"Próxima página");
+            if(index==0)decoration(45,Items.CYAN_STAINED_GLASS_PANE);
+            item(4,Items.MAP,switch(page){case MEMBERS->"Membros do clã";case INVITES->"Convites recebidos";case INVITE_PLAYER->"Convidar jogador";default->"Convites enviados";},"Página "+(index+1),"Total de entradas: "+count);
+            if(count==0)item(22,Items.GLASS_BOTTLE,"Nada por aqui ainda","Não há entradas nesta lista.");
+        }
+        if(page==Page.HOME&&data.clan().isPresent()&&own().leader().equals(owner.getUuid())){
+            var danger=display.getStack(43);danger.set(DataComponentTypes.CUSTOM_NAME,Text.literal("Excluir clã").formatted(Formatting.RED));
+        }
         sendContentUpdates();
     }
     private void navigate(Page page){this.page=page;index=0;render();}
@@ -132,21 +157,22 @@ public final class ClanMenu extends GenericContainerScreenHandler {
     @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}
     @Override public void onSlotClick(int slot,int button,SlotActionType type,PlayerEntity player){
         if(!canUse(player)||owner.currentScreenHandler!=this||busy||type!=SlotActionType.PICKUP||(button!=0&&button!=1))return;
+        if(slot<0||slot>=54||display.getStack(slot).isEmpty()||display.getStack(slot).isOf(Items.BLACK_STAINED_GLASS_PANE)||display.getStack(slot).isOf(Items.CYAN_STAINED_GLASS_PANE)||display.getStack(slot).isOf(Items.GRAY_STAINED_GLASS_PANE))return;
         try{
             if(slot==49){refresh();return;}
             if(slot==50){if(page==Page.HOME)owner.closeHandledScreen();else navigate(Page.HOME);return;}
             if(slot==45){index=Math.max(0,index-1);render();return;}if(slot==53){index++;render();return;}
             switch(page){
                 case HOME->{
-                    if((slot==28||slot==29)&&data.clan().isPresent()&&clans.customizationEnabled())clans.openCustomization(owner,slot==28?Surface.CLAN_NAME:Surface.CLAN_TAG,own().id());
+                    if((slot==38||slot==39)&&data.clan().isPresent()&&clans.customizationEnabled())clans.openCustomization(owner,slot==38?Surface.CLAN_NAME:Surface.CLAN_TAG,own().id());
                     else if(slot==22)navigate(Page.INVITES);
-                    else if(slot==30&&data.clan().isPresent())navigate(Page.IDENTITY);
-                    else if(slot==31&&data.clan().isPresent())navigate(Page.SENT_INVITES);
+                    else if(slot==29&&data.clan().isPresent())navigate(Page.IDENTITY);
+                    else if(slot==33&&data.clan().isPresent())navigate(Page.SENT_INVITES);
                     else if(slot==20&&data.clan().isPresent())navigate(Page.MEMBERS);
                     else if(slot==24&&data.clan().isPresent())navigate(Page.INVITE_PLAYER);
-                    else if(slot==33&&data.clan().isPresent())ClanHistoryMenu.open(owner,clans,own().id(),0);
-                    else if(slot==32&&data.clan().isPresent())action(()->scoped().leave(owner.getUuid()),Page.HOME);
-                    else if(slot==40&&data.clan().isPresent())action(()->scoped().disband(owner.getUuid(),false),Page.DISBAND);
+                    else if(slot==31&&data.clan().isPresent())ClanHistoryMenu.open(owner,clans,own().id(),0);
+                    else if(slot==41&&data.clan().isPresent())action(()->scoped().leave(owner.getUuid()),Page.HOME);
+                    else if(slot==43&&data.clan().isPresent())action(()->scoped().disband(owner.getUuid(),false),Page.DISBAND);
                     else if(slot==46&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),true),Page.HOME);
                     else if(slot==47&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),false),Page.HOME);
                 }

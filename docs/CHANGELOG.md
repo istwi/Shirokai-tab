@@ -1,3 +1,10 @@
+## 0.16.1-dev
+
+- Menu de clã com moldura escura/ciano, estrela central e ações espaçadas por função.
+- Ícones e descrições revisados; exclusão isolada em vermelho; fechar distinto de voltar.
+- Paginação contextual, total de entradas e estado vazio; decoração sem ações.
+- Mantém confirmações, autorização SQL e personalização de nome/sigla.
+
 ## 0.16.0-dev
 
 - Clãs: histórico paginado por GUI/comando, diagnóstico SQLite/relacional e reparo

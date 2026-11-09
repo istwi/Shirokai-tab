@@ -1,3 +1,20 @@
+## Visual do clã — 0.16.1
+
+Painel nativo com moldura escura, detalhes ciano e estrela central, alinhado ao
+cabeçalho dourado Shirokai. Os slots começam em0:
+
+| Linha | Esquerda | Centro | Direita |
+| --- | --- | --- | --- |
+| Comunidade | Membros20 | Convites recebidos22 | Convidar24 |
+| Gestão | Nome/sigla29 | Histórico31 | Convites enviados33 |
+| Personalização/saída | Estilo do nome38 e sigla39 | Sair41 | Excluir43 |
+
+Excluir aparece em vermelho somente para o líder e mantém a confirmação separada.
+Rodapé: atualizar49 e fechar/voltar50; navegação45/53 somente quando aplicável.
+Listas têm cabeçalho com página/total e aviso de lista vazia. Molduras são decorativas,
+sem ações ou extração de itens. A posição dos botões de clã é definida no código;
+menus.json continua configurando o perfil e a ativação do menu de clã.
+
 # Menus configuráveis — 0.15.0-dev
 
 `config/shirokai-core/menus.json` é criado somente quando ausente. Controla o

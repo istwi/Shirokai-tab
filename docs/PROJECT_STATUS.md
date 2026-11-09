@@ -1,3 +1,23 @@
+# Estado atual — 0.16.1-dev
+
+Menu de clã redesenhado: moldura escura com detalhes ciano, estrela central e
+botões distribuídos por função. Exclusão vermelha isolada, retorno distinto de
+fechar, paginação contextual e estado de lista vazia. Itens decorativos sem ações.
+Nome/sigla continuam usando apresentação/presets do servidor. MENUS.md lista slots.
+
+Build:123 testes unitários sem falhas;51 verificações Fabric em três boots
+aprovadas. Smoke de clãs verifica novas posições, convites, editor, histórico,
+transferência e exclusão.
+Ainda não há validação visual em cliente real. Layout é inventário vanilla;
+não altera a textura da janela nem exige resource pack.
+
+JAR: build/libs/shirokai-core-0.16.1-dev.jar
+SHA256: d29ec6d518b027dc0c5545a1d5893537e468df9c56fbc69753ad85aa5e2d3796
+Base:eaf29d9. SQLite6 e JSONs existentes preservados; clanMenuEnabled continua
+controlando a ativação. Instalação: substituir JAR e reiniciar.
+
+---
+
 # Estado atual — 0.16.0-dev
 
 Clãs: histórico paginado GUI/CLI, diagnóstico SQLite/FKs e de relações, reparos

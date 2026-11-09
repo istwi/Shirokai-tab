@@ -1,3 +1,5 @@
+> 0.16.1-dev: painel de clã reorganizado no estilo Shirokai; [layout e navegação](docs/MENUS.md).
+
 > 0.16.0-dev: histórico, diagnóstico e reparos de [clãs](docs/CLANS.md),
 > [presets animados e controles por área](docs/CUSTOMIZATION.md) e integração
 > opcional de [Vanish](docs/VANISH.md). Configurações existentes são preservadas.
