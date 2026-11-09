@@ -54,19 +54,19 @@ public final class ClanMenuSmoke implements ModInitializer {
             .thenComposeAsync(clan->clans.invite(a,b),server).thenComposeAsync(clan->{ClanMenu.open(member,clans);return until.apply(()->member.currentScreenHandler instanceof ClanMenu);},server)
             .thenComposeAsync(v->{
                 var shownPage=menu(member).page();clans.menuEnabled(false);check(!menu(member).canUse(member),"Disabled open clan screen still accepts actions");
-                click(member,22);check(menu(member).page()==shownPage,"Disabled screen changed pages");
-                clans.menuEnabled(true);click(member,22);check(menu(member).page()==ClanMenu.Page.INVITES,"Invite page missing");click(member,9);return until.apply(()->clans.cached(b).isPresent()&&menu(member).page()==ClanMenu.Page.HOME);},server)
+                click(member,13);check(menu(member).page()==shownPage,"Disabled screen changed pages");
+                clans.menuEnabled(true);click(member,13);check(menu(member).page()==ClanMenu.Page.INVITES,"Invite page missing");click(member,9);return until.apply(()->clans.cached(b).isPresent()&&menu(member).page()==ClanMenu.Page.HOME);},server)
             .thenComposeAsync(v->{ClanMenu.open(leader,clans);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);},server)
-            .thenComposeAsync(v->{click(leader,31);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanHistoryMenu);},server)
+            .thenComposeAsync(v->{click(leader,21);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanHistoryMenu);},server)
             .thenComposeAsync(v->{
                 var history=(com.shirokai.core.clans.ClanHistoryMenu)leader.currentScreenHandler;
                 check(!history.canUse(member)&&history.quickMove(leader,9).isEmpty(),"History menu ownership/inventory leak");
                 check(!history.getSlot(9).getStack().isEmpty(),"Clan history missing");history.onSlotClick(50,0,SlotActionType.PICKUP,leader);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);
             },server)
             .thenComposeAsync(v->clans.invite(a,UUID.fromString("33333333-3333-3333-3333-333333333333")),server)
-            .thenComposeAsync(v->{click(leader,49);return until.apply(()->menu(leader).getSlot(33).getStack().get(net.minecraft.component.DataComponentTypes.LORE).lines().getFirst().getString().equals("1"));},server)
-            .thenComposeAsync(v->{click(leader,33);check(menu(leader).page()==ClanMenu.Page.SENT_INVITES,"Sent invites page missing");click(leader,9);return until.apply(()->menu(leader).getSlot(9).getStack().isEmpty());},server)
-            .thenComposeAsync(v->{click(leader,50);click(leader,29);click(leader,20);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor);},server)
+            .thenComposeAsync(v->{click(leader,19);return until.apply(()->menu(leader).getSlot(16).getStack().get(net.minecraft.component.DataComponentTypes.LORE).lines().getFirst().getString().equals("1"));},server)
+            .thenComposeAsync(v->{click(leader,16);check(menu(leader).page()==ClanMenu.Page.SENT_INVITES,"Sent invites page missing");click(leader,9);return until.apply(()->menu(leader).getSlot(9).getStack().isEmpty());},server)
+            .thenComposeAsync(v->{click(leader,41);click(leader,15);click(leader,20);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor);},server)
             .thenComposeAsync(v->{
                 var editor=(com.shirokai.core.clans.ClanIdentityEditor)leader.currentScreenHandler;
                 check(editor.setNewItemName("MenuEdited"),"Editor refused text");
@@ -79,34 +79,34 @@ public final class ClanMenuSmoke implements ModInitializer {
             },server).thenComposeAsync(v->{
                 check(leader.getInventory().getStack(0).getCount()==5&&leader.experienceLevel==0,"Editor altered inventory or XP");
                 check(!leader.getInventory().contains(new ItemStack(Items.PAPER)),"Editor leaked display paper");
-                click(leader,29);click(leader,24);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor);
+                click(leader,15);click(leader,24);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor);
             },server).thenComposeAsync(v->{
                 var editor=(com.shirokai.core.clans.ClanIdentityEditor)leader.currentScreenHandler;editor.setNewItemName("CANCEL");leader.closeHandledScreen();
                 editor.onSlotClick(0,0,SlotActionType.PICKUP,leader);check(clans.cached(a).orElseThrow().tag()==null,"Closed editor saved draft");
                 ClanMenu.open(leader,clans);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);
             },server)
             .thenComposeAsync(v->{var menu=menu(leader);check(!menu.canUse(member),"Other player owns menu");
-                for(var action:SlotActionType.values())if(action!=SlotActionType.PICKUP)menu.onSlotClick(43,0,action,leader);
-                menu.onSlotClick(43,0,SlotActionType.PICKUP,member);menu.onSlotClick(-999,0,SlotActionType.PICKUP,leader);
+                for(var action:SlotActionType.values())if(action!=SlotActionType.PICKUP)menu.onSlotClick(34,0,action,leader);
+                menu.onSlotClick(34,0,SlotActionType.PICKUP,member);menu.onSlotClick(-999,0,SlotActionType.PICKUP,leader);
                 check(menu.quickMove(leader,4).isEmpty(),"Menu icon transferred");check(leader.getInventory().getStack(0).getCount()==5,"Inventory altered");
-                click(leader,20);click(leader,memberSlot(leader,b));click(leader,20);
+                click(leader,12);click(leader,memberSlot(leader,b));click(leader,20);
                 return until.apply(()->clans.cached(b).orElseThrow().members().get(b)==ClanSnapshot.Role.OFFICER&&menu(leader).page()==ClanMenu.Page.HOME);
             },server).thenComposeAsync(v->{
-                click(leader,20);click(leader,memberSlot(leader,b));click(leader,40);check(menu(leader).page()==ClanMenu.Page.TRANSFER,"Transfer confirmation missing");
+                click(leader,12);click(leader,memberSlot(leader,b));click(leader,31);check(menu(leader).page()==ClanMenu.Page.TRANSFER,"Transfer confirmation missing");
                 return clans.transferOffer(b);
             },server).thenComposeAsync(offer->{check(offer.isEmpty(),"Transfer requested before confirming");click(leader,22);return until.apply(()->menu(leader).page()==ClanMenu.Page.HOME);},server)
-            .thenComposeAsync(v->{click(member,49);return until.apply(()->menu(member).getSlot(46).getStack().isOf(Items.EMERALD));},server)
-            .thenComposeAsync(v->{click(member,46);return until.apply(()->clans.cached(b).orElseThrow().leader().equals(b)&&!menu(member).getSlot(43).getStack().isEmpty());},server)
-            .thenComposeAsync(v->{click(member,43);return until.apply(()->menu(member).page()==ClanMenu.Page.DISBAND);},server)
+            .thenComposeAsync(v->{click(member,19);return until.apply(()->menu(member).getSlot(37).getStack().isOf(Items.EMERALD));},server)
+            .thenComposeAsync(v->{click(member,37);return until.apply(()->clans.cached(b).orElseThrow().leader().equals(b)&&menu(member).getSlot(34).getStack().isOf(Items.BARRIER));},server)
+            .thenComposeAsync(v->{click(member,34);return until.apply(()->menu(member).page()==ClanMenu.Page.DISBAND);},server)
             .thenComposeAsync(v->{check(clans.cached(b).isPresent(),"First click deleted clan");click(member,24);return until.apply(()->menu(member).page()==ClanMenu.Page.HOME);},server)
             .thenComposeAsync(v->clans.disband(b,true).handleAsync((value,error)->{check(error!=null,"Cancel retained disband confirmation");return null;},server),server)
-            .thenComposeAsync(v->{click(member,43);return until.apply(()->menu(member).page()==ClanMenu.Page.DISBAND);},server)
+            .thenComposeAsync(v->{click(member,34);return until.apply(()->menu(member).page()==ClanMenu.Page.DISBAND);},server)
             .thenComposeAsync(v->{
                 var shownPage=menu(member).page();clans.menuEnabled(false);check(!menu(member).canUse(member),"Disabled open clan screen still accepts actions");
                 click(member,22);check(menu(member).page()==shownPage,"Disabled screen changed pages");
                 clans.menuEnabled(true);click(member,22);return until.apply(()->clans.cached(b).isEmpty()&&menu(member).page()==ClanMenu.Page.HOME);},server)
             .thenRunAsync(()->{check(clans.cached(a).isEmpty(),"Disband left membership");check(leader.getInventory().getStack(0).getCount()==5,"Items changed");
-                var closed=menu(member);click(member,50);check(member.currentScreenHandler!=closed&&!closed.canUse(member),"Menu remained usable after close");
+                var closed=menu(member);click(member,28);check(member.currentScreenHandler!=closed&&!closed.canUse(member),"Menu remained usable after close");
             },server);
         return flow.whenCompleteAsync((v,error)->{leader.closeHandledScreen();member.closeHandledScreen();try{storage.close();}catch(Exception close){throw new CompletionException(close);}},server);
     }

@@ -1,3 +1,11 @@
+## 0.16.2-dev
+
+- Menu principal de clã segue a referência: cinco linhas, vidro cinza, cabeça
+  informativa, bússola para atualizar, bloco de redstone para fechar e barreira
+  para excluir. Oito estrelas para as funções, com estilos reunidos em submenu.
+- Listas adaptadas a27 entradas por página e navegação em cinco linhas.
+- Preservadas permissões, escopo do clã e confirmações de transferência/exclusão.
+
 ## 0.16.1-dev
 
 - Menu de clã com moldura escura/ciano, estrela central e ações espaçadas por função.

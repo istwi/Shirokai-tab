@@ -1,3 +1,5 @@
+> 0.16.2-dev: menu de clã com cinco linhas e ícones/posições da referência; [layout](docs/MENUS.md).
+
 > 0.16.1-dev: painel de clã reorganizado no estilo Shirokai; [layout e navegação](docs/MENUS.md).
 
 > 0.16.0-dev: histórico, diagnóstico e reparos de [clãs](docs/CLANS.md),

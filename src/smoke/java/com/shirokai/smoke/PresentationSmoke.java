@@ -92,8 +92,8 @@ public final class PresentationSmoke implements ModInitializer {
                 check(color(menu.getInventory().getStack(9).get(DataComponentTypes.CUSTOM_NAME),0xff0000),"Profile title preview lost style");
                 ClanMenu.open(a,clans);
             },server).thenComposeAsync(v->until.apply(()->a.currentScreenHandler instanceof ClanMenu),server).thenRunAsync(()->{
-                var menu=(ClanMenu)a.currentScreenHandler;check(color(menu.getInventory().getStack(4).get(DataComponentTypes.CUSTOM_NAME),0xff0000),"Clan menu name lost style");
-                check(color(menu.getInventory().getStack(4).get(DataComponentTypes.LORE).lines().getFirst(),0xaa00aa),"Clan tag and name styles not independent");
+                var menu=(ClanMenu)a.currentScreenHandler;check(color(menu.getInventory().getStack(10).get(DataComponentTypes.LORE).lines().get(0),0xff0000),"Clan menu name lost style");
+                check(color(menu.getInventory().getStack(10).get(DataComponentTypes.LORE).lines().get(1),0xaa00aa),"Clan tag and name styles not independent");
             },server).thenComposeAsync(v->chat.mute(null,a.getUuid(),0L,"fixture"),server).thenRunAsync(()->{clear.run();endpoint.signed(a,SignedMessage.ofUnsigned(a.getUuid(),"@StyledBob muted"));check(pb.isEmpty()&&pc.isEmpty(),"Mention bypassed mute");},server);
         return result.whenCompleteAsync((v,error)->{tab.close();board.close();for(var p:online){chat.leave(p.getUuid());titles.forget(p.getUuid());clans.forget(p.getUuid());p.closeHandledScreen();}try{storage.close();}catch(Exception e){throw new CompletionException(e);}},server);
     }

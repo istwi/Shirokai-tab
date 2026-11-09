@@ -1,19 +1,30 @@
-## Visual do clã — 0.16.1
+## Visual do clã — 0.16.2
 
-Painel nativo com moldura escura, detalhes ciano e estrela central, alinhado ao
-cabeçalho dourado Shirokai. Os slots começam em0:
+Menu principal com cinco linhas (45 slots), fundo de vidro cinza e as posições
+solicitadas na referência. Slots começam em0; opções continuam sujeitas à
+associação e às permissões atuais.
 
-| Linha | Esquerda | Centro | Direita |
-| --- | --- | --- | --- |
-| Comunidade | Membros20 | Convites recebidos22 | Convidar24 |
-| Gestão | Nome/sigla29 | Histórico31 | Convites enviados33 |
-| Personalização/saída | Estilo do nome38 e sigla39 | Sair41 | Excluir43 |
+| Slot | Item | Função |
+| --- | --- | --- |
+| 10 | Cabeça | Informações do clã, nome/sigla, membros e cargo |
+| 19 | Bússola | Atualizar |
+| 28 | Bloco de redstone | Fechar aba |
+| 34 | Barreira | Excluir clã, somente líder e com confirmação |
+| 12 | Nether star | Membros e cargos |
+| 13 | Nether star | Convites recebidos |
+| 14 | Nether star | Convidar jogador |
+| 15 | Nether star | Editar nome e sigla |
+| 16 | Nether star | Convites enviados |
+| 21 | Nether star | Histórico |
+| 22 | Nether star | Estilos: submenu com nome e sigla, somente líder |
+| 23 | Nether star | Sair do clã |
 
-Excluir aparece em vermelho somente para o líder e mantém a confirmação separada.
-Rodapé: atualizar49 e fechar/voltar50; navegação45/53 somente quando aplicável.
-Listas têm cabeçalho com página/total e aviso de lista vazia. Molduras são decorativas,
-sem ações ou extração de itens. A posição dos botões de clã é definida no código;
-menus.json continua configurando o perfil e a ativação do menu de clã.
+Estilos indisponíveis e ações sem autorização deixam o vidro no lugar. Uma oferta
+de liderança adiciona aceitar/recusar em37/38 somente enquanto houver oferta.
+Listas do ClanMenu têm27 entradas por página, anterior36/próxima44 e rodapé com
+atualizar40/voltar41. Histórico mantém sua tela própria. Molduras não têm ações nem
+podem ser extraídas. O layout do clã é definido no código; menus.json continua
+configurando o perfil e a ativação do clã.
 
 # Menus configuráveis — 0.15.0-dev
 

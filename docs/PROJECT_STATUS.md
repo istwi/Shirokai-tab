@@ -1,3 +1,25 @@
+# Estado atual — 0.16.2-dev
+
+Menu principal do clã segue a referência: cinco linhas/45 slots e vidro cinza.
+Cabeça10 informa dados do clã, bússola19 atualiza, bloco de redstone28 fecha e
+barreira34 exclui com confirmação. Oito estrelas12..16/21..23 oferecem funções;
+estilos de nome/sigla reunidos em submenu. Nome e sigla estilizados ficam na lore
+da cabeça. Ações indisponíveis deixam o vidro no lugar, sem burlar permissões.
+
+Listas com27 entradas por página, navegação36/44 e atualizar40/voltar41. Ofertas
+de liderança usam37/38 somente quando pendentes. Histórico mantém sua tela própria.
+Sem alteração de SQLite6 ou JSONs existentes. MENUS.md contém o mapa dos slots.
+
+Build:123 testes unitários sem falhas;51 verificações Fabric aprovadas em três
+boots. Fixtures de clã/apresentação validam novos slots, ações e cores na lore.
+Renderização em cliente real ainda não certificada.
+
+JAR: build/libs/shirokai-core-0.16.2-dev.jar
+SHA256: 3b44eceb5bd9dbd25ffc2e32751cb5086f8d67378c0f2e985141d0ed72b55f42
+Base:7ea21c0. Instalação: substituir JAR e reiniciar, preservando configurações.
+
+---
+
 # Estado atual — 0.16.1-dev
 
 Menu de clã redesenhado: moldura escura com detalhes ciano, estrela central e
