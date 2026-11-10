@@ -61,7 +61,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
     private boolean paged(){return page==Page.MEMBERS||page==Page.INVITES||page==Page.INVITE_PLAYER||page==Page.SENT_INVITES;}
     private void frame(){
         if(page==Page.HOME){
-            for(int slot=0;slot<45;slot++)if(slot!=24&&slot!=25&&slot!=30&&slot!=31&&slot!=32&&slot!=33)decoration(slot,Items.GRAY_STAINED_GLASS_PANE);
+            for(int slot=0;slot<45;slot++)if(slot!=24&&slot!=25&&slot!=30&&slot!=31&&slot!=32&&slot!=33&&slot!=34)decoration(slot,Items.GRAY_STAINED_GLASS_PANE);
             item(28,Items.ARROW,"Voltar ao menu");
         }else{
             for(int slot=0;slot<9;slot++)decoration(slot,Items.GRAY_STAINED_GLASS_PANE);

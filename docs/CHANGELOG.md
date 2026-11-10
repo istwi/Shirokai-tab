@@ -1,3 +1,7 @@
+## 0.16.8-dev
+
+- Deixa vazio o slot34 do painel principal do clã, onde ficava a barreira antiga.
+
 ## 0.16.7-dev
 
 - Cabeças de perfil/clã/estilos exibem a skin do jogador que abriu o menu.

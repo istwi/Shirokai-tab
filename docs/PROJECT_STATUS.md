@@ -1,3 +1,16 @@
+# Estado atual — 0.16.8-dev
+
+Slot34 do painel principal de clã agora fica vazio, sem pane, conforme X da
+referência. Mantidos os demais ícones, a exclusão em19 e os espaços vazios prévios.
+Build aprovado com124 testes unitários sem falhas; sem nova execução Fabric para
+este ajuste decorativo. Sem mudanças de SQL/JSON ou nas ações dos botões.
+
+JAR: build/libs/shirokai-core-0.16.8-dev.jar
+SHA256: b0250a7742fd20c87d1bb4d197e26425f88ccc46203b7dfb6c082ee375798174
+Base:bd13b4a. Substituir JAR e reiniciar, sem apagar configurações.
+
+---
+
 # Estado atual — 0.16.7-dev
 
 Cabeças informativas de perfil/clã/estilos usam o GameProfile do jogador que abriu

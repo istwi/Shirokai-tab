@@ -1,3 +1,5 @@
+> 0.16.8: slot34 do painel principal do clã fica vazio, sem vidro, conforme o X da referência.
+
 ## Cabeças e ícones — 0.16.7
 
 Cabeças informativas de /perfil, /clan e estilos usam UUID/nome/texturas do
