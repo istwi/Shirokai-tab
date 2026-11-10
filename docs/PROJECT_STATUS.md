@@ -1,3 +1,16 @@
+# Estado atual — 0.16.3-dev
+
+Ajuste visual solicitado: slots24,25,30,31,32,33 do painel principal ficam vazios,
+sem pane. Demais ícones, moldura, permissões e telas permanecem como0.16.2.
+Build e123 testes unitários aprovados. Sem nova execução Fabric para este ajuste
+decorativo; validação de cliques da0.16.2 permanece registrada abaixo.
+
+JAR: build/libs/shirokai-core-0.16.3-dev.jar
+SHA256: 14c989801c2b9dbe23fdbecd5200992760f12fba92794ce9a2cfcf05766cd40c
+Base:1d9b5f0. Substituir JAR e reiniciar, sem apagar JSONs ou banco.
+
+---
+
 # Estado atual — 0.16.2-dev
 
 Menu principal do clã segue a referência: cinco linhas/45 slots e vidro cinza.

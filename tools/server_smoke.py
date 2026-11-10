@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
         server.wait('SQLite pronto:')
         server.command('shirokaicore status', 'SQLite=READY')
         server.command('shirokaicore modules', 'administration=RUNNING')
-        server.command('shirokaicore version', 'Shirokai Core 0.16.2-dev')
+        server.command('shirokaicore version', 'Shirokai Core 0.16.3-dev')
         server.command('shirokaicore permissions', 'vanilla-op4')
         server.command('shirokaicore placeholders %shirokai:online%/%shirokai:dollars%', '0/N/D')
         server.command('shirokaicore debug', 'SQLite integrity_check=ok')

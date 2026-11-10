@@ -1,3 +1,7 @@
+## 0.16.3-dev
+
+- Remove somente os vidros dos seis espaços indicados no painel principal de clã:24,25,30,31,32,33.
+
 ## 0.16.2-dev
 
 - Menu principal de clã segue a referência: cinco linhas, vidro cinza, cabeça
