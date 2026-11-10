@@ -80,7 +80,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
                 if(entry.getKey().equals("next")&&(page+1)*size>=entries.size())continue;
             }
             if(entry.getKey().equals("styles")&&!titles.customizationEnabled()&&!PanelLayout.matches(layout))continue;
-            var b=entry.getValue();display.setStack(b.slot(),icon(b.item(),b.name(),b.lore(),common));
+            var b=entry.getValue();var stack=icon(b.item(),b.name(),b.lore(),common);if(entry.getKey().equals("header"))PlayerHeads.apply(stack,owner);display.setStack(b.slot(),stack);
         }
         sendContentUpdates();
     }

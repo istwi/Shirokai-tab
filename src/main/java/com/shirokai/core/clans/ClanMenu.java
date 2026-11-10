@@ -62,8 +62,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
     private void frame(){
         if(page==Page.HOME){
             for(int slot=0;slot<45;slot++)if(slot!=24&&slot!=25&&slot!=30&&slot!=31&&slot!=32&&slot!=33)decoration(slot,Items.GRAY_STAINED_GLASS_PANE);
-            item(19,Items.COMPASS,"Atualizar painel","Recarregar as informações do clã.");
-            item(28,Items.REDSTONE_BLOCK,"Fechar aba");
+            item(28,Items.ARROW,"Voltar ao menu");
         }else{
             for(int slot=0;slot<9;slot++)decoration(slot,Items.GRAY_STAINED_GLASS_PANE);
             for(int slot=36;slot<45;slot++)decoration(slot,Items.GRAY_STAINED_GLASS_PANE);
@@ -87,29 +86,30 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     data.clan().map(c->"Sigla: "+Objects.toString(c.tag(),"Não definida")).orElse("Crie um clã: /clan create <nome>"),
                     data.clan().map(c->"Membros: "+c.members().size()+"/"+data.limit()).orElse("Ou aceite um convite recebido."),
                     data.clan().map(c->"Seu cargo: "+Messages.role(c.members().get(owner.getUuid()))).orElse(""));
+                com.shirokai.core.menus.PlayerHeads.apply(display.getStack(10),owner);
                 if(clans.menuPresentationEnabled())data.clan().ifPresent(clan->{
                     var card=display.getStack(10);var lore=new ArrayList<Text>(card.get(DataComponentTypes.LORE).lines());
                     lore.set(0,Text.literal("Nome: ").formatted(Formatting.GRAY).append(clans.presentClan(owner.getUuid(),clan,Surface.CLAN_NAME,clan.name())));
                     lore.set(1,Text.literal("Sigla: ").formatted(Formatting.GRAY).append(clans.presentClan(owner.getUuid(),clan,Surface.CLAN_TAG,Objects.toString(clan.tag(),"Não definida"))));
                     card.set(DataComponentTypes.LORE,new LoreComponent(lore));
                 });
-                item(13,Items.NETHER_STAR,"Convites recebidos",Integer.toString(data.invitations().size()),"Clique para aceitar ou recusar.");
+                item(13,Items.PAPER,"Convites recebidos",Integer.toString(data.invitations().size()),"Clique para aceitar ou recusar.");
                 if(data.clan().isPresent()){
-                    item(12,Items.NETHER_STAR,"Membros e cargos","Consulte e gerencie os membros do clã.");
-                    item(14,Items.NETHER_STAR,"Convidar jogador","Convide novos aliados para o clã.");
-                    item(15,Items.NETHER_STAR,"Editar nome e sigla","Personalize a identidade do seu clã.");
-                    item(16,Items.NETHER_STAR,"Convites enviados",Integer.toString(data.sent().size()),"Clique em um convite para cancelar.");
-                    item(21,Items.NETHER_STAR,"Histórico do clã","Consulte as ações registradas.");
-                    if(clans.customizationEnabled()&&own().leader().equals(owner.getUuid()))item(22,Items.NETHER_STAR,"Estilos do clã","Escolha o estilo do nome ou da sigla.");
-                    item(23,Items.NETHER_STAR,"Sair do clã","Encerrar sua participação neste clã.");
+                    item(12,Items.PAPER,"Membros e cargos","Consulte e gerencie os membros do clã.");
+                    item(14,Items.PAPER,"Convidar jogador","Convide novos aliados para o clã.");
+                    item(15,Items.PAPER,"Editar nome e sigla","Personalize a identidade do seu clã.");
+                    item(16,Items.PAPER,"Convites enviados",Integer.toString(data.sent().size()),"Clique em um convite para cancelar.");
+                    item(21,Items.PAPER,"Histórico do clã","Consulte as ações registradas.");
+                    if(clans.customizationEnabled()&&own().leader().equals(owner.getUuid()))item(22,Items.PAPER,"Estilos do clã","Escolha o estilo do nome ou da sigla.");
+                    item(23,Items.PAPER,"Sair do clã","Encerrar sua participação neste clã.");
                     if(own().leader().equals(owner.getUuid())){
-                        item(34,Items.BARRIER,"Excluir clã","Exige confirmação em outra tela.");
-                        display.getStack(34).set(DataComponentTypes.CUSTOM_NAME,Text.literal("Excluir clã").formatted(Formatting.RED));
+                        item(19,Items.BARRIER,"Excluir clã","Exige confirmação em outra tela.");
+                        display.getStack(19).set(DataComponentTypes.CUSTOM_NAME,Text.literal("Excluir clã").formatted(Formatting.RED));
                     }
                 }
                 if(data.transfer().isPresent()){item(37,Items.EMERALD,"Aceitar liderança","Confirme a solicitação recebida.");item(38,Items.BARRIER,"Recusar liderança");}
             }
-            case STYLES->{item(20,Items.NETHER_STAR,"Estilo do nome");item(24,Items.NETHER_STAR,"Estilo da sigla");}
+            case STYLES->{item(20,Items.PAPER,"Estilo do nome");item(24,Items.PAPER,"Estilo da sigla");}
             case IDENTITY->{item(20,Items.NAME_TAG,"Editar nome completo");item(24,Items.PAPER,"Editar sigla");}
             case SENT_INVITES->{
                 var entries=data.sent().keySet().stream().sorted().toList();index=Math.min(index,Math.max(0,(entries.size()-1)/27));
@@ -128,10 +128,10 @@ public final class ClanMenu extends GenericContainerScreenHandler {
             }
             case MEMBER->{
                 item(4,Items.PLAYER_HEAD,name(target));item(20,Items.GOLD_INGOT,"Promover");item(22,Items.IRON_INGOT,"Rebaixar");item(24,Items.BARRIER,"Expulsar");
-                if(own().leader().equals(owner.getUuid()))item(31,Items.NETHER_STAR,"Solicitar transferência de liderança","Exige aceitação do destinatário.");
+                if(own().leader().equals(owner.getUuid()))item(31,Items.PAPER,"Solicitar transferência de liderança","Exige aceitação do destinatário.");
             }
             case DISBAND->{item(4,Items.TNT,"EXCLUIR "+own().name(),"Todos os membros serão desvinculados.","Somente confirme se deseja excluir este clã.");item(22,Items.REDSTONE_BLOCK,"CONFIRMAR EXCLUSÃO");item(24,Items.EMERALD_BLOCK,"Cancelar");}
-            case TRANSFER->{item(4,Items.NETHER_STAR,"TRANSFERIR LIDERANÇA",name(target),"O destinatário ainda precisará aceitar.");item(22,Items.EMERALD_BLOCK,"Confirmar solicitação");item(24,Items.BARRIER,"Cancelar");}
+            case TRANSFER->{item(4,Items.PAPER,"TRANSFERIR LIDERANÇA",name(target),"O destinatário ainda precisará aceitar.");item(22,Items.EMERALD_BLOCK,"Confirmar solicitação");item(24,Items.BARRIER,"Cancelar");}
         }
         if(paged()){
             int count=switch(page){case MEMBERS->own().members().size();case INVITES->data.invitations().size();case SENT_INVITES->data.sent().size();default->(int)owner.getServer().getPlayerManager().getPlayerList().stream().filter(p->!own().members().containsKey(p.getUuid())&&com.shirokai.core.visibility.VisibilityService.canSee(owner.getServer(),owner,p)).count();};
@@ -168,8 +168,12 @@ public final class ClanMenu extends GenericContainerScreenHandler {
         if(!canUse(player)||owner.currentScreenHandler!=this||busy||type!=SlotActionType.PICKUP||(button!=0&&button!=1))return;
         if(slot<0||slot>=45||display.getStack(slot).isEmpty()||display.getStack(slot).isOf(Items.BLACK_STAINED_GLASS_PANE)||display.getStack(slot).isOf(Items.CYAN_STAINED_GLASS_PANE)||display.getStack(slot).isOf(Items.GRAY_STAINED_GLASS_PANE))return;
         try{
-            if(slot==(page==Page.HOME?19:40)){refresh();return;}
-            if(slot==(page==Page.HOME?28:41)){if(page==Page.HOME)owner.closeHandledScreen();else navigate(Page.HOME);return;}
+            if(slot==(page==Page.HOME?10:40)){refresh();return;}
+            if(slot==(page==Page.HOME?28:41)){if(page==Page.HOME){
+                owner.closeHandledScreen();var server=owner.getServer();
+                if(server.getCommandManager().getDispatcher().getRoot().getChild("menu")!=null)server.getCommandManager().executeWithPrefix(owner.getCommandSource(),"menu");
+                else owner.sendMessage(Messages.info("Menu principal não está disponível neste servidor."),false);
+            }else navigate(Page.HOME);return;}
             if(slot==36){index=Math.max(0,index-1);render();return;}if(slot==44){index++;render();return;}
             switch(page){
                 case HOME->{
@@ -181,7 +185,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
                     else if(slot==21&&data.clan().isPresent())ClanHistoryMenu.open(owner,clans,own().id(),0);
                     else if(slot==22&&data.clan().isPresent()&&clans.customizationEnabled())navigate(Page.STYLES);
                     else if(slot==23&&data.clan().isPresent())action(()->scoped().leave(owner.getUuid()),Page.HOME);
-                    else if(slot==34&&data.clan().isPresent())action(()->scoped().disband(owner.getUuid(),false),Page.DISBAND);
+                    else if(slot==19&&data.clan().isPresent())action(()->scoped().disband(owner.getUuid(),false),Page.DISBAND);
                     else if(slot==37&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),true),Page.HOME);
                     else if(slot==38&&data.transfer().isPresent())action(()->clans.scoped(data.transfer().get().clan()).answerTransfer(owner.getUuid(),false),Page.HOME);
                 }

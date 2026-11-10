@@ -1,3 +1,26 @@
+# Estado atual — 0.16.7-dev
+
+Cabeças informativas de perfil/clã/estilos usam o GameProfile do jogador que abriu
+a tela, incluindo cópia das propriedades de texturas, sem lookup adicional. API
+Minecraft1.21.1 ProfileComponent(GameProfile) auditada por javap no JAR mapeado.
+Apenas itens PLAYER_HEAD recebem o componente; ícones customizados preservados.
+
+Clã: exclusão movida para19, vidro cinza para não líderes. Ícones de estrela
+substituídos por papel. Seta28 volta ao /menu externo; cabeça10 atualiza os dados.
+Confirmação/autorização de exclusão mantidas. Layout/JSONs dos demais menus e
+SQLite6 preservados. Sem migração nova de config necessária.
+
+Build aprovado:124 testes JUnit e51 verificações Fabric em três boots.
+Fixtures verificam UUID da cabeça do observador em perfil e clã,
+vidro para não líder, transferência e confirmação da exclusão no slot novo.
+Skin renderizada e /menu externo ainda dependem de validação com cliente real.
+
+JAR: build/libs/shirokai-core-0.16.7-dev.jar
+SHA256: ae9c9336d976e4c102db615947517387024a8ebfea833c3f7bb3889accf728d4
+Base:ec96200. Substituir JAR e reiniciar, sem apagar menus.json/banco.
+
+---
+
 # Estado atual — 0.16.6-dev
 
 Corrige perfil que permanecia em seis linhas por ter título personalizado, como

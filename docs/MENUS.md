@@ -1,3 +1,14 @@
+## Cabeças e ícones — 0.16.7
+
+Cabeças informativas de /perfil, /clan e estilos usam UUID/nome/texturas do
+GameProfile do jogador que abriu a tela. Sem consultas adicionais de skin.
+
+No painel principal de clã: exclusão movida para19 (X da referência), somente
+para o líder; para os demais membros permanece vidro cinza. Antigo34 volta ao
+fundo. Cabeça10 também atualiza os dados. Seta28 substitui a redstone e retorna
+via /menu, se instalado. Demais estrelas do clã foram trocadas por papel, inclusive
+os submenus. Confirmação de exclusão permanece em tela separada.
+
 ## Correção de migração — 0.16.6
 
 Perfis com a geometria antiga (seis linhas, slots de tags e botões originais)

@@ -1,3 +1,10 @@
+## 0.16.7-dev
+
+- Cabeças de perfil/clã/estilos exibem a skin do jogador que abriu o menu.
+- Exclusão do clã movida para19; não líderes veem vidro nessa posição.
+- Seta28 volta ao /menu externo; cabeça10 atualiza o painel do clã.
+- Ícones de estrela do clã substituídos por papel.
+
 ## 0.16.6-dev
 
 - Corrige migração do perfil antigo com título/textos/ícones personalizados.

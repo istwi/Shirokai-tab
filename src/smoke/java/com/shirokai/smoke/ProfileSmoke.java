@@ -138,6 +138,7 @@ public final class ProfileSmoke implements ModInitializer {
             return until(() -> owner.currentScreenHandler instanceof ProfileMenu);
         },server).thenComposeAsync(v -> {
             var menu = (ProfileMenu)owner.currentScreenHandler;
+            check(menu.getSlot(10).getStack().get(net.minecraft.component.DataComponentTypes.PROFILE).gameProfile().getId().equals(owner.getUuid()),"Profile head is not the viewing player");
             check(!menu.canUse(stranger),"Other player can use menu");
             check(menu.quickMove(owner,9).isEmpty(),"Quick move extracted icon");
             for (var action : SlotActionType.values()) if (action != SlotActionType.PICKUP)

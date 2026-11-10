@@ -54,6 +54,7 @@ public final class StyleChoiceMenu extends GenericContainerScreenHandler {
             "Estado: "+switch(status.status()){case ADMINISTRATIVE->"Padrão do servidor";case ACTIVE->"Aplicado";case UNAVAILABLE->"Sem acesso no momento";case REMOVED->"Estilo indisponível";},
             "Sua escolha fica salva mesmo sem acesso ao estilo.",
             "Enquanto indisponível, usamos o estilo padrão.");
+        com.shirokai.core.menus.PlayerHeads.apply(display.getStack(10),owner);
         entries=view.catalog().presets().entrySet().stream().filter(e->e.getValue().definition().surfaces().contains(view.surface())).map(Map.Entry::getKey).sorted().toList();
         page=Math.min(page,Math.max(0,(entries.size()-1)/PanelLayout.CONTENT.size()));
         for(int i=0;i<PanelLayout.CONTENT.size()&&page*PanelLayout.CONTENT.size()+i<entries.size();i++){
