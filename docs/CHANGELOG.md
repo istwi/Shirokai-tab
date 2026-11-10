@@ -1,3 +1,9 @@
+## 0.16.4-dev
+
+- Menu de clã disponível somente para membros de um clã, incluindo quem entrou por convite.
+- Sem clã, orienta criação/convites no chat; fecha telas após perda da associação.
+- Preserva comandos de criação, convites e aceitação.
+
 ## 0.16.3-dev
 
 - Remove somente os vidros dos seis espaços indicados no painel principal de clã:24,25,30,31,32,33.

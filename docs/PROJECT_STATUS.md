@@ -1,3 +1,23 @@
+# Estado atual — 0.16.4-dev
+
+/clan e /clan menu abrem o painel somente para quem pertence a um clã. Sem
+associação, mostram orientação para /clan create <nome>, /clan invites e
+/clan accept <nome>. Membros que entraram por convite também acessam o painel.
+Sair/exclusão/expulsão invalida o menu; ações/reload sem associação fecham a tela.
+A checagem usa a associação carregada do SQL na abertura e o cache do servidor
+em canUse. Comandos textuais de criação/convites/aceitação continuam disponíveis.
+
+Build aprovado:123 testes JUnit e51 verificações Fabric em três boots.
+Fixture de clã verifica entrada por convite, navegação e fechamento
+após exclusão. Layout0.16.3 preservado. Sem alteração de SQLite6 ou JSONs existentes.
+Renderização/login autenticado de cliente real permanecem pendentes.
+
+JAR: build/libs/shirokai-core-0.16.4-dev.jar
+SHA256: 33faa6a4be8522cd056b2a632d8b97cfd1df28c2b966ecfb5d975a52d6ac01e4
+Base:b92989d. Instalação: substituir JAR e reiniciar, preservando configurações.
+
+---
+
 # Estado atual — 0.16.3-dev
 
 Ajuste visual solicitado: slots24,25,30,31,32,33 do painel principal ficam vazios,

@@ -1,3 +1,7 @@
+> 0.16.4: /clan e /clan menu exigem associação atual a um clã. Sem clã, orientam
+> /clan create <nome>; convites/aceitação continuam acessíveis por comandos. Sair,
+> expulsão ou exclusão invalida a tela aberta.
+
 > 0.16.3: no painel principal, slots24,25,30,31,32,33 ficam vazios, sem vidro, conforme os pontos da referência.
 
 ## Visual do clã — 0.16.2

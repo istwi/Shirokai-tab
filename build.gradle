@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '2.2.20'
 }
-version = '0.16.3-dev'
+version = '0.16.4-dev'
 group = 'com.shirokai'
 base { archivesName = 'shirokai-core' }
 repositories {

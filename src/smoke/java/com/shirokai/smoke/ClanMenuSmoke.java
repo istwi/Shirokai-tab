@@ -51,11 +51,11 @@ public final class ClanMenuSmoke implements ModInitializer {
                 check(leader.currentScreenHandler==previous,"Paused clan editor opened");
                 clans.menuEnabled(true);return clan;
             },server)
-            .thenComposeAsync(clan->clans.invite(a,b),server).thenComposeAsync(clan->{ClanMenu.open(member,clans);return until.apply(()->member.currentScreenHandler instanceof ClanMenu);},server)
+            .thenComposeAsync(clan->clans.invite(a,b),server).thenComposeAsync(clan->clans.accept(b,"MenuClan"),server).thenComposeAsync(clan->{ClanMenu.open(member,clans);return until.apply(()->member.currentScreenHandler instanceof ClanMenu);},server)
             .thenComposeAsync(v->{
                 var shownPage=menu(member).page();clans.menuEnabled(false);check(!menu(member).canUse(member),"Disabled open clan screen still accepts actions");
                 click(member,13);check(menu(member).page()==shownPage,"Disabled screen changed pages");
-                clans.menuEnabled(true);click(member,13);check(menu(member).page()==ClanMenu.Page.INVITES,"Invite page missing");click(member,9);return until.apply(()->clans.cached(b).isPresent()&&menu(member).page()==ClanMenu.Page.HOME);},server)
+                clans.menuEnabled(true);click(member,13);check(menu(member).page()==ClanMenu.Page.INVITES,"Invite page missing");click(member,41);return until.apply(()->clans.cached(b).isPresent()&&menu(member).page()==ClanMenu.Page.HOME);},server)
             .thenComposeAsync(v->{ClanMenu.open(leader,clans);return until.apply(()->leader.currentScreenHandler instanceof ClanMenu);},server)
             .thenComposeAsync(v->{click(leader,21);return until.apply(()->leader.currentScreenHandler instanceof com.shirokai.core.clans.ClanHistoryMenu);},server)
             .thenComposeAsync(v->{
@@ -104,9 +104,9 @@ public final class ClanMenuSmoke implements ModInitializer {
             .thenComposeAsync(v->{
                 var shownPage=menu(member).page();clans.menuEnabled(false);check(!menu(member).canUse(member),"Disabled open clan screen still accepts actions");
                 click(member,22);check(menu(member).page()==shownPage,"Disabled screen changed pages");
-                clans.menuEnabled(true);click(member,22);return until.apply(()->clans.cached(b).isEmpty()&&menu(member).page()==ClanMenu.Page.HOME);},server)
+                clans.menuEnabled(true);click(member,22);return until.apply(()->clans.cached(b).isEmpty()&&!(member.currentScreenHandler instanceof ClanMenu));},server)
             .thenRunAsync(()->{check(clans.cached(a).isEmpty(),"Disband left membership");check(leader.getInventory().getStack(0).getCount()==5,"Items changed");
-                var closed=menu(member);click(member,28);check(member.currentScreenHandler!=closed&&!closed.canUse(member),"Menu remained usable after close");
+                check(!(member.currentScreenHandler instanceof ClanMenu),"Menu remained open without clan");
             },server);
         return flow.whenCompleteAsync((v,error)->{leader.closeHandledScreen();member.closeHandledScreen();try{storage.close();}catch(Exception close){throw new CompletionException(close);}},server);
     }

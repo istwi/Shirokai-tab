@@ -46,9 +46,11 @@ public final class ClanMenu extends GenericContainerScreenHandler {
         load(player.getUuid(),service,player.getServer()).whenCompleteAsync((data,error)->{
             if(!service.menuEnabled()||player.isDisconnected()||player.currentScreenHandler!=previous)return;
             if(error!=null){player.sendMessage(Text.literal("Não foi possível carregar o clã; tente novamente."),false);return;}
+            if(data.clan().isEmpty()){creationHint(player);return;}
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId,inventory,ignored)->new ClanMenu(syncId,inventory,player,service,data),service.present(player.getUuid(),Surface.MENU_TITLE,"✦ CLÃ SHIROKAI")));
         },player.getServer());
     }
+    private static void creationHint(ServerPlayerEntity player){player.sendMessage(Messages.info("Crie seu clã usando /clan create <nome>. Para entrar em outro, use /clan invites e /clan accept <nome>."),false);}
     private void item(int slot,Item type,String name,String...lore){
         var stack=new ItemStack(type);stack.set(DataComponentTypes.CUSTOM_NAME,clans.present(owner.getUuid(),Surface.MENU_NAME,name).copy().formatted(Formatting.AQUA).styled(style->style.withItalic(false)));
         stack.set(DataComponentTypes.LORE,new LoreComponent(Arrays.stream(lore).map(line->(Text)clans.present(owner.getUuid(),Surface.MENU_LORE,line).copy().formatted(Formatting.GRAY).styled(style->style.withItalic(false))).toList()));display.setStack(slot,stack);
@@ -148,6 +150,7 @@ public final class ClanMenu extends GenericContainerScreenHandler {
             operation.get().thenComposeAsync(result->load(owner.getUuid(),clans,owner.getServer()),owner.getServer()).whenCompleteAsync((value,error)->{
                 busy=false;if(closed||owner.currentScreenHandler!=this)return;
                 if(error!=null){failure(error);return;}
+                if(value.clan().isEmpty()){owner.closeHandledScreen();creationHint(owner);return;}
                 data=value;page=expected.equals(value.clan().map(ClanSnapshot::id))?destination:Page.HOME;index=0;render();owner.sendMessage(Messages.info("Clã atualizado."),false);
             },owner.getServer());
         }catch(Exception error){busy=false;failure(error);}
@@ -155,10 +158,11 @@ public final class ClanMenu extends GenericContainerScreenHandler {
     private void refresh(){
         busy=true;load(owner.getUuid(),clans,owner.getServer()).whenCompleteAsync((value,error)->{
             busy=false;if(closed||owner.currentScreenHandler!=this)return;if(error!=null){failure(error);return;}
+            if(value.clan().isEmpty()){owner.closeHandledScreen();creationHint(owner);return;}
             data=value;page=Page.HOME;index=0;render();
         },owner.getServer());
     }
-    @Override public boolean canUse(PlayerEntity player){return clans.menuEnabled()&&!closed&&player==owner&&!owner.isDisconnected();}
+    @Override public boolean canUse(PlayerEntity player){return clans.menuEnabled()&&!closed&&player==owner&&!owner.isDisconnected()&&clans.cached(owner.getUuid()).isPresent();}
     @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}
     @Override public void onSlotClick(int slot,int button,SlotActionType type,PlayerEntity player){
         if(!canUse(player)||owner.currentScreenHandler!=this||busy||type!=SlotActionType.PICKUP||(button!=0&&button!=1))return;
