@@ -1,3 +1,22 @@
+# Estado atual — 0.16.9-dev
+
+Impactor: moedas válidas sem conta do jogador agora exibem0 em vez de N/D. Vale
+para dollars/tokens/cash, no cache nativo e exportação PAPI. Consulta hasAccount
+continua impedindo account() no caso ausente: nenhum depósito/criação de conta.
+Erros, moeda inexistente, conta incompatível ou sessão obsoleta seguem indisponíveis.
+Saldos existentes mantêm a consulta e formatação anteriores. Sem alterações de
+SQL6, integrations.json, permissões ou regras de inicialização do Impactor.
+
+Build aprovado:124 testes JUnit sem falhas e14 verificações com mods opcionais
+reais aprovadas. Ausência de conta nas três moedas retorna0 sem criá-la; moeda
+ausente permanece indisponível, sem fallback para primária.
+
+JAR: build/libs/shirokai-core-0.16.9-dev.jar
+SHA256: dc6138c709c318631ae38a6f0048f70740191f3c15e1c9bf117ba0e248df86e4
+Base:09e39c7. Substituir JAR e reiniciar; não apagar JSONs nem saldos.
+
+---
+
 # Estado atual — 0.16.8-dev
 
 Slot34 do painel principal de clã agora fica vazio, sem pane, conforme X da

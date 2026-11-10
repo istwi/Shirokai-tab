@@ -17,7 +17,8 @@ public final class ImpactorAccess {
         if (currency.isEmpty() || !currency.get().key().asString().equals(currencyId)) return CompletableFuture.completedFuture(Optional.empty());
         // account() can create an account. Do not call it for an absent account.
         return service.hasAccount(currency.get(), player).thenComposeAsync(exists -> {
-            if (!current.getAsBoolean() || EconomyService.instance() != service || !exists) return CompletableFuture.completedFuture(Optional.<String>empty());
+            if (!current.getAsBoolean() || EconomyService.instance() != service) return CompletableFuture.completedFuture(Optional.<String>empty());
+            if (!exists) return CompletableFuture.completedFuture(Optional.of("0"));
             return service.account(currency.get(), player).thenApplyAsync(account -> {
                 if (!current.getAsBoolean() || EconomyService.instance() != service || account.virtual() || !account.owner().equals(player) || !account.currency().key().asString().equals(currencyId)) return Optional.<String>empty();
                 BigDecimal value = account.balance();

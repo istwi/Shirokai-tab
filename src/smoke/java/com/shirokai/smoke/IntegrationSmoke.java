@@ -174,13 +174,18 @@ public final class IntegrationSmoke implements ModInitializer {
                 check(missing.isEmpty(), "Missing currency fell back to primary");
                 UUID absent = UUID.randomUUID();
                 return new ImpactorAccess(server).balance(absent, "impactor:dollars")
-                    .thenComposeAsync(balance -> { check(balance.isEmpty(), "Missing account invented a balance"); return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:dollars")).orElseThrow(), absent); }, server)
+                    .thenComposeAsync(balance -> { check(balance.equals(Optional.of("0")), "Missing account did not display zero"); return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:dollars")).orElseThrow(), absent); }, server)
                     .thenAccept(exists -> check(!exists, "Display created an absent economy account"));
             }, server).thenComposeAsync(v->{
                 UUID absent=UUID.randomUUID();
                 return new ImpactorAccess(server).balance(absent,"impactor:cash")
-                    .thenComposeAsync(balance->{check(balance.isEmpty(),"Missing cash account invented a balance");return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:cash")).orElseThrow(),absent);},server)
+                    .thenComposeAsync(balance->{check(balance.equals(Optional.of("0")),"Missing cash account did not display zero");return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:cash")).orElseThrow(),absent);},server)
                     .thenAccept(exists->check(!exists,"Cash placeholder created an account"));
+            }, server).thenComposeAsync(v->{
+                UUID absent=UUID.randomUUID();
+                return new ImpactorAccess(server).balance(absent,"impactor:tokens")
+                    .thenComposeAsync(balance->{check(balance.equals(Optional.of("0")),"Missing tokens account did not display zero");return EconomyService.instance().hasAccount(EconomyService.instance().currencies().currency(Key.key("impactor:tokens")).orElseThrow(),absent);},server)
+                    .thenAccept(exists->check(!exists,"Tokens placeholder created an account"));
             }, server).thenRunAsync(() -> {
                 var replacement = (PlaceholderHandler)(c, arg) -> PlaceholderResult.value(Text.literal("replacement"));
                 Placeholders.register(Identifier.of("shirokai:smoke_literal"), replacement); bridge.close();

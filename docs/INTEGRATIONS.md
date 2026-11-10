@@ -1,3 +1,7 @@
+> 0.16.9: dólares/tokens/cash mostram0 quando a moeda existe e o jogador ainda
+> não possui conta. Não cria contas nem altera saldos; moeda inexistente, erro de
+> API ou sessão obsoleta continuam indisponíveis.
+
 > 0.16: integração opcional de entidades [Drex Vanish](VANISH.md), versão auditada1.5.9+1.21.1. Core sozinho não fornece vanish.
 
 > 0.15.1 acrescenta cashCurrency e %shirokai:cash%, independentes de dollars/tokens.
@@ -186,7 +190,8 @@ Use `%shirokai:cash%` no TAB/scoreboard do Core ou pelo handler shirokai:cash do
 Fabric Placeholder API em mods compatíveis. Configuração: cashCurrency aponta
 para impactor:cash por padrão. A moeda precisa estar registrada no Impactor e a
 conta deve existir; o Core não cria moedas/contas nem fabrica saldo. Saldo zero
-existente aparece como0; moeda/conta ausente retorna o fallback (normalmente N/D).
+existente aparece como0; desde0.16.9, conta ausente em moeda válida também exibe0
+sem criar conta. Moeda ausente ou erro mantém o fallback (normalmente N/D).
 Nunca usa dollars, tokens ou moeda primária como substituto.
 
 Exemplo completo: examples/integrations.json. No trecho das moedas:

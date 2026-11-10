@@ -1,3 +1,9 @@
+## 0.16.9-dev
+
+- Dinheiro/tokens/cash exibem0 para jogadores sem conta em moeda válida do Impactor.
+- Não cria conta nem modifica saldo; moedas ausentes e erros continuam N/D.
+- Regressão com Impactor real para ausência de conta nas três moedas.
+
 ## 0.16.8-dev
 
 - Deixa vazio o slot34 do painel principal do clã, onde ficava a barreira antiga.

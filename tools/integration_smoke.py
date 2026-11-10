@@ -67,7 +67,7 @@ with tempfile.TemporaryDirectory(prefix='runtime-', dir=reports) as tmp:
                    'actual Impactor dollars tokens cash distinct balances zero cash reload and PAPI export without primary fallback',
                    'actual Cobblemon species registry and official acquisition updates Pokedex snapshot',
                    'actual Shirokai Dex expansion and consistent provider switching through PAPI',
-                   'missing currency/account fallback without account creation', 'PAPI foreign replacement preserved and disconnect cache cleared']
+                   'missing accounts display zero for dollars tokens cash without creation; missing currency remains unavailable', 'PAPI foreign replacement preserved and disconnect cache cleared']
     finally:
         if process.poll() is None:
             try:
