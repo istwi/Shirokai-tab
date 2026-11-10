@@ -1,3 +1,9 @@
+## 0.16.6-dev
+
+- Corrige migração do perfil antigo com título/textos/ícones personalizados.
+- Reconhece geometria antiga pelos slots e move controles sem apagar a aparência.
+- Mantém backup, clanMenuEnabled e layouts com posições personalizadas.
+
 ## 0.16.5-dev
 
 - /perfil e seleção de estilos compartilham o layout de cinco linhas da referência.

@@ -25,10 +25,15 @@ class MenuConfigTest {
         var file=directory.resolve("menus.json");var legacy=MenuConfig.legacyDefaults();
         String source=MenuConfig.json(new MenuConfig(1,false,legacy.profile()));Files.writeString(file,source);
         var migrated=MenuConfig.load(file);assertFalse(migrated.clanMenuEnabled());assertEquals(MenuConfig.defaults().profile(),migrated.profile());
-        assertEquals(source,Files.readString(file.resolveSibling("menus.json.pre-0.16.5.bak")));
+        assertEquals(source,Files.readString(file.resolveSibling("menus.json.pre-0.16.6.bak")));
         String updated=Files.readString(file);MenuConfig.load(file);assertEquals(updated,Files.readString(file));
         String custom=MenuConfig.json(legacy).replace("PERFIL SHIROKAI","MEU PERFIL");Files.writeString(file,custom);
-        assertEquals(6,MenuConfig.load(file).profile().rows());assertEquals(custom,Files.readString(file));
+        var customFile=directory.resolve("custom.json");Files.writeString(customFile,custom);
+        var migratedCustom=MenuConfig.load(customFile);assertEquals(5,migratedCustom.profile().rows());assertTrue(migratedCustom.profile().title().contains("MEU PERFIL"));
+        assertEquals(custom,Files.readString(customFile.resolveSibling("custom.json.pre-0.16.6.bak")));
+        var modified=JsonParser.parseString(custom).getAsJsonObject();var buttons=modified.getAsJsonObject("profile").getAsJsonObject("buttons");
+        buttons.getAsJsonObject("header").addProperty("slot",47);buttons.getAsJsonObject("styles").addProperty("slot",4);
+        Files.writeString(file,modified.toString());assertEquals(6,MenuConfig.load(file).profile().rows());assertEquals(modified.toString(),Files.readString(file));
     }
     @Test void collisionsOutOfRangeRowsAndDuplicateTagSlotsAreRejected(){
         for(int slot:new int[]{10,45,54,-1}){var root=defaults();root.getAsJsonObject("profile").getAsJsonArray("tagSlots").add(slot);assertThrows(Exception.class,()->MenuConfig.parse(root.toString()));}

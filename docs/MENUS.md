@@ -1,3 +1,11 @@
+## Correção de migração — 0.16.6
+
+Perfis com a geometria antiga (seis linhas, slots de tags e botões originais)
+agora migram mesmo com título, nomes, descrições, ícones ou tags personalizados.
+Esses valores são preservados; só linhas/posições mudam. Backup em
+menus.json.pre-0.16.6.bak antes da troca atômica. Geometrias personalizadas continuam
+intactas. Isso corrige o caso do título “✦ PERFIL” impedir a atualização na0.16.5.
+
 ## Perfil e estilos — 0.16.5
 
 Ambos usam cinco linhas, vidro cinza na moldura/divisória e15 opções na área à

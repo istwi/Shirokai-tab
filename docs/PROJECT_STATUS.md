@@ -1,3 +1,22 @@
+# Estado atual — 0.16.6-dev
+
+Corrige perfil que permanecia em seis linhas por ter título personalizado, como
+“✦ PERFIL”. Migração reconhece rows/tagSlots/slots de botões antigos, preservando
+título, textos, itens e modelos de tags; move apenas geometria. Botões ainda iguais
+aos defaults recebem as novas dicas. Preserva clanMenuEnabled. Backup
+menus.json.pre-0.16.6.bak e troca atômica antes de publicar o perfil carregado.
+Geometrias com posições personalizadas permanecem intactas.
+
+Build aprovado:124 testes JUnit sem falhas, com regressão para título personalizado,
+backup, migração idempotente e preservação de geometria customizada. Sem novo smoke
+Fabric nesta correção de carregamento; UI0.16.5 já validada em51 verificações.
+
+JAR: build/libs/shirokai-core-0.16.6-dev.jar
+SHA256: adbae9a89b8cbd3377a35e08037aedd70ac6324d51c7a565e5ab312d3bb9097d
+Base:07dc803. Substituir JAR e reiniciar, sem apagar menus.json/banco.
+
+---
+
 # Estado atual — 0.16.5-dev
 
 Perfil e estilos compartilham painel de cinco linhas: cabeça10, quadro19, seta28,

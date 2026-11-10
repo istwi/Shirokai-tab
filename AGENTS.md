@@ -118,6 +118,6 @@ players durante save nem omitir teams externos/modificados/mistos. LIVE usa weak
 references e libera managers fechados. Testar save + restore + troca de cargo.
 
 Perfil0.16.5: PanelLayout compartilha moldura/15slots com StyleChoiceMenu.
-MenuConfig.load migra somente profile exatamente igual a legacyDefaults, com
-backup antes de troca atômica. Preservar clanMenuEnabled e layouts customizados.
+0.16.6: MenuConfig.load reconhece geometria legacy (rows/tagSlots/slots dos
+botões), preservando título, itens/textos e tags; backup antes de troca atômica. Preservar clanMenuEnabled e layouts customizados.
 Cabeça10/quadro19/seta28; perfil default usa quadro direito para limpar tags.

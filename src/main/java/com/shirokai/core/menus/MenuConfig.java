@@ -53,6 +53,18 @@ public record MenuConfig(int schemaVersion, boolean clanMenuEnabled, Profile pro
         var head=buttons.get("header");var lore=new ArrayList<>(head.lore());lore.add("<gray>Clique para atualizar.</gray>");buttons.put("header",new Button(10,head.item(),head.name(),lore));
         return new MenuConfig(1,true,new Profile(5,old.profile().title(),PanelLayout.CONTENT,buttons,old.profile().tags()));
     }
+    private static boolean legacyGeometry(Profile profile){
+        var old=legacyDefaults().profile();
+        return profile.rows()==old.rows()&&profile.tagSlots().equals(old.tagSlots())&&ACTIONS.stream().allMatch(key->profile.buttons().get(key).slot()==old.buttons().get(key).slot());
+    }
+    private static Profile migrateProfile(Profile profile){
+        var old=legacyDefaults().profile();var target=defaults().profile();var buttons=new LinkedHashMap<String,Button>();
+        profile.buttons().forEach((key,b)->{
+            var next=target.buttons().get(key);
+            buttons.put(key,b.equals(old.buttons().get(key))?next:new Button(next.slot(),b.item(),b.name(),b.lore()));
+        });
+        return new Profile(target.rows(),profile.title(),target.tagSlots(),buttons,profile.tags());
+    }
     private static final Gson GSON=new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static String json(MenuConfig value){return GSON.toJson(value)+"\n";}
     public static MenuConfig load(Path file)throws IOException{
@@ -60,9 +72,9 @@ public record MenuConfig(int schemaVersion, boolean clanMenuEnabled, Profile pro
         if(Files.size(file)>65536)throw new IOException("menus.json excede64KiB");
         try{
             String source=Files.readString(file);var parsed=parse(source);
-            if(parsed.profile().equals(legacyDefaults().profile())){
-                try{Files.writeString(file.resolveSibling(file.getFileName()+".pre-0.16.5.bak"),source,StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
-                var migrated=new MenuConfig(parsed.schemaVersion(),parsed.clanMenuEnabled(),defaults().profile());
+            if(legacyGeometry(parsed.profile())){
+                try{Files.writeString(file.resolveSibling(file.getFileName()+".pre-0.16.6.bak"),source,StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
+                var migrated=new MenuConfig(parsed.schemaVersion(),parsed.clanMenuEnabled(),migrateProfile(parsed.profile()));
                 Path temporary=Files.createTempFile(file.getParent(),"menus-",".tmp");
                 try{Files.writeString(temporary,json(migrated));Files.move(temporary,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}finally{Files.deleteIfExists(temporary);}
                 return migrated;
