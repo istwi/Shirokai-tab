@@ -1,3 +1,20 @@
+## Perfil e estilos — 0.16.5
+
+Ambos usam cinco linhas, vidro cinza na moldura/divisória e15 opções na área à
+direita (12..16,21..25,30..34). Cabeça10 informa jogador; quadro19 controla estilos;
+seta28 volta. No perfil, seta executa /menu se instalado; nos estilos, retorna ao
+/perfil (ou /clan para escolhas de clã). Não há perda das escolhas salvas.
+
+No perfil: cabeça também atualiza dados; quadro esquerdo abre estilos e direito
+remove tags equipadas. Nos estilos: cabeça informa escolha/estado, quadro restaura
+o padrão administrativo. Navegação36/44 só aparece quando existem outras páginas.
+
+O perfil permanece configurável por menus.json. Somente o perfil exatamente igual
+ao padrão antigo é migrado automaticamente; cria menus.json.pre-0.16.5.bak antes
+da troca e preserva clanMenuEnabled. Layouts modificados pelo administrador não são
+reescritos. Para aplicar a referência nesses casos, use a seção profile de
+examples/menus.json e /shirokaicore reload. Telas abertas mantêm seu snapshot.
+
 > 0.16.4: /clan e /clan menu exigem associação atual a um clã. Sem clã, orientam
 > /clan create <nome>; convites/aceitação continuam acessíveis por comandos. Sair,
 > expulsão ou exclusão invalida a tela aberta.

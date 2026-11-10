@@ -32,7 +32,7 @@ public record MenuConfig(int schemaVersion, boolean clanMenuEnabled, Profile pro
     private static void text(String value){if(value==null||value.length()>512||value.codePoints().anyMatch(Character::isISOControl))throw new IllegalArgumentException("Texto do menu inválido/excede512 caracteres");}
     private static List<String> lines(List<String> value){if(value==null||value.size()>12)throw new IllegalArgumentException("Máximo12 linhas de descrição");value.forEach(MenuConfig::text);return List.copyOf(value);}
     private static Button button(int slot,String item,String name,String... lore){return new Button(slot,"minecraft:"+item,name,List.of(lore));}
-    public static MenuConfig defaults(){
+    public static MenuConfig legacyDefaults(){
         var buttons=new LinkedHashMap<String,Button>();
         buttons.put("header",button(4,"player_head","<aqua>%menu:player%</aqua>","<gray>Cargo fixo: %menu:rank%</gray>","<gray>Clã: %menu:clan%</gray>","<gray>Tags opcionais: %menu:count%</gray>","<gray>Clique nas tags para equipar/remover no chat.</gray>"));
         buttons.put("previous",button(45,"arrow","<aqua>Página anterior</aqua>"));
@@ -45,12 +45,30 @@ public record MenuConfig(int schemaVersion, boolean clanMenuEnabled, Profile pro
         return new MenuConfig(1,true,new Profile(6,"<gold><bold>✦ PERFIL SHIROKAI</bold></gold>",slots,buttons,
             new Tags("minecraft:name_tag","minecraft:barrier","%menu:tag%",List.of("<gray>%menu:description%</gray>","<gray>Estado: %menu:availability%</gray>","<gray>Categoria: %menu:category%</gray>","<gray>Exclusiva do chat</gray>","<gray>Chat: %menu:selection%</gray>"))));
     }
+    public static MenuConfig defaults(){
+        var old=legacyDefaults();var buttons=new LinkedHashMap<>(old.profile().buttons());
+        var positions=Map.of("header",10,"styles",19,"back",28,"previous",36,"next",44,"clear",40,"refresh",38);
+        buttons.replaceAll((key,b)->new Button(positions.get(key),b.item(),b.name(),b.lore()));
+        var style=buttons.get("styles");buttons.put("styles",new Button(19,style.item(),"<aqua>Estilo de cores</aqua>",List.of("<gray>Esquerdo: escolher estilo.</gray>","<gray>Direito: remover tags equipadas.</gray>")));
+        var head=buttons.get("header");var lore=new ArrayList<>(head.lore());lore.add("<gray>Clique para atualizar.</gray>");buttons.put("header",new Button(10,head.item(),head.name(),lore));
+        return new MenuConfig(1,true,new Profile(5,old.profile().title(),PanelLayout.CONTENT,buttons,old.profile().tags()));
+    }
     private static final Gson GSON=new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static String json(MenuConfig value){return GSON.toJson(value)+"\n";}
     public static MenuConfig load(Path file)throws IOException{
         Files.createDirectories(file.getParent());if(!Files.exists(file))try{Files.writeString(file,json(defaults()),StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
         if(Files.size(file)>65536)throw new IOException("menus.json excede64KiB");
-        try{return parse(Files.readString(file));}catch(Exception error){Throwable cause=error;while(cause.getCause()!=null)cause=cause.getCause();throw new IOException(file+": "+cause.getMessage(),error);}
+        try{
+            String source=Files.readString(file);var parsed=parse(source);
+            if(parsed.profile().equals(legacyDefaults().profile())){
+                try{Files.writeString(file.resolveSibling(file.getFileName()+".pre-0.16.5.bak"),source,StandardOpenOption.CREATE_NEW);}catch(FileAlreadyExistsException ignored){}
+                var migrated=new MenuConfig(parsed.schemaVersion(),parsed.clanMenuEnabled(),defaults().profile());
+                Path temporary=Files.createTempFile(file.getParent(),"menus-",".tmp");
+                try{Files.writeString(temporary,json(migrated));Files.move(temporary,file,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);}finally{Files.deleteIfExists(temporary);}
+                return migrated;
+            }
+            return parsed;
+        }catch(Exception error){Throwable cause=error;while(cause.getCause()!=null)cause=cause.getCause();throw new IOException(file+": "+cause.getMessage(),error);}
     }
     public static MenuConfig parse(String source)throws IOException{
         var root=JsonValidation.object(source);JsonValidation.fields(root,Set.of("schemaVersion","clanMenuEnabled","profile"));JsonValidation.integer(root,"schemaVersion");JsonValidation.bool(root,"clanMenuEnabled");

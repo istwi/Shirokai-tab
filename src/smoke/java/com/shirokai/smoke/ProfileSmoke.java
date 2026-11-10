@@ -118,7 +118,7 @@ public final class ProfileSmoke implements ModInitializer {
         },server).thenComposeAsync(v->{
             owner.closeHandledScreen();ProfileMenu.open(owner,service);return until(()->owner.currentScreenHandler instanceof ProfileMenu);
         },server).thenRunAsync(()->{
-            var menu=(ProfileMenu)owner.currentScreenHandler;check(menu.getInventory().size()==54&&menu.getSlot(48).getStack().isOf(Items.MILK_BUCKET),"Reopened menu did not pick up new config");
+            var menu=(ProfileMenu)owner.currentScreenHandler;check(menu.getInventory().size()==45&&menu.getSlot(10).getStack().isOf(Items.PLAYER_HEAD),"Reopened menu did not pick up new config");
             check(owner.getInventory().getStack(0).getCount()==5,"Configurable menu altered player items");
         },server);
     }
@@ -141,33 +141,33 @@ public final class ProfileSmoke implements ModInitializer {
             check(!menu.canUse(stranger),"Other player can use menu");
             check(menu.quickMove(owner,9).isEmpty(),"Quick move extracted icon");
             for (var action : SlotActionType.values()) if (action != SlotActionType.PICKUP)
-                menu.onSlotClick(9,0,action,owner);
+                menu.onSlotClick(12,0,action,owner);
             menu.onSlotClick(-999,0,SlotActionType.PICKUP,owner);
             menu.onSlotClick(9999,0,SlotActionType.PICKUP,owner);
-            menu.onSlotClick(9,0,SlotActionType.PICKUP,stranger);
+            menu.onSlotClick(12,0,SlotActionType.PICKUP,stranger);
             check(service.cached(id).orElseThrow().selectedVisual()==null,"Malformed click mutated profile");
             check(owner.getInventory().getStack(0).getCount()==5,"Menu changed player inventory");
-            menu.onSlotClick(9,0,SlotActionType.PICKUP,owner);
+            menu.onSlotClick(12,0,SlotActionType.PICKUP,owner);
             return until(() -> service.cached(id).orElseThrow().chatIds().equals(List.of("a")));
         },server).thenComposeAsync(v -> {
-            ((ProfileMenu)owner.currentScreenHandler).onSlotClick(10,1,SlotActionType.PICKUP,owner);
+            ((ProfileMenu)owner.currentScreenHandler).onSlotClick(13,1,SlotActionType.PICKUP,owner);
             return until(() -> service.cached(id).orElseThrow().chatIds().equals(List.of("a","b")));
         },server).thenComposeAsync(v -> {
-            ((ProfileMenu)owner.currentScreenHandler).onSlotClick(11,1,SlotActionType.PICKUP,owner);
+            ((ProfileMenu)owner.currentScreenHandler).onSlotClick(14,1,SlotActionType.PICKUP,owner);
             long after = tick + 5;
             return until(() -> tick >= after);
         },server).thenComposeAsync(v -> storage.titleState(id),server).thenComposeAsync(state -> {
             check(state.chatIds().equals(List.of("a","b")),"Third identification was accepted");
             check(state.selectedVisual()==null,"Optional chat tag leaked into visual rank");
             var menu = (ProfileMenu)owner.currentScreenHandler;
-            menu.onSlotClick(48,0,SlotActionType.PICKUP,owner);
+            menu.onSlotClick(19,1,SlotActionType.PICKUP,owner);
             return until(() -> service.cached(id).orElseThrow().selectedVisual()==null && service.cached(id).orElseThrow().chatIds().isEmpty());
         },server).thenRunAsync(() -> {
             var menu = (ProfileMenu)owner.currentScreenHandler;
-            menu.onSlotClick(50,0,SlotActionType.PICKUP,owner);
+            menu.onSlotClick(28,0,SlotActionType.PICKUP,owner);
             check(owner.currentScreenHandler!=menu,"Return button did not close profile");
             check(!menu.canUse(owner),"Closed menu accepted use");
-            menu.onSlotClick(9,0,SlotActionType.PICKUP,owner);
+            menu.onSlotClick(12,0,SlotActionType.PICKUP,owner);
             check(service.cached(id).orElseThrow().selectedVisual()==null,"Closed menu mutated selection");
             check(owner.getInventory().getStack(0).getCount()==5,"Player items changed");
         },server);

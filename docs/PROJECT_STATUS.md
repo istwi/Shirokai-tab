@@ -1,3 +1,27 @@
+# Estado atual — 0.16.5-dev
+
+Perfil e estilos compartilham painel de cinco linhas: cabeça10, quadro19, seta28,
+vidro cinza na moldura/divisória e15 opções à direita. Paginação36/44 contextual.
+Perfil: cabeça atualiza; quadro esquerdo abre estilos, direito limpa tags; seta
+usa /menu externo. Estilos: cabeça informa escolha, quadro usa padrão, seta volta
+a /perfil ou /clan conforme o escopo. Escolhas por ID/permissões/CAS preservadas.
+
+MenuConfig migra somente o perfil exatamente igual ao padrão antigo, guardando
+menus.json.pre-0.16.5.bak e preservando clanMenuEnabled. Troca atômica do arquivo.
+Layouts customizados permanecem intactos; examples/menus.json fornece o novo modelo.
+Menus abertos guardam o layout exibido. SQLite6/schema JSON1 preservados.
+
+Build:124 testes unitários sem falhas, incluindo migração/backup/preservação.
+51 verificações Fabric aprovadas em três boots; perfil/estilos/apresentação
+validados nos slots novos, com preservação do layout aberto após reload.
+Renderização com cliente real ainda não certificada.
+
+JAR: build/libs/shirokai-core-0.16.5-dev.jar
+SHA256: f92e4eb16cc7258eab6bfefad6b57449225ecb3067baebff66f1930748d6a247
+Base:e6ea08d. Substituir JAR e reiniciar, sem apagar banco/configurações.
+
+---
+
 # Estado atual — 0.16.4-dev
 
 /clan e /clan menu abrem o painel somente para quem pertence a um clã. Sem

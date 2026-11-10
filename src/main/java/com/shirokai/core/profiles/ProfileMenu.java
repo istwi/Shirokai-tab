@@ -58,6 +58,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
     private void render(){render(true);}
     private void render(boolean refreshEntries){
         display.clear();
+        if(PanelLayout.matches(layout))PanelLayout.frame(display);
         if(refreshEntries)entries=titles.catalog(owner.getUuid()).definitions().values().stream().filter(t->t.category()!=TitleDefinition.Category.ROLE&&t.chat())
             .sorted(Comparator.comparing(TitleDefinition::category).thenComparing(Comparator.comparingInt(TitleDefinition::priority).reversed()).thenComparing(TitleDefinition::id)).toList();
         int size=layout.tagSlots().size();page=Math.min(page,Math.max(0,(entries.size()-1)/size));
@@ -73,7 +74,12 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
             var tags=layout.tags();display.setStack(layout.tagSlots().get(i),icon(availability==TitleRules.Availability.UNLOCKED?tags.unlockedItem():tags.lockedItem(),tags.name(),tags.lore(),values));
         }
         for(var entry:layout.buttons().entrySet()){
-            if(entry.getKey().equals("styles")&&!titles.customizationEnabled())continue;
+            if(PanelLayout.matches(layout)){
+                if(entry.getKey().equals("clear")||entry.getKey().equals("refresh"))continue;
+                if(entry.getKey().equals("previous")&&page==0)continue;
+                if(entry.getKey().equals("next")&&(page+1)*size>=entries.size())continue;
+            }
+            if(entry.getKey().equals("styles")&&!titles.customizationEnabled()&&!PanelLayout.matches(layout))continue;
             var b=entry.getValue();display.setStack(b.slot(),icon(b.item(),b.name(),b.lore(),common));
         }
         sendContentUpdates();
@@ -82,6 +88,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
     @Override public ItemStack quickMove(PlayerEntity player,int slot){return ItemStack.EMPTY;}
     @Override public void onSlotClick(int slot,int button,SlotActionType action,PlayerEntity player){
         if(!canUse(player)||owner.currentScreenHandler!=this||busy||action!=SlotActionType.PICKUP||(button!=0&&button!=1))return;
+        if(slot<0||slot>=display.size()||display.getStack(slot).isEmpty()||display.getStack(slot).isOf(Items.GRAY_STAINED_GLASS_PANE))return;
         String control=layout.buttons().entrySet().stream().filter(e->e.getValue().slot()==slot).map(Map.Entry::getKey).findFirst().orElse("");
         if(control.equals("previous")){page=Math.max(0,page-1);render();return;}
         if(control.equals("next")){if((page+1)*layout.tagSlots().size()<entries.size())page++;render();return;}
@@ -90,11 +97,11 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
             if(server.getCommandManager().getDispatcher().getRoot().getChild("menu")!=null)server.getCommandManager().executeWithPrefix(owner.getCommandSource(),"menu");
             else owner.sendMessage(Text.literal("Menu principal não está disponível neste servidor."),false);return;
         }
-        if(control.equals("styles")){if(titles.customizationEnabled())titles.openCustomization(owner);return;}
+        if(control.equals("styles")&&button==0){if(titles.customizationEnabled())titles.openCustomization(owner);return;}
         CompletableFuture<TitleState> operation;
         try{
-            if(control.equals("clear"))operation=titles.clear(owner.getUuid());
-            else if(control.equals("refresh"))operation=titles.view(owner.getUuid());
+            if(control.equals("clear")||control.equals("styles")&&button==1)operation=titles.clear(owner.getUuid());
+            else if(control.equals("refresh")||control.equals("header"))operation=titles.view(owner.getUuid());
             else{int index=layout.tagSlots().indexOf(slot);if(index<0||page*layout.tagSlots().size()+index>=entries.size())return;operation=titles.equip(owner.getUuid(),entries.get(page*layout.tagSlots().size()+index).id(),true);}
         }catch(Exception error){failure(error);return;}
         busy=true;operation.whenCompleteAsync((value,error)->{

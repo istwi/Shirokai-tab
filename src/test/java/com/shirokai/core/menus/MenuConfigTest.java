@@ -13,17 +13,26 @@ class MenuConfigTest {
     private JsonObject defaults(){return JsonParser.parseString(MenuConfig.json(MenuConfig.defaults())).getAsJsonObject();}
     @Test void defaultLayoutRoundTripsAndClansAreAvailable()throws Exception{
         var config=MenuConfig.parse(MenuConfig.json(MenuConfig.defaults()));assertEquals(MenuConfig.defaults(),config);
-        assertTrue(config.clanMenuEnabled());assertEquals(36,config.profile().tagSlots().size());
-        assertEquals(48,config.profile().buttons().get("clear").slot());new MenuPlan(config);
+        assertTrue(config.clanMenuEnabled());assertEquals(15,config.profile().tagSlots().size());
+        assertEquals(40,config.profile().buttons().get("clear").slot());new MenuPlan(config);
     }
     @Test void existingFilesAreNeverOverwrittenAndInvalidFilesFail()throws Exception{
         var file=directory.resolve("menus.json");MenuConfig.load(file);var original=Files.readString(file);
         MenuConfig.load(file);assertEquals(original,Files.readString(file));
         Files.writeString(file,"invalid");assertThrows(Exception.class,()->MenuConfig.load(file));assertEquals("invalid",Files.readString(file));
     }
+    @Test void legacyDefaultMigratesWithBackupAndCustomLayoutIsPreserved()throws Exception{
+        var file=directory.resolve("menus.json");var legacy=MenuConfig.legacyDefaults();
+        String source=MenuConfig.json(new MenuConfig(1,false,legacy.profile()));Files.writeString(file,source);
+        var migrated=MenuConfig.load(file);assertFalse(migrated.clanMenuEnabled());assertEquals(MenuConfig.defaults().profile(),migrated.profile());
+        assertEquals(source,Files.readString(file.resolveSibling("menus.json.pre-0.16.5.bak")));
+        String updated=Files.readString(file);MenuConfig.load(file);assertEquals(updated,Files.readString(file));
+        String custom=MenuConfig.json(legacy).replace("PERFIL SHIROKAI","MEU PERFIL");Files.writeString(file,custom);
+        assertEquals(6,MenuConfig.load(file).profile().rows());assertEquals(custom,Files.readString(file));
+    }
     @Test void collisionsOutOfRangeRowsAndDuplicateTagSlotsAreRejected(){
-        for(int slot:new int[]{4,45,54,-1}){var root=defaults();root.getAsJsonObject("profile").getAsJsonArray("tagSlots").add(slot);assertThrows(Exception.class,()->MenuConfig.parse(root.toString()));}
-        var root=defaults();root.getAsJsonObject("profile").getAsJsonArray("tagSlots").add(9);assertThrows(Exception.class,()->MenuConfig.parse(root.toString()));
+        for(int slot:new int[]{10,45,54,-1}){var root=defaults();root.getAsJsonObject("profile").getAsJsonArray("tagSlots").add(slot);assertThrows(Exception.class,()->MenuConfig.parse(root.toString()));}
+        var root=defaults();root.getAsJsonObject("profile").getAsJsonArray("tagSlots").add(12);assertThrows(Exception.class,()->MenuConfig.parse(root.toString()));
         for(int rows:new int[]{0,7,3}){var candidate=defaults();candidate.getAsJsonObject("profile").addProperty("rows",rows);assertThrows(Exception.class,()->MenuConfig.parse(candidate.toString()));}
     }
     @Test void unknownActionsFieldsAndWrongTypesAreRejected(){

@@ -1,3 +1,10 @@
+## 0.16.5-dev
+
+- /perfil e seleção de estilos compartilham o layout de cinco linhas da referência.
+- Cabeça informativa10, quadro19, seta28 e opções à direita; paginação contextual.
+- Migração do perfil padrão antigo com backup, preservando layouts personalizados.
+- Mantém seleção por ID, permissões, revisões, segurança de itens e animações.
+
 ## 0.16.4-dev
 
 - Menu de clã disponível somente para membros de um clã, incluindo quem entrou por convite.

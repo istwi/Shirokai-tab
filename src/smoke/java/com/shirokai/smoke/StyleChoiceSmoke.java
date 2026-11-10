@@ -68,13 +68,13 @@ public final class StyleChoiceSmoke implements ModInitializer {
                 StyleChoiceMenu.open(a,choices,Surface.TITLE,null);return until.apply(()->a.currentScreenHandler instanceof StyleChoiceMenu);
             },server).thenComposeAsync(v->{
                 menu[0]=(StyleChoiceMenu)a.currentScreenHandler;
-                menu[0].onSlotClick(10,0,SlotActionType.QUICK_MOVE,a);
+                menu[0].onSlotClick(13,0,SlotActionType.QUICK_MOVE,a);
                 check(choices.resolution(a.getUuid(),Surface.TITLE).saved()==null,"Quick move changed preference");
-                menu[0].onSlotClick(10,0,SlotActionType.PICKUP,b);
+                menu[0].onSlotClick(13,0,SlotActionType.PICKUP,b);
                 check(choices.resolution(a.getUuid(),Surface.TITLE).saved()==null,"Other owner changed preference");
-                premium.set(false);menu[0].onSlotClick(10,0,SlotActionType.PICKUP,a);
+                premium.set(false);menu[0].onSlotClick(13,0,SlotActionType.PICKUP,a);
                 check(choices.resolution(a.getUuid(),Surface.TITLE).saved()==null,"Revoked permission accepted old button");
-                premium.set(true);menu[0].onSlotClick(10,0,SlotActionType.PICKUP,a);
+                premium.set(true);menu[0].onSlotClick(13,0,SlotActionType.PICKUP,a);
                 return until.apply(()->"gold".equals(choices.resolution(a.getUuid(),Surface.TITLE).saved()));
             },server).thenComposeAsync(v->{
                 var visual=titles.chatPresentation(a.getUuid()).getFirst();
@@ -106,7 +106,7 @@ public final class StyleChoiceSmoke implements ModInitializer {
                 check(color(titles.chatPresentation(a.getUuid()).getFirst(),0x55ffff),"Fallback not rendered");
                 check("gold".equals(choices.resolution(a.getUuid(),Surface.TITLE).saved()),"Permission loss erased ID");
                 premium.set(true);check(color(titles.chatPresentation(a.getUuid()).getFirst(),0xffaa00),"Recovery did not restore preset");
-                a.closeHandledScreen();menu[0].onSlotClick(9,0,SlotActionType.PICKUP,a);
+                a.closeHandledScreen();menu[0].onSlotClick(12,0,SlotActionType.PICKUP,a);
                 check("gold".equals(choices.resolution(a.getUuid(),Surface.TITLE).saved()),"Closed menu changed selection");
                 return choices.view(a.getUuid(),Surface.CLAN_NAME,clanId[0]);
             },server).thenComposeAsync(view->{stale[0]=view;return choices.choose(a.getUuid(),view,"gold",()->true);},server)

@@ -2,82 +2,67 @@
   "schemaVersion": 1,
   "clanMenuEnabled": true,
   "profile": {
-    "rows": 6,
+    "rows": 5,
     "title": "<gold><bold>✦ PERFIL SHIROKAI</bold></gold>",
     "tagSlots": [
-      9,
-      10,
-      11,
       12,
       13,
       14,
       15,
       16,
-      17,
-      18,
-      19,
-      20,
       21,
       22,
       23,
       24,
       25,
-      26,
-      27,
-      28,
-      29,
       30,
       31,
       32,
       33,
-      34,
-      35,
-      36,
-      37,
-      38,
-      39,
-      40,
-      41,
-      42,
-      43,
-      44
+      34
     ],
     "buttons": {
-      "clear": {
-        "slot": 48,
-        "item": "minecraft:milk_bucket",
-        "name": "<aqua>Remover tags opcionais</aqua>",
-        "lore": []
-      },
-      "styles": {
-        "slot": 47,
-        "item": "minecraft:painting",
-        "name": "<aqua>Estilo das tags</aqua>",
-        "lore": [
-          "<gray>Escolha as cores das tags opcionais.</gray>"
-        ]
-      },
-      "refresh": {
-        "slot": 49,
-        "item": "minecraft:clock",
-        "name": "<aqua>Atualizar perfil</aqua>",
-        "lore": [
-          "<gray>Página %menu:page%</gray>"
-        ]
-      },
       "header": {
-        "slot": 4,
+        "slot": 10,
         "item": "minecraft:player_head",
         "name": "<aqua>%menu:player%</aqua>",
         "lore": [
           "<gray>Cargo fixo: %menu:rank%</gray>",
           "<gray>Clã: %menu:clan%</gray>",
           "<gray>Tags opcionais: %menu:count%</gray>",
-          "<gray>Clique nas tags para equipar/remover no chat.</gray>"
+          "<gray>Clique nas tags para equipar/remover no chat.</gray>",
+          "<gray>Clique para atualizar.</gray>"
         ]
       },
+      "styles": {
+        "slot": 19,
+        "item": "minecraft:painting",
+        "name": "<aqua>Estilo de cores</aqua>",
+        "lore": [
+          "<gray>Esquerdo: escolher estilo.</gray>",
+          "<gray>Direito: remover tags equipadas.</gray>"
+        ]
+      },
+      "clear": {
+        "slot": 40,
+        "item": "minecraft:milk_bucket",
+        "name": "<aqua>Remover tags opcionais</aqua>",
+        "lore": []
+      },
+      "previous": {
+        "slot": 36,
+        "item": "minecraft:arrow",
+        "name": "<aqua>Página anterior</aqua>",
+        "lore": []
+      },
+      "next": {
+        "slot": 44,
+        "item": "minecraft:arrow",
+        "name": "<aqua>Próxima página</aqua>",
+        "lore": []
+      },
       "back": {
-        "slot": 50,
+        "slot": 28,
         "item": "minecraft:arrow",
         "name": "<yellow><bold>VOLTAR AO MENU</bold></yellow>",
         "lore": [
@@ -86,17 +71,13 @@
           "<yellow>➜ Clique para voltar!</yellow>"
         ]
       },
-      "next": {
-        "slot": 53,
-        "item": "minecraft:arrow",
-        "name": "<aqua>Próxima página</aqua>",
-        "lore": []
-      },
-      "previous": {
-        "slot": 45,
-        "item": "minecraft:arrow",
-        "name": "<aqua>Página anterior</aqua>",
-        "lore": []
+      "refresh": {
+        "slot": 38,
+        "item": "minecraft:clock",
+        "name": "<aqua>Atualizar perfil</aqua>",
+        "lore": [
+          "<gray>Página %menu:page%</gray>"
+        ]
       }
     },
     "tags": {

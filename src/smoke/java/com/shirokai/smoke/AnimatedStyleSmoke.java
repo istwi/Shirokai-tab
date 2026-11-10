@@ -43,9 +43,9 @@ public final class AnimatedStyleSmoke implements ModInitializer {
                 check(color(titles.chatPresentation(owner.getUuid()).getFirst(),0x5555ff)&&color(oldChat,0xff5555),"Chat snapshot mutated retroactively");
                 check(color(clans.present(owner.getUuid(),Surface.CLAN_NAME,"Animated"),0x5555ff),"Clan frame did not advance");
                 var menu=new ProfileMenu(125,owner.getInventory(),owner,titles,titles.cached(owner.getUuid()).orElseThrow());owner.currentScreenHandler=menu;
-                check(color(menu.getSlot(9).getStack().get(DataComponentTypes.CUSTOM_NAME),0x5555ff),"Profile preview did not use frame");tick.set(40);menu.refreshVisuals();check(color(menu.getSlot(9).getStack().get(DataComponentTypes.CUSTOM_NAME),0xff5555),"Profile animation did not refresh");
+                check(color(menu.getSlot(12).getStack().get(DataComponentTypes.CUSTOM_NAME),0x5555ff),"Profile preview did not use frame");tick.set(40);menu.refreshVisuals();check(color(menu.getSlot(12).getStack().get(DataComponentTypes.CUSTOM_NAME),0xff5555),"Profile animation did not refresh");
                 var rules=new EnumMap<VisualTarget,PersonalizationConfig.Rule>(VisualTarget.class);rules.putAll(PersonalizationConfig.defaults().surfaces());rules.put(VisualTarget.MENU,new PersonalizationConfig.Rule(true,false,""));choices.policy(new PersonalizationConfig(1,rules));menu.refreshVisuals();
-                check(color(menu.getSlot(9).getStack().get(DataComponentTypes.CUSTOM_NAME),0xffffff),"Area animation control ignored");
+                check(color(menu.getSlot(12).getStack().get(DataComponentTypes.CUSTOM_NAME),0xffffff),"Area animation control ignored");
                 check(choices.resolution(owner.getUuid(),Surface.TITLE).saved().equals("pulse"),"Area control erased choice");
                 check(color(renderer.renderAt(owner.getUuid(),Surface.CLAN_NAME,"Animated",VisualTarget.TAB,20,true),0x5555ff),"TAB area control mixed with menu");
                 check(color(renderer.renderAt(owner.getUuid(),Surface.CLAN_NAME,"Animated",VisualTarget.SCOREBOARD,20,false),0xffffff),"Viewer disabled animation ignored");

@@ -89,7 +89,7 @@ public final class PresentationSmoke implements ModInitializer {
                 var modified=new ScoreboardConfig(1,20,List.of(new ScoreboardConfig.Layout("default",0,TabConfig.Condition.any(),"Title",List.of(new ScoreboardConfig.Line("title",TabConfig.Condition.any(),"%shirokai:selected_title%")))));
                 board.replacePlan(new ScoreboardPlan(modified,engine));var score=pa.stream().filter(ScoreboardScoreUpdateS2CPacket.class::isInstance).map(ScoreboardScoreUpdateS2CPacket.class::cast).findFirst().orElseThrow();check(score.display().orElseThrow().getString().isEmpty(),"Optional tag leaked into sidebar rank");
                 var menu=new ProfileMenu(91,a.getInventory(),a,titles,titles.cached(a.getUuid()).orElseThrow());a.currentScreenHandler=menu;
-                check(color(menu.getInventory().getStack(9).get(DataComponentTypes.CUSTOM_NAME),0xff0000),"Profile title preview lost style");
+                check(color(menu.getInventory().getStack(12).get(DataComponentTypes.CUSTOM_NAME),0xff0000),"Profile title preview lost style");
                 ClanMenu.open(a,clans);
             },server).thenComposeAsync(v->until.apply(()->a.currentScreenHandler instanceof ClanMenu),server).thenRunAsync(()->{
                 var menu=(ClanMenu)a.currentScreenHandler;check(color(menu.getInventory().getStack(10).get(DataComponentTypes.LORE).lines().get(0),0xff0000),"Clan menu name lost style");
