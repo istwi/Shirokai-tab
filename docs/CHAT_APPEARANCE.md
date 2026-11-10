@@ -1,3 +1,24 @@
+## Tooltip do jogador — 0.16.10
+
+`playerHoverInfo` em config/shirokai-core/chat-appearance.json controla o tooltip
+ao passar o mouse no nome. Padrão false, inclusive em arquivo antigo sem o campo:
+
+```json
+"playerHoverInfo": false
+```
+
+false remove o tooltip simples do Core e o SHOW_ENTITY vanilla de jogadores
+(tipo/UUID), preservando clique para responder, inserção, cores e mensagem.
+Nomes vanilla usados em avisos/conquistas também deixam de incluir esse tooltip.
+true restaura o comportamento anterior: tooltip simples no Core e vanilla com
+informações de entidade. Pode mudar por /shirokaicore reload.
+
+A ponte só fica ativa enquanto o módulo de chat do Core está instalado/ativo.
+Mobs/itens não são afetados. Textos anteriores não são reescritos; só novos nomes.
+Mods que constroem seu próprio HoverEvent sem usar o nome vanilla não são
+interceptados. Isso é uma preferência visual, não remoção do UUID do protocolo.
+Corpo/assinatura/máscara de mensagens permanecem intactos; não há reenvio de chat.
+
 # Chat compacto e cores — 0.13.1-dev
 
 Defaults solicitados:

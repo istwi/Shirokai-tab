@@ -121,3 +121,8 @@ Perfil0.16.5: PanelLayout compartilha moldura/15slots com StyleChoiceMenu.
 0.16.6: MenuConfig.load reconhece geometria legacy (rows/tagSlots/slots dos
 botões), preservando título, itens/textos e tags; backup antes de troca atômica. Preservar clanMenuEnabled e layouts customizados.
 Cabeça10/quadro19/seta28; perfil default usa quadro direito para limpar tags.
+
+Hover0.16.10: playerHoverInfo controla tooltips do Core e Entity.getHoverEvent
+para ServerPlayerEntity somente, com bridge ativa do chat. Não modificar corpo,
+assinatura, máscaras, traduções ou hover de mobs/itens. ChatAppearance schema1
+aceita campo ausente como false; true restaura vanilla. Ler CHAT_APPEARANCE.md.

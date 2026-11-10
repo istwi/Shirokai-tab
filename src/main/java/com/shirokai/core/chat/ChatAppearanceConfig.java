@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.util.*;
 
 public record ChatAppearanceConfig(int schemaVersion,boolean enabled,boolean legacyColors,String colorPermission,
-                                   boolean connectionMessages,Map<Channel,String> bodyColors){
+                                   boolean connectionMessages,Map<Channel,String> bodyColors,boolean playerHoverInfo){
+    public ChatAppearanceConfig(int schemaVersion,boolean enabled,boolean legacyColors,String colorPermission,boolean connectionMessages,Map<Channel,String> bodyColors){this(schemaVersion,enabled,legacyColors,colorPermission,connectionMessages,bodyColors,false);}
     private static final Gson GSON=new GsonBuilder().setPrettyPrinting().create();
     public ChatAppearanceConfig{
         bodyColors=Map.copyOf(bodyColors);
@@ -28,8 +29,9 @@ public record ChatAppearanceConfig(int schemaVersion,boolean enabled,boolean leg
         try{return parse(Files.readString(file));}catch(Exception error){throw new IOException(file+": "+error.getMessage(),error);}
     }
     public static ChatAppearanceConfig parse(String text)throws IOException{
-        var root=JsonValidation.object(text);JsonValidation.fields(root,Set.of("schemaVersion","enabled","legacyColors","colorPermission","connectionMessages","bodyColors"));
+        var root=JsonValidation.object(text);JsonValidation.fields(root,Set.of("schemaVersion","enabled","legacyColors","colorPermission","connectionMessages","bodyColors","playerHoverInfo"));
         JsonValidation.integer(root,"schemaVersion");
+        if(root.has("playerHoverInfo"))JsonValidation.bool(root,"playerHoverInfo");
         for(String key:List.of("enabled","legacyColors","connectionMessages"))JsonValidation.bool(root,key);
         JsonValidation.string(root,"colorPermission",false);
         if(!root.has("bodyColors")||!root.get("bodyColors").isJsonObject())throw new IllegalArgumentException("bodyColors deve ser objeto");

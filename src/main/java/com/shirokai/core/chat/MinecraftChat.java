@@ -37,7 +37,7 @@ public final class MinecraftChat {
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(player->player.getUuid().equals(id)&&!player.isDisconnected()).findFirst().orElse(null);}
     private Text label(ChatService.Envelope message){
         var author=player(message.author());String name=author==null?message.author().toString():author.getGameProfile().getName();
-        return (presentation==null||!presentation.plan().config().chatEnabled()?service.header(message):presentation.header(message)).copy().styled(style->style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal("Jogador: "+name)))
+        return (presentation==null||!presentation.plan().config().chatEnabled()?service.header(message):presentation.header(message)).copy().styled(style->style.withHoverEvent(appearance.playerHoverInfo()?new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal("Jogador: "+name)):null)
                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,"/chat msg "+name+" ")));
     }
     private boolean colors(UUID author){return appearance.enabled()&&appearance.legacyColors()&&(appearance.colorPermission().isEmpty()||permissions.allowed(author,appearance.colorPermission()));}

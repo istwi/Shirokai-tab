@@ -1,3 +1,9 @@
+## 0.16.10-dev
+
+- playerHoverInfo opcional, false por padrão, oculta tooltips do nome no chat.
+- Nomes vanilla de jogadores deixam de gerar o tooltip tipo/UUID enquanto oculto.
+- Preserva cliques e mensagens assinadas; opção recarregável e sem reescrever JSONs.
+
 ## 0.16.9-dev
 
 - Dinheiro/tokens/cash exibem0 para jogadores sem conta em moeda válida do Impactor.

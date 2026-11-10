@@ -10,6 +10,7 @@ public final class ConnectionAnnouncements {
     private ConnectionAnnouncements(){}
     public static MinecraftChat install(MinecraftChat chat){var previous=current;current=chat;return previous;}
     public static void clear(MinecraftChat chat){if(current==chat)current=null;}
+    public static boolean playerHoverInfo(){var chat=current;return chat==null||chat.appearance().playerHoverInfo();}
     public static Text replace(Text original,ServerPlayerEntity player,boolean joined){
         var chat=current;
         if(chat==null||!chat.appearance().connectionMessages())return original;

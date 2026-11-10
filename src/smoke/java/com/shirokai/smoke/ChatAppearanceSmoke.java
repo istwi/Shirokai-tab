@@ -56,6 +56,14 @@ public final class ChatAppearanceSmoke implements ModInitializer {
             .thenRunAsync(()->{
                 clear.run();var incoming=SignedMessage.ofUnsigned(a.getUuid(),"Global");
                 endpoint.signed(a,incoming);var global=packet(pb);
+                check(global.serializedParameters().name().getStyle().getHoverEvent()==null,"Core chat still has a hover tooltip");
+                check(global.serializedParameters().name().getStyle().getClickEvent()!=null,"Core chat lost click action");
+                check(a.getDisplayName().getStyle().getHoverEvent()==null,"Vanilla player name still exposes entity UUID");
+                check(a.getDisplayName().getStyle().getClickEvent()!=null,"Vanilla player name lost tell action");
+                var normalAppearance=endpoint.appearance();
+                endpoint.appearance(new ChatAppearanceConfig(1,true,true,"",true,normalAppearance.bodyColors(),true));
+                check(a.getDisplayName().getStyle().getHoverEvent()!=null&&a.getDisplayName().getStyle().getHoverEvent().getAction()==HoverEvent.Action.SHOW_ENTITY,"Hover option failed to restore vanilla identity");
+                endpoint.appearance(normalAppearance);
                 Text displayed=global.serializedParameters().applyChatDecoration(Text.literal(global.body().content()));
                 check(displayed.getString().equals("[G] LayoutAlice: Global"),"Global layout still has vanilla brackets or wrong prefix");
                 check(color(displayed,"[G]",0xaaaaaa)&&color(displayed,"Global",0xaaaaaa),"Global prefix/body not gray");

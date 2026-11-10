@@ -1,3 +1,27 @@
+# Estado atual — 0.16.10-dev
+
+playerHoverInfo em chat-appearance.json, false por padrão inclusive em arquivos
+antigos sem o campo, remove tooltip dos cabeçalhos Core e SHOW_ENTITY de nomes
+vanilla de jogadores (tipo/UUID). Clique de resposta preservado. true restaura o
+hover. Reload aplica a opção sem reescrever JSON existente. Schema1/SQLite6 mantidos.
+
+Hook server-only auditado: Entity.getHoverEvent():HoverEvent, herdado por
+PlayerEntity.addTellClickEvent/getDisplayName no Minecraft1.21.1. Cancela apenas
+para ServerPlayerEntity com bridge do chat ativa e opção false. Não reescreve
+pacotes, traduções, corpo/assinatura/máscara ou nomes de mobs. Mensagens antigas e
+hover customizado de outros mods fora da factory vanilla não são alterados.
+
+Build:125 testes JUnit sem falhas e51 verificações Fabric em três boots.
+Smoke real de aparência verifica hover Core e
+vanilla ocultos, clique preservado e restauração SHOW_ENTITY com opção true.
+Artefato/refmap/mixin verificados, sem fixtures smoke. Cliente real não certificado.
+
+JAR: build/libs/shirokai-core-0.16.10-dev.jar
+SHA256: 4148f84f600824418f4753f88955572f76dfc9193be635a484e264bdfe123d5d
+Base:4af3cc9. Substituir JAR e reiniciar; novos nomes ficam sem tooltip por padrão.
+
+---
+
 # Estado atual — 0.16.9-dev
 
 Impactor: moedas válidas sem conta do jogador agora exibem0 em vez de N/D. Vale
