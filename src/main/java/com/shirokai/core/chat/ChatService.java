@@ -24,6 +24,8 @@ public final class ChatService {
     public ChatService(ChatRepository repository,PermissionService permissions,Executor server,Audience audience,Function<UUID,List<String>> tags,Clock clock,ChatConfig config,BiConsumer<UUID,String> moderation){
         this.repository=repository;this.permissions=permissions;this.server=server;this.audience=audience;this.tags=tags;this.clock=clock;this.config=config;this.moderation=moderation;
     }
+    private BiConsumer<UUID,String> contentValidator=(author,body)->{};
+    public void contentValidator(BiConsumer<UUID,String> validator){contentValidator=Objects.requireNonNull(validator);}
     public ChatConfig config(){return config;}
     public void replaceConfig(ChatConfig value){config=value;}
     public CompletableFuture<ChatProfile> join(UUID player){
@@ -74,7 +76,7 @@ public final class ChatService {
             if(channel==Channel.PRIVATE)throw new IllegalArgumentException("Canal privado exige destinatário");
             session(sender);if(!permitted(sender,channel))throw new IllegalStateException("Sem permissão para canal "+channel);
             var author=participant(sender);if(channel==Channel.CLAN&&author.clan()==null)throw new IllegalStateException("Você não pertence a um clã");
-            gate(sender,body);var envelope=new Envelope(sender,label(author,channel,""),body,channel);int sent=0;
+            gate(sender,body);contentValidator.accept(sender,body);var envelope=new Envelope(sender,label(author,channel,""),body,channel);int sent=0;
             for(var recipient:List.copyOf(audience.online()))if(accepts(recipient,author,channel)){sink.deliver(recipient.id(),envelope);sent++;}
             return sent;
         }catch(RuntimeException error){rejected(sender,error);throw error;}
@@ -85,7 +87,7 @@ public final class ChatService {
             if(!permitted(sender,Channel.PRIVATE)||!permitted(target,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
             var author=participant(sender);var recipient=participant(target);
             if(!visible.test(sender,target)||source.profile.ignored().contains(target)||!accepts(recipient,author,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
-            gate(sender,body);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE,recipient.name());
+            gate(sender,body);contentValidator.accept(sender,body);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE,recipient.name());
             sink.deliver(target,envelope);sink.deliver(sender,envelope);source.reply=target;session(target).reply=sender;
         }catch(RuntimeException error){rejected(sender,error);throw error;}
     }

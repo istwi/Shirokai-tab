@@ -124,7 +124,14 @@ public final class CoreRuntime implements AutoCloseable {
         modules.register(module("integrations", Set.of("placeholders", "permissions"), () -> {
             var integrationConfig = IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
             integrations = new IntegrationRuntime(server, integrationConfig, placeholders, permissions, () -> running("clans") ? clans : null, () -> config.unavailablePlaceholder(), logger);
-            if(chat!=null)chat.shares().providers(integrations::partyShare,integrations::walletShare);
+            if(chat!=null){
+                chat.shares().providers(integrations::partyShare,integrations::walletShare);
+                integrations.trainer(chat::trainer);
+                chat.summaryValues((id,key)->{
+                    var p=server.getPlayerManager().getPlayer(id);
+                    return p==null?"N/D":placeholders.resolve(key,new PlaceholderService.Context(id,p.getGameProfile().getName(),0)).orElse("N/D");
+                });
+            }
         }, () -> { if (integrations != null) integrations.close(); }));
         modules.register(module("styles",Set.of(),()->{
             styles=new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json")));

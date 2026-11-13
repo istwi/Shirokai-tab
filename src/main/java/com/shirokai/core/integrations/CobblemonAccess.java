@@ -17,19 +17,35 @@ public final class CobblemonAccess implements AutoCloseable {
     @Override public void close() { if (subscription != null) subscription.unsubscribe(); }
 
     public Optional<net.minecraft.text.Text> partyShare(ServerPlayerEntity author,int slot) {
+        return partyShare(author,slot,net.minecraft.text.Text.literal(author.getGameProfile().getName()));
+    }
+    public Optional<net.minecraft.text.Text> partyShare(ServerPlayerEntity author,int slot,net.minecraft.text.Text trainer) {
         if (!author.getServer().isOnThread()) throw new IllegalStateException("Equipe exige thread do servidor");
         if(slot<1||slot>6)return Optional.empty();
         var pokemon=Cobblemon.INSTANCE.getStorage().getParty(author).get(slot-1);
         if(pokemon==null)return Optional.empty();
-        // Do not forward nickname actions or parse nickname/species as markup.
         String name=pokemon.getDisplayName(false).getString();
-        var tooltip=net.minecraft.text.Text.literal("Treinador: "+author.getGameProfile().getName()+" • Slot "+slot)
-            .append("\n"+name+" • Nível "+pokemon.getLevel())
-            .append("\nEspécie: "+pokemon.getSpecies().getName())
-            .append("\nGênero: "+pokemon.getGender().name()+" • Shiny: "+(pokemon.getShiny()?"Sim":"Não"))
-            .append("\nNatureza: "+pokemon.getNature().getName().getPath()+" • Habilidade: "+pokemon.getAbility().getName());
-        return Optional.of(net.minecraft.text.Text.literal("["+name+" Nv. "+pokemon.getLevel()+"]")
+        var tooltip=net.minecraft.text.Text.empty().append(label("Treinador: ")).append(trainer.copy())
+            .append(label(" • Slot ")).append(value(Integer.toString(slot)))
+            .append(label("\nPokémon: ")).append(value(name))
+            .append(label(" • Nível: ")).append(value(Integer.toString(pokemon.getLevel())))
+            .append(label("\nEspécie: ")).append(value(pokemon.getSpecies().getName()))
+            .append(label("\nGênero: ")).append(value(pokemon.getGender().name()))
+            .append(label(" • Shiny: ")).append(value(pokemon.getShiny()?"Sim":"Não"))
+            .append(label("\nNatureza: ")).append(value(pokemon.getNature().getName().getPath()))
+            .append(label(" • Habilidade: ")).append(value(pokemon.getAbility().getName()))
+            .append(label("\nIVs (HP/Atk/Def/SpA/SpD/Spe):"))
+            .append(value("\n"+ivs(pokemon.getIvs())+" • Total: "+pokemon.getIvs().total()+"/186"));
+        return Optional.of(net.minecraft.text.Text.literal("["+name+"]")
             .formatted(net.minecraft.util.Formatting.AQUA).styled(style->style.withHoverEvent(new net.minecraft.text.HoverEvent(net.minecraft.text.HoverEvent.Action.SHOW_TEXT,tooltip))));
+    }
+    private static net.minecraft.text.MutableText label(String text){return net.minecraft.text.Text.literal(text).formatted(net.minecraft.util.Formatting.GRAY);}
+    private static net.minecraft.text.MutableText value(String text){return net.minecraft.text.Text.literal(text).formatted(net.minecraft.util.Formatting.WHITE);}
+    private static String ivs(com.cobblemon.mod.common.pokemon.IVs ivs){
+        var stats=List.of(com.cobblemon.mod.common.api.pokemon.stats.Stats.HP,com.cobblemon.mod.common.api.pokemon.stats.Stats.ATTACK,
+            com.cobblemon.mod.common.api.pokemon.stats.Stats.DEFENCE,com.cobblemon.mod.common.api.pokemon.stats.Stats.SPECIAL_ATTACK,
+            com.cobblemon.mod.common.api.pokemon.stats.Stats.SPECIAL_DEFENCE,com.cobblemon.mod.common.api.pokemon.stats.Stats.SPEED);
+        return stats.stream().map(stat->Integer.toString(ivs.getOrDefault(stat))).collect(java.util.stream.Collectors.joining(" / "));
     }
 
     public Map<String, String> snapshot(ServerPlayerEntity player) {

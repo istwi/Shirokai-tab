@@ -37,6 +37,13 @@ class ChatAppearanceTest {
         root.addProperty("playerHoverInfo",true);assertTrue(ChatAppearanceConfig.parse(root.toString()).playerHoverInfo());
         root.addProperty("playerHoverInfo","false");assertThrows(Exception.class,()->ChatAppearanceConfig.parse(root.toString()));
     }
+    @Test void summaryDefaultsOnForLegacyFilesButExplicitFalseIsPreserved()throws Exception{
+        var root=new Gson().toJsonTree(ChatAppearanceConfig.defaults()).getAsJsonObject();root.remove("playerSummary");
+        Path file=directory.resolve("summary.json");String legacy=root.toString();Files.writeString(file,legacy);
+        assertTrue(ChatAppearanceConfig.load(file).playerSummary());assertEquals(legacy,Files.readString(file));
+        root.addProperty("playerSummary",false);assertFalse(ChatAppearanceConfig.parse(root.toString()).playerSummary());
+        root.addProperty("playerSummary","true");assertThrows(Exception.class,()->ChatAppearanceConfig.parse(root.toString()));
+    }
     @Test void colorsResetAndEscapingNeverInterpretMarkupOrActions(){
         var text=LegacyChatColors.render("Base &aGreen &7Gray &rDefault &&a <click:/op>literal</click>",Formatting.YELLOW);
         assertEquals("Base Green Gray Default &a <click:/op>literal</click>",text.getString());

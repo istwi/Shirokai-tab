@@ -50,13 +50,19 @@ public final class ChatAppearanceSmoke implements ModInitializer {
         try{var json=new Gson().toJsonTree(ChatConfig.defaults()).getAsJsonObject();json.addProperty("cooldownMillis",0);json.addProperty("duplicateWindowSeconds",0);config=ChatConfig.parse(json.toString());}
         catch(Exception error){throw new CompletionException(error);}
         var endpoint=new MinecraftChat(server,storage,permissions,null,null,config,org.slf4j.LoggerFactory.getLogger("chat-appearance-smoke"),()->List.of(a,b,c));
+        endpoint.summaryValues((id,key)->key.equals("shirokai:pokedex_percent")?"9.43":"5");
         var chat=endpoint.service();Runnable clear=()->{pa.clear();pb.clear();pc.clear();};
         var previous=ConnectionAnnouncements.install(endpoint);
         return chat.join(a.getUuid()).thenComposeAsync(v->chat.join(b.getUuid()),server).thenComposeAsync(v->chat.join(c.getUuid()),server)
             .thenRunAsync(()->{
                 clear.run();var incoming=SignedMessage.ofUnsigned(a.getUuid(),"Global");
                 endpoint.signed(a,incoming);var global=packet(pb);
-                check(global.serializedParameters().name().getStyle().getHoverEvent()==null,"Core chat still has a hover tooltip");
+                var hover=global.serializedParameters().name().getStyle().getHoverEvent();
+                check(hover!=null&&hover.getAction()==HoverEvent.Action.SHOW_TEXT,"Core nickname missing summary hover");
+                String summary=((Text)hover.getValue(HoverEvent.Action.SHOW_TEXT)).getString();
+                check(summary.contains("LayoutAlice")&&summary.contains("Pokédex: 9.43%")&&summary.contains("Ginásios: 5"),"Nickname summary used wrong subject or data");
+                var original=endpoint.appearance();endpoint.appearance(new ChatAppearanceConfig(1,true,true,"",true,original.bodyColors(),false,false));
+                clear.run();endpoint.signed(a,SignedMessage.ofUnsigned(a.getUuid(),"Sem resumo"));check(packet(pb).serializedParameters().name().getStyle().getHoverEvent()==null,"Summary disable ignored");endpoint.appearance(original);
                 check(global.serializedParameters().name().getStyle().getClickEvent()!=null,"Core chat lost click action");
                 check(a.getDisplayName().getStyle().getHoverEvent()==null,"Vanilla player name still exposes entity UUID");
                 check(a.getDisplayName().getStyle().getClickEvent()!=null,"Vanilla player name lost tell action");
@@ -82,6 +88,14 @@ public final class ChatAppearanceSmoke implements ModInitializer {
                 check(shared.body().content().equals(shareBody)&&Objects.equals(shared.signature(),sharedIncoming.signature()),"Share changed signed body/signature");
                 check(shared.unsignedContent()!=null&&shared.unsignedContent().getString().equals("Veja [Pikachu 1] e [Dollars: 10]"),"Share did not decorate normal chat");
                 check(pc.isEmpty(),"Share escaped local audience");
+                endpoint.shares().providers((id,slot)->slot==6?Optional.empty():Optional.of(Text.literal("[Pikachu "+slot+"]")),id->Optional.of(Text.literal("[Dollars: 10]")));
+                clear.run();endpoint.signed(a,SignedMessage.ofUnsigned(a.getUuid(),"Vazio @6"));
+                check(pb.isEmpty()&&pc.isEmpty(),"Empty slot announcement leaked to recipients");
+                check(pa.stream().filter(GameMessageS2CPacket.class::isInstance).map(GameMessageS2CPacket.class::cast).anyMatch(p->p.content().getString().contains("precisa ter um Pokémon no slot 6")),"Empty slot notice missing for author");
+                clear.run();try{chat.send(a.getUuid(),Channel.LOCAL,"Vazio @6",endpoint::system);throw new AssertionError("Command accepted empty slot");}catch(IllegalStateException expected){}
+                check(pb.isEmpty()&&pc.isEmpty(),"Command broadcast empty slot");
+                try{chat.privateMessage(a.getUuid(),b.getUuid(),"Vazio @6",endpoint::system);throw new AssertionError("Private accepted empty slot");}catch(IllegalStateException expected){}
+                check(pb.isEmpty(),"Private empty slot leaked");
                 clear.run();var shareMask=new FilterMask(shareBody.length());shareMask.markFiltered(1);
                 b.setClientOptions(new SyncedClientOptions("en_us",2,ChatVisibility.FULL,true,127,net.minecraft.util.Arm.RIGHT,true,true));
                 endpoint.signed(a,sharedIncoming.withFilterMask(shareMask));

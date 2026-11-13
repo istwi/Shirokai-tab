@@ -1,3 +1,27 @@
+## Ajustes 0.17.1-dev
+
+- Se qualquer `@1`..`@6` válido apontar para slot vazio, a mensagem inteira não é
+  enviada; somente o autor recebe “Você precisa ter um Pokémon no slot X para
+  compartilhá-lo.” Vale para chat normal, comandos de canais e mensagens privadas.
+  O gate de moderação vem primeiro. Sem Cobblemon/integração disponível a consulta
+  também falha fechada, sem anunciar informação de slot ao público.
+- O chip agora mostra somente `[Entei]`; o nível continua no tooltip.
+- Tooltip colorido: `Treinador: [CARGO] Nick`, usando o cargo principal atual e
+  os estilos de cargo de `presentation.json` (`titleTemplates`, mesmo ID do cargo).
+  IVs reais em HP/Atk/Def/SpA/SpD/Spe e total base /186; não substitui IVs originais
+  por valores efetivos de Hyper Training. Nenhum dado é interpretado como markup.
+- Hover no cabeçalho/nick do chat mostra treinador/cargo, Pokédex (%) e ginásios.
+  Usa as mesmas chaves `shirokai:pokedex_percent` e `shirokai:gyms` já disponíveis
+  à scoreboard; sem provider/score mostra N/D. Não inventa total de ginásios.
+  O tooltip é um snapshot da mensagem, sem animação de histórico ou consultas SQL.
+- `playerSummary` em `chat-appearance.json`: true por padrão, inclusive quando
+  ausente em arquivo antigo; false desativa o novo resumo. Aceita reload e não
+  reescreve arquivos existentes. `playerHoverInfo` continua controlando o hover
+  vanilla de identidade/UUID e o fallback simples quando o resumo está desligado.
+  Não é necessário ativar esse hover vanilla para ver o resumo novo do chat.
+
+Substituir o JAR e reiniciar; preservar configurações e banco.
+
 # Chat e MOTD — 0.17.0-dev
 
 Minecraft 1.21.1, Fabric, **Java 21**. Atualização da base 0.16.10-dev;

@@ -7,6 +7,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ChatSharesTest {
+    @Test void emptySlotValidationRejectsBeforeDeliveryAndChecksOnlyAuthor(){
+        var shares=new ChatShares();UUID author=UUID.randomUUID();
+        shares.providers((id,slot)->{assertEquals(author,id);return slot==1?Optional.of(Text.literal("Entei")):Optional.empty();},id->Optional.empty());
+        shares.validate(author,"@1 @carteira");
+        var error=assertThrows(IllegalStateException.class,()->shares.validate(author,"Tenho @1 mas @2 vazio"));
+        assertTrue(error.getMessage().contains("slot 2"));
+        shares.validate(author,"@7 @12 email@1");
+    }
     @Test void resolvesOnlyAuthorAndValidSlotsWithBoundedSnapshots(){
         var shares=new ChatShares();UUID author=UUID.randomUUID();var reads=new AtomicInteger();
         shares.providers((id,slot)->{assertEquals(author,id);assertEquals(1,slot);reads.incrementAndGet();return Optional.of(Text.literal("[Pikachu]"));},id->{assertEquals(author,id);return Optional.of(Text.literal("[Saldo 10]"));});

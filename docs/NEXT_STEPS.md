@@ -1,3 +1,8 @@
+## Continuidade 0.17.1-dev
+
+Validar no cliente real os novos tooltips e IVs. Preservar validação de slot antes
+de qualquer entrega e resumo independente do hover vanilla; CHAT_SHARES_MOTD.md.
+
 ## Continuidade 0.17.0-dev
 
 Marcações próprias e MOTD implementados: [guia](CHAT_SHARES_MOTD.md).

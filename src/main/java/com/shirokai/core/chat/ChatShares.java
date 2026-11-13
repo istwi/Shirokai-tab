@@ -15,6 +15,16 @@ public final class ChatShares {
         this.pokemon=Objects.requireNonNull(pokemon);this.wallet=Objects.requireNonNull(wallet);
     }
     public static boolean contains(String body) { return TOKEN.matcher(body).find(); }
+    public void validate(UUID author,String body){
+        var matcher=TOKEN.matcher(LegacyChatColors.plain(body));var checked=new HashSet<Integer>();int count=0;
+        while(matcher.find()&&count++<8){
+            String token=matcher.group(1);
+            if(token.equalsIgnoreCase("carteira"))continue;
+            int slot=Integer.parseInt(token);
+            if(checked.add(slot)&&pokemon.apply(author,slot).isEmpty())
+                throw new IllegalStateException("Você precisa ter um Pokémon no slot "+slot+" para compartilhá-lo.");
+        }
+    }
     public Text render(UUID author, String body, Function<String,Text> literal) {
         if(!contains(body))return literal.apply(body);
         Text rendered=literal.apply(body);String plain=rendered.getString();

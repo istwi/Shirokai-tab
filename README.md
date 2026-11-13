@@ -1,3 +1,9 @@
+## Ajustes de chat 0.17.1-dev
+
+Slot vazio avisa somente ao autor. Compartilhamento mostra só o nome do Pokémon;
+tooltip inclui IVs e treinador com cargo colorido. Hover no nick mostra cargo,
+Pokédex e ginásios. [Detalhes](docs/CHAT_SHARES_MOTD.md).
+
 ## Chat: Pokémon, carteira e MOTD (0.17.0-dev)
 
 `@1` a `@6` compartilham seu próprio Pokémon; `@carteira` mostra seus saldos.

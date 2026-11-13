@@ -144,3 +144,6 @@ chat-appearance.json/schema1 participa do reload atômico; cores por canal, inte
 schema de chat.json/SQLite6. Arquivos existentes são preservados; somente os dois
 formatos exatamente iguais aos defaults antigos mudam em memória para [G]/[L].
 Primeira instalação exige reinício para carregar mixins e chat_type do datapack do mod.
+
+0.17.1: `playerSummary` opcional em chat-appearance.json (defaulttrue), reload;
+false desliga resumo do nick. Ver CHAT_SHARES_MOTD.md para distinção do hover vanilla.

@@ -264,3 +264,8 @@ broadcast duplicado. Refmap inclui ambos; versão Minecraft continua fixa1.21.1.
 Callbacks transformados foram exercitados com Args/nomes sintéticos no smoke, sem
 executar login/autenticação. Não certifica um cliente ou coexistência universal
 com outro mod que substitua esses mesmos avisos. Nenhuma dependência foi alterada.
+
+0.17.1: IVs de Cobblemon1.8.3 auditados por javap: IVs herda
+PokemonStats.getOrDefault(Stat)/total(); Stats.HP/ATTACK/DEFENCE/SPECIAL_ATTACK/
+SPECIAL_DEFENCE/SPEED. Somente leitura. Cargo usa TitleService.visualPresentation
+com VisualTarget.CHAT; resumo usa placeholders nativos, sem consulta econômica/SQL.

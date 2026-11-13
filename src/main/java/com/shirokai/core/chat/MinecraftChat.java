@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 public final class MinecraftChat {
     private final MinecraftServer server;private final ChatService service;private final Supplier<Collection<ServerPlayerEntity>> online;private final Logger logger;private final PermissionService permissions;
+    private final TitleService titles;
     private final ChatShares shares=new ChatShares();
     public ChatShares shares(){return shares;}
     private ChatAppearanceConfig appearance=ChatAppearanceConfig.defaults();
@@ -24,13 +25,14 @@ public final class MinecraftChat {
         this(server,storage,permissions,titles,clans,config,logger,()->List.copyOf(server.getPlayerManager().getPlayerList()));
     }
     public MinecraftChat(MinecraftServer server,SqliteStorage storage,PermissionService permissions,TitleService titles,ClanService clans,ChatConfig config,Logger logger,Supplier<Collection<ServerPlayerEntity>> online){
-        this.server=server;this.online=online;this.logger=logger;this.permissions=permissions;
+        this.server=server;this.online=online;this.logger=logger;this.permissions=permissions;this.titles=titles;
         service=new ChatService(new ChatRepository(storage,Clock.systemUTC()),permissions,server,
             ()->online.get().stream().filter(player->!player.isDisconnected()).map(player->{
                 UUID clan=clans==null?null:clans.cached(player.getUuid()).map(snapshot->snapshot.id()).orElse(null);
                 return new ChatService.Participant(player.getUuid(),player.getGameProfile().getName(),player.getWorld().getRegistryKey().getValue().toString(),player.getX(),player.getY(),player.getZ(),clan);
             }).toList(),id->titles==null?List.of():titles.chatDefinitions(id).stream().map(def->def.display()).toList(),
             Clock.systemUTC(),config,(id,reason)->logger.warn("[chat] Mensagem rejeitada de {}: {}",id,reason));
+        service.contentValidator(shares::validate);
         service.visibility((viewer,actor)->com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,actor));
     }
     private com.shirokai.core.presentation.PresentationRuntime presentation;
@@ -39,8 +41,33 @@ public final class MinecraftChat {
     private ServerPlayerEntity player(UUID id){return online.get().stream().filter(player->player.getUuid().equals(id)&&!player.isDisconnected()).findFirst().orElse(null);}
     private Text label(ChatService.Envelope message){
         var author=player(message.author());String name=author==null?message.author().toString():author.getGameProfile().getName();
-        return (presentation==null||!presentation.plan().config().chatEnabled()?service.header(message):presentation.header(message)).copy().styled(style->style.withHoverEvent(appearance.playerHoverInfo()?new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal("Jogador: "+name)):null)
+        return (presentation==null||!presentation.plan().config().chatEnabled()?service.header(message):presentation.header(message)).copy().styled(style->style.withHoverEvent(appearance.playerSummary()?new HoverEvent(HoverEvent.Action.SHOW_TEXT,playerSummary(message.author())):appearance.playerHoverInfo()?new HoverEvent(HoverEvent.Action.SHOW_TEXT,Text.literal("Jogador: "+name)):null)
                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,"/chat msg "+name+" ")));
+    }
+    private java.util.function.BiFunction<UUID,String,String> summaryValues=(id,key)->"N/D";
+    public void summaryValues(java.util.function.BiFunction<UUID,String,String> provider){summaryValues=Objects.requireNonNull(provider);}
+    public Text rank(UUID id){
+        if(titles!=null&&presentation!=null)return safe(titles.visualPresentation(id,com.shirokai.core.customization.VisualTarget.CHAT,0,false));
+        if(titles!=null)return titles.rank(id).map(def->Text.literal(def.display()).formatted(net.minecraft.util.Formatting.AQUA)).orElseGet(Text::empty);
+        String group=permissions.metadata(id).group();
+        return group==null?Text.empty():Text.literal("["+group.toUpperCase(Locale.ROOT)+"]").formatted(net.minecraft.util.Formatting.AQUA);
+    }
+    public Text trainer(UUID id){
+        var author=player(id);var result=Text.empty();var cargo=rank(id);
+        if(!cargo.getString().isEmpty())result.append(cargo).append(" ");
+        return result.append(Text.literal(author==null?"Indisponível":author.getGameProfile().getName()).formatted(net.minecraft.util.Formatting.WHITE));
+    }
+    public Text playerSummary(UUID id){
+        var text=Text.empty().append(Text.literal("Treinador").formatted(net.minecraft.util.Formatting.AQUA,net.minecraft.util.Formatting.BOLD));
+        text.append(Text.literal("\n").setStyle(Style.EMPTY)).append(trainer(id));
+        String dex=summaryValues.apply(id,"shirokai:pokedex_percent"),gyms=summaryValues.apply(id,"shirokai:gyms");
+        text.append(Text.literal("\nPokédex: ").setStyle(Style.EMPTY.withColor(net.minecraft.util.Formatting.WHITE)))
+            .append(Text.literal(dex.equals("N/D")?dex:dex+"%").setStyle(Style.EMPTY.withColor(net.minecraft.util.Formatting.RED)));
+        return text.append(Text.literal("\nGinásios: ").setStyle(Style.EMPTY.withColor(net.minecraft.util.Formatting.WHITE)))
+            .append(Text.literal(gyms).setStyle(Style.EMPTY.withColor(net.minecraft.util.Formatting.AQUA)));
+    }
+    private static Text safe(Text value){
+        var result=Text.empty();value.visit((style,part)->{result.append(Text.literal(part).setStyle(style.withHoverEvent(null).withClickEvent(null).withInsertion(null)));return Optional.empty();},Style.EMPTY);return result;
     }
     private boolean colors(UUID author){return appearance.enabled()&&appearance.legacyColors()&&(appearance.colorPermission().isEmpty()||permissions.allowed(author,appearance.colorPermission()));}
     private Text body(ChatService.Envelope message,UUID viewer){

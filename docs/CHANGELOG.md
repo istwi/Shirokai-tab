@@ -1,3 +1,9 @@
+## 0.17.1-dev
+
+Slot vazio rejeita envio com aviso só ao autor; chip Pokémon sem nível; IVs e
+cargo/nick coloridos no tooltip. Resumo do jogador ao passar mouse no nick, com
+Pokédex/ginásios reais e opção playerSummary. Sem migração de banco/arquivos.
+
 ## 0.17.0-dev
 
 Adiciona compartilhamento do próprio Pokémon (`@1`..`@6`) e carteira (`@carteira`)

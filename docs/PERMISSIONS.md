@@ -152,3 +152,6 @@ chat-appearance.json.colorPermission vazio permite cores &0..f/&r para todos. Pa
 restringir, configure shirokaicore.chat.color ou outro nó e conceda via LuckPerms.
 A permissão é revalidada por envio; não é bypass de filtro/cooldown/mute/ignore.
 Cor padrão do canal e avisos [+]/[-] são política do servidor, sem elevar autoridade.
+
+0.17.1: nenhum nó novo. Resumo e cargo respeitam audiência existente do chat;
+slot vazio não pode ser anunciado nem usando os bypass de moderação.

@@ -40,3 +40,6 @@
 | Release estável | Não disponível | Critérios completos não cumpridos |
 
 Scoreboard funcional implementada em0.8; a validação de pacotes sintéticos não equivale à aparência com cliente real.
+
+0.17.1: slot vazio gera aviso privado; Pokémon sem nível inline, tooltip com IVs
+e cargo/nick coloridos. Resumo no hover do nick com cargo, Pokédex e ginásios.

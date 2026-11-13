@@ -1,3 +1,34 @@
+# Estado atual — 0.17.1-dev
+
+Base:545fcbe (0.17.0-dev), Java21/Minecraft1.21.1/Fabric preservados.
+Slot vazio rejeita envio inteiro, com aviso somente ao autor: validador único
+após moderação e antes de qualquer sink, incluindo privados e comandos.
+Chip `[Nome]` sem nível; nível permanece no tooltip colorido. Tooltip inclui
+cargo principal estilizado/nick e IVs base HP/Atk/Def/SpA/SpD/Spe + total /186.
+
+Hover no nick/cabeçalho Core mostra treinador/cargo, Pokédex e ginásios pelos
+mesmos placeholders disponíveis à scoreboard. Dados ausentes aparecem N/D;
+não inventa denominador de ginásios. playerSummary defaulttrue é independente
+do hover vanilla playerHoverInfo; arquivos antigos recebem default em memória,
+sem reescrita, explicitfalse preservado. Reload aceito; SQLite6/schema1 mantidos.
+
+Validação:132 testes JUnit, sem falhas/erros/skips;53 verificações Fabric em
+três boots e14 de providers reais aprovadas. Fixture verificou IVs conhecidos
+31/30/29/28/27/26 e total171/186, nome sem nível e cargo no treinador; chat testou
+aviso exclusivo do autor, zero entrega em slot vazio nas três rotas, resumo e
+flagfalse. Cliente real/login autenticado/renderização não certificados.
+Relatórios:build/test-results/test, build/server-smoke/result.json e
+build/integration-smoke/result.json. JAR sem fixtures de teste.
+
+JAR:releases/shirokai-core-0.17.1-dev.jar
+SHA256:be46f29ef64a0d69b2d9ce3e8f550305d2c904ba6cee8a2371ebd1abeda36c92
+
+[Guia](CHAT_SHARES_MOTD.md). Substituir JAR e reiniciar, preservando banco/JSONs.
+Código, documentação, testes e artefato preparados para GitHub; sem publicação
+de release estável ou configuração de ambiente.
+
+---
+
 # Estado atual — 0.17.0-dev
 
 Base remota: 1d24fc366927a912a68be212bed21f67f2543b5d (0.16.10-dev).

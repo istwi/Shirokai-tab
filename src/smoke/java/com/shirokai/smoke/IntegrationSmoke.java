@@ -151,9 +151,20 @@ public final class IntegrationSmoke implements ModInitializer {
             .thenComposeAsync(v -> until.apply(() -> { runtime.tick(); return service.render("%shirokai:pokedex_owned%", context, "N/D").equals("1"); }), server)
             .thenRunAsync(() -> {
                 check(new BigDecimal(service.render("%shirokai:pokedex_percent%", context, "N/D")).compareTo(BigDecimal.ZERO)>0,"Official acquisition did not update percent");
+                var actual=com.cobblemon.mod.common.Cobblemon.INSTANCE.getStorage().getParty(player).get(0);
+                var stats=List.of(com.cobblemon.mod.common.api.pokemon.stats.Stats.HP,com.cobblemon.mod.common.api.pokemon.stats.Stats.ATTACK,
+                    com.cobblemon.mod.common.api.pokemon.stats.Stats.DEFENCE,com.cobblemon.mod.common.api.pokemon.stats.Stats.SPECIAL_ATTACK,
+                    com.cobblemon.mod.common.api.pokemon.stats.Stats.SPECIAL_DEFENCE,com.cobblemon.mod.common.api.pokemon.stats.Stats.SPEED);
+                for(int index=0;index<stats.size();index++)actual.getIvs().set(stats.get(index),31-index);
                 var shared=runtime.partyShare(player.getUuid(),1).orElseThrow();
                 check(shared.getString().toLowerCase(java.util.Locale.ROOT).contains("pikachu"),"Party share did not read own real slot");
                 check(shared.getStyle().getHoverEvent()!=null,"Party share missing tooltip");
+                check(!shared.getString().contains("Nv.")&&!shared.getString().contains("Nível"),"Level still shown inline");
+                String lore=((Text)shared.getStyle().getHoverEvent().getValue(net.minecraft.text.HoverEvent.Action.SHOW_TEXT)).getString();
+                check(lore.contains("IVs (HP/Atk/Def/SpA/SpD/Spe)")&&lore.contains("31 / 30 / 29 / 28 / 27 / 26 • Total: 171/186"),"Real party IVs wrong order or total");
+                runtime.trainer(id->Text.literal("[OWNER] "+player.getGameProfile().getName()).formatted(net.minecraft.util.Formatting.AQUA));
+                String rankedLore=((Text)runtime.partyShare(player.getUuid(),1).orElseThrow().getStyle().getHoverEvent().getValue(net.minecraft.text.HoverEvent.Action.SHOW_TEXT)).getString();
+                check(rankedLore.contains("Treinador: [OWNER] CoreIntegrate"),"Colored trainer rank slot not composed");
                 check(runtime.partyShare(player.getUuid(),6).isEmpty()&&runtime.partyShare(player.getUuid(),0).isEmpty(),"Empty/invalid slot did not fail closed");
                 check(runtime.partyShare(UUID.randomUUID(),1).isEmpty(),"Share used another player's party");
                 var wallet=runtime.walletShare(player.getUuid()).orElseThrow().getString();

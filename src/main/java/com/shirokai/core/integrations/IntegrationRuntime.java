@@ -140,11 +140,13 @@ public final class IntegrationRuntime implements AutoCloseable {
         var session = sessions.get(context.playerId());
         return session == null ? Optional.empty() : Optional.ofNullable(session.values.get(key));
     }
+    private Function<UUID,net.minecraft.text.Text> trainer;
+    public void trainer(Function<UUID,net.minecraft.text.Text> provider){trainer=Objects.requireNonNull(provider);}
     public Optional<net.minecraft.text.Text> partyShare(UUID author,int slot) {
         if(closed||!server.isOnThread()||cobblemon==null)return Optional.empty();
         var player=server.getPlayerManager().getPlayer(author);
         if(player==null||player.isDisconnected())return Optional.empty();
-        try{return cobblemon.partyShare(player,slot);}
+        try{return trainer==null?cobblemon.partyShare(player,slot):cobblemon.partyShare(player,slot,trainer.apply(author));}
         catch(RuntimeException|LinkageError error){failure("party-share",error);return Optional.empty();}
     }
     public Optional<net.minecraft.text.Text> walletShare(UUID author) {

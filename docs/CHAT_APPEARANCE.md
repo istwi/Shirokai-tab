@@ -149,3 +149,8 @@ intacta sem decoração para filtrados. Executa os callbacks já transformados d
 dois mixins com argumentos sintéticos e verifica preservação de aviso externo.
 Não realiza login/logout autenticado nem certifica renderização de cliente real.
 Resultados atuais em PROJECT_STATUS.md.
+
+0.17.1: `playerSummary` defaulttrue adiciona resumo no nick/cabeçalho Core com cargo,
+Pokédex e ginásios. Flag ausente assume true sem reescrever JSON. Independente de
+playerHoverInfo, que permanece para identidade vanilla; false no resumo restaura
+o comportamento antigo. Clique de resposta, corpo, assinatura e máscara preservados.

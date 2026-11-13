@@ -132,3 +132,9 @@ do autor somente, após gate e roteamento. Não expandir unsignedContent para
 filtrados/máscaras não-pass-through. Saldos usam cache próprio; não criar contas.
 MOTD renderiza na thread do servidor e publica snapshot sem IO no Netty; hook
 1.21.1 troca apenas description. Não prometer animação contínua no multiplayer.
+
+Chat0.17.1: validador de conteúdo após gate e antes de QUALQUER sink; slot vazio
+rejeita envio inteiro e o aviso é só para autor. Não voltar a anunciar indisponível
+publicamente. Chip sem nível; tooltip com cargo colorido, nick e IVs base reais.
+playerSummary defaulttrue é independente de playerHoverInfo vanilla; resumo Core
+usa placeholders de Pokédex/ginásios do autor e mantém campo assinado/filtros.

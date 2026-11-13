@@ -288,3 +288,7 @@ login/logout autenticado nem comprovação de assinatura criptográfica válida.
 ChatAppearanceSmoke também exige nick branco nos componentes reais de global/local,
 caminho de comandos, templates dos cinco canais, alvo privado e avisos [+]/[-],
 sem alterar indicadores/corpo. Suítes existentes preservam as cores das tags.
+
+0.17.1: testar rejeição de slot vazio antes de todos os sinks, aviso só no autor,
+canais/privado, resumo do nick com dados corretos e opção false, compatibilidade
+do JSON antigo sem reescrita, chip sem nível e IVs no tooltip com Cobblemon real.
