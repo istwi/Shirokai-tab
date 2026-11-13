@@ -23,3 +23,8 @@ Um JRE sozinho não permite compilar.
 Nenhum script ou mudança de configuração de ambiente foi salvo/publicado
 nesta tarefa de desenvolvimento. O JDK e cache atuais são arquivos locais;
 não há garantia de restauração em novas tarefas.
+
+0.17.0: JDK21 oficial novamente instalado com SHA-256 verificado nesta instância.
+O download privado do Dex usa asset oficial via API GitHub (Accept octet-stream),
+com o mesmo SHA-256 fixado; nenhum checksum foi relaxado. Sem mudanças/publicação
+de configuração do ambiente.

@@ -9,7 +9,8 @@
     "PlayerJoinAnnouncement",
     "PlayerQuitAnnouncement",
     "ScoreboardTeamPersistence",
-    "PlayerNameHover"
+    "PlayerNameHover",
+    "ServerListMotd"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -24,7 +24,8 @@ for entry in manifest:
     target = mods / entry['filename']
     if target.exists(): data = target.read_bytes()
     else:
-        with urllib.request.urlopen(entry['url'], timeout=120) as response: data = response.read()
+        request = urllib.request.Request(entry['url'], headers={'Accept': 'application/octet-stream'} if entry['url'].startswith('https://api.github.com/repos/') else {})
+        with urllib.request.urlopen(request, timeout=120) as response: data = response.read()
     if digest(data) != entry['sha256']: raise RuntimeError(f"SHA256 mismatch: {entry['filename']}")
     save_verified(target, data)
     with zipfile.ZipFile(io.BytesIO(data)) as archive: root_ids.add(json.loads(archive.read('fabric.mod.json'))['id'])

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "enabled": true,
+  "frameTicks": 60,
+  "frames": [
+    [
+      "<gradient:#ffcc33:#fff4b0><bold>✦ SHIROKAI ✦</bold></gradient>",
+      "<aqua>Cobblemon</aqua> <gray>%server:online%/%server:max% online</gray>"
+    ],
+    [
+      "<gold><bold>✦ SHIROKAI ✦</bold></gold>",
+      "<green>Explore • Capture • Battle</green>"
+    ]
+  ]
+}

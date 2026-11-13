@@ -25,6 +25,9 @@ class ChatConfigAndGateTest {
         var json=new Gson().toJsonTree(ChatConfig.defaults()).getAsJsonObject();var words=new JsonArray();words.add("blocked");json.add("blockedWords",words);
         var config=ChatConfig.parse(json.toString());var gate=new SpamGate();
         assertThrows(IllegalStateException.class,()->gate.admit("ＢＬＯＣＫＥＤ",config,1,true,false));
+        assertThrows(IllegalStateException.class,()->gate.admit("blócked",config,1,true,false));
+        assertThrows(IllegalStateException.class,()->gate.admit("blo\u200bcked",config,1,true,false));
+        assertThrows(IllegalStateException.class,()->gate.admit("bl&ao&bcked",config,1,true,false));
         gate.admit("blocked",config,2,true,true);
     }
 }

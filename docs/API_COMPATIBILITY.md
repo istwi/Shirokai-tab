@@ -1,3 +1,13 @@
+## 0.17.0 — APIs auditadas
+
+Cobblemon1.8.3: Cobblemon.getStorage().getParty(ServerPlayerEntity).get(slot-1),
+Pokemon.getDisplayName(false)/getLevel/getSpecies/getGender/getShiny/getNature/getAbility.
+Assinaturas conferidas por javap no JAR oficial fixado. Impactor reutiliza o adapter/cache
+existente, sem criação de contas. Minecraft1.21.1: ServerQueryNetworkHandler.onRequest
+instancia QueryResponseS2CPacket(ServerMetadata); ModifyArg substitui somente description,
+preservando os outros componentes do record. Render no servidor, snapshot no Netty.
+[Uso e limites de animação](CHAT_SHARES_MOTD.md).
+
 > 0.16: Drex Vanish1.5.9+1.21.1 auditado por artefato/bytecode e smoke real;
 > API, hash, dependências e limites em VANISH.md. Reflection opcional não inclui
 > provider no JAR de produção. Versões novas exigem nova auditoria.

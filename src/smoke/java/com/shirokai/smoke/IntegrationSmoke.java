@@ -149,7 +149,17 @@ public final class IntegrationSmoke implements ModInitializer {
                 server.getCommandManager().executeWithPrefix(server.getCommandSource(), "givepokemonother CoreIntegrate pikachu");
             }, server)
             .thenComposeAsync(v -> until.apply(() -> { runtime.tick(); return service.render("%shirokai:pokedex_owned%", context, "N/D").equals("1"); }), server)
-            .thenRunAsync(() -> check(new BigDecimal(service.render("%shirokai:pokedex_percent%", context, "N/D")).compareTo(BigDecimal.ZERO) > 0, "Official acquisition did not update percent"), server)
+            .thenRunAsync(() -> {
+                check(new BigDecimal(service.render("%shirokai:pokedex_percent%", context, "N/D")).compareTo(BigDecimal.ZERO)>0,"Official acquisition did not update percent");
+                var shared=runtime.partyShare(player.getUuid(),1).orElseThrow();
+                check(shared.getString().toLowerCase(java.util.Locale.ROOT).contains("pikachu"),"Party share did not read own real slot");
+                check(shared.getStyle().getHoverEvent()!=null,"Party share missing tooltip");
+                check(runtime.partyShare(player.getUuid(),6).isEmpty()&&runtime.partyShare(player.getUuid(),0).isEmpty(),"Empty/invalid slot did not fail closed");
+                check(runtime.partyShare(UUID.randomUUID(),1).isEmpty(),"Share used another player's party");
+                var wallet=runtime.walletShare(player.getUuid()).orElseThrow().getString();
+                check(wallet.contains("Dollars: "+service.render("%shirokai:dollars%",context,"N/D"))&&wallet.contains("Tokens: "+service.render("%shirokai:tokens%",context,"N/D")),"Wallet share differs from actual own balances");
+                check(runtime.walletShare(UUID.randomUUID()).isEmpty(),"Share exposed other wallet");
+            },server)
             .thenComposeAsync(v -> until.apply(() -> positive(service.render("%shirokai:dex_percent%", context, "N/D"))), server)
             .thenComposeAsync(v->{
                 runtime.replaceConfig(new IntegrationConfig(1,true,true,true,true,20,base.dollarsCurrency(),base.tokensCurrency(),"impactor:missing_cash","smoke_gyms","national","cobblemon"));

@@ -1,3 +1,11 @@
+## 0.17.0 — Novos recursos
+
+- Chat: `@1`..`@6`, próprio slot Cobblemon; `@carteira`, próprios saldos Impactor.
+- Moderação: gate compartilhado existente; filtro agora ignora acentos/invisíveis.
+- MOTD: cores/HEX/gradientes, placeholders globais e quadros por consulta; reload.
+- Não oferece animação contínua da lista vanilla nem dados de outro jogador.
+[Detalhes](CHAT_SHARES_MOTD.md).
+
 > 0.16: histórico/diagnóstico/reparos transacionais de clãs e presets animados
 > por área entregues. Vanish de entidades depende do Drex Vanish1.5.9+1.21.1
 > opcional; integração testada com jogadores sintéticos (VANISH.md).

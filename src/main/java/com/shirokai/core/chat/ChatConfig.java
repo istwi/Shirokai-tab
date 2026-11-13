@@ -15,7 +15,7 @@ public record ChatConfig(int schemaVersion, Channel defaultChannel, double local
                 ||maximumLength<1||maximumLength>1024||cooldownMillis<0||cooldownMillis>60000||duplicateWindowSeconds<0||duplicateWindowSeconds>3600)
             throw new IllegalArgumentException("Configuração de chat fora dos limites");
         blockedWords=Set.copyOf(Objects.requireNonNull(blockedWords));channelPermissions=Map.copyOf(Objects.requireNonNull(channelPermissions));nameFormats=Map.copyOf(Objects.requireNonNull(nameFormats));
-        if(blockedWords.size()>1000||blockedWords.stream().anyMatch(word->word.isBlank()||word.length()>64))throw new IllegalArgumentException("Filtro de palavras inválido");
+        if(blockedWords.size()>1000||blockedWords.stream().anyMatch(word->SpamGate.normalize(word).isBlank()||word.length()>64))throw new IllegalArgumentException("Filtro de palavras inválido");
         for(Channel channel:Channel.values()){
             String permission=channelPermissions.get(channel),format=nameFormats.get(channel);
             if(permission==null||!permission.matches("[a-zA-Z0-9_.-]{0,128}")||format==null||format.length()>512||format.codePoints().anyMatch(Character::isISOControl))throw new IllegalArgumentException("Permissão/formato inválido: "+channel);

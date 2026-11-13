@@ -140,6 +140,23 @@ public final class IntegrationRuntime implements AutoCloseable {
         var session = sessions.get(context.playerId());
         return session == null ? Optional.empty() : Optional.ofNullable(session.values.get(key));
     }
+    public Optional<net.minecraft.text.Text> partyShare(UUID author,int slot) {
+        if(closed||!server.isOnThread()||cobblemon==null)return Optional.empty();
+        var player=server.getPlayerManager().getPlayer(author);
+        if(player==null||player.isDisconnected())return Optional.empty();
+        try{return cobblemon.partyShare(player,slot);}
+        catch(RuntimeException|LinkageError error){failure("party-share",error);return Optional.empty();}
+    }
+    public Optional<net.minecraft.text.Text> walletShare(UUID author) {
+        if(closed||!server.isOnThread()||impactor==null)return Optional.empty();
+        var session=sessions.get(author);var player=server.getPlayerManager().getPlayer(author);
+        if(session==null||player==null||player.isDisconnected())return Optional.empty();
+        var text=net.minecraft.text.Text.literal("[Carteira de "+player.getGameProfile().getName()+": ");
+        text.append("Dollars: "+session.values.getOrDefault("shirokai:dollars","N/D"));
+        text.append(" | Tokens: "+session.values.getOrDefault("shirokai:tokens","N/D"));
+        if(config.cashCurrency()!=null)text.append(" | Cash: "+session.values.getOrDefault("shirokai:cash","N/D"));
+        return Optional.of(text.append("]").formatted(net.minecraft.util.Formatting.GOLD));
+    }
     public String status() { return providers + " sessions=" + sessions.size() + " queued=" + pending.size() + " failures=" + failures + " pokedex=" + config.pokedexProvider() + " currencies=" + config.dollarsCurrency() + "," + config.tokensCurrency() + "," + Objects.toString(config.cashCurrency(),"DISABLED"); }
     @Override public void close() { if (closed) return; closed = true; sessions.clear(); pending.clear(); placeholders.external((key, context) -> Optional.empty()); if (papi != null) papi.close(); if (cobblemon != null) cobblemon.close(); }
 }

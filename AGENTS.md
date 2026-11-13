@@ -126,3 +126,9 @@ Hover0.16.10: playerHoverInfo controla tooltips do Core e Entity.getHoverEvent
 para ServerPlayerEntity somente, com bridge ativa do chat. Não modificar corpo,
 assinatura, máscaras, traduções ou hover de mobs/itens. ChatAppearance schema1
 aceita campo ausente como false; true restaura vanilla. Ler CHAT_APPEARANCE.md.
+
+Chat/MOTD0.17: ler docs/CHAT_SHARES_MOTD.md. Tokens não possuem alvo; resolver UUID
+do autor somente, após gate e roteamento. Não expandir unsignedContent para
+filtrados/máscaras não-pass-through. Saldos usam cache próprio; não criar contas.
+MOTD renderiza na thread do servidor e publica snapshot sem IO no Netty; hook
+1.21.1 troca apenas description. Não prometer animação contínua no multiplayer.

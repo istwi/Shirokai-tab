@@ -1,3 +1,10 @@
+## 0.17.0 — Chat e MOTD
+
+Novo `motd.json` schema1: enabled/frameTicks/frames; até duas linhas por quadro.
+Reload por `/shirokaicore reload`; inválido preserva a configuração ativa.
+`chat.json` mantém schema1 e adiciona normalização de acentos/invisíveis no filtro.
+[Exemplos completos](CHAT_SHARES_MOTD.md). SQLite6 e JSONs existentes preservados.
+
 > 0.16: personalization.json controla presets/animações por área (CUSTOMIZATION.md).
 > menus.json novo habilita o menu de clã; false existente permanece até alteração
 > explícita. Presets aceitam frames/frameTicks sem mudar schema1. SQLite continua6.

@@ -1,3 +1,9 @@
+## Chat: Pokémon, carteira e MOTD (0.17.0-dev)
+
+`@1` a `@6` compartilham seu próprio Pokémon; `@carteira` mostra seus saldos.
+Filtro de linguagem e antispam em `chat.json`; MOTD colorido com placeholders e
+quadros em `motd.json`. [Configuração e limites](docs/CHAT_SHARES_MOTD.md).
+
 > 0.16.5-dev: /perfil e estilos usam o [mesmo layout de cinco linhas](docs/MENUS.md), com migração do padrão antigo e backup.
 
 > 0.16.2-dev: menu de clã com cinco linhas e ícones/posições da referência; [layout](docs/MENUS.md).

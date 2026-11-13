@@ -44,6 +44,7 @@ public final class CoreRuntime implements AutoCloseable {
     private TabRuntime tab;
     private ScoreboardRuntime scoreboard;
     private IntegrationRuntime integrations;
+    private com.shirokai.core.motd.MotdPlan motd;
     private com.shirokai.core.menus.MenuPlan menus;
     private com.shirokai.core.visibility.VisibilityService visibility;
     public String vanishStatus(){return visibility==null?"DISABLED":visibility.status();}
@@ -123,6 +124,7 @@ public final class CoreRuntime implements AutoCloseable {
         modules.register(module("integrations", Set.of("placeholders", "permissions"), () -> {
             var integrationConfig = IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
             integrations = new IntegrationRuntime(server, integrationConfig, placeholders, permissions, () -> running("clans") ? clans : null, () -> config.unavailablePlaceholder(), logger);
+            if(chat!=null)chat.shares().providers(integrations::partyShare,integrations::walletShare);
         }, () -> { if (integrations != null) integrations.close(); }));
         modules.register(module("styles",Set.of(),()->{
             styles=new StyleEngine(StyleConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/styles.json")));
@@ -157,6 +159,10 @@ public final class CoreRuntime implements AutoCloseable {
             modules.start(id, config.enabled(id));
             logger.info("[{}] {}", id, modules.states().get(id));
         }
+        try {
+            motd=new com.shirokai.core.motd.MotdPlan(com.shirokai.core.motd.MotdConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/motd.json")),styles==null?new StyleEngine(StyleConfig.defaults()):styles);
+            updateMotd();
+        } catch(Exception error){logger.error("[motd] Configuração inválida; MOTD vanilla preservado",error);}
     }
     private static CoreModule module(String id, Set<String> dependencies, CheckedAction start, CheckedAction stop) {
         return new CoreModule() {
@@ -196,7 +202,14 @@ public final class CoreRuntime implements AutoCloseable {
         });
     }
     public void playerLeft(java.util.UUID player) { if(customization!=null)customization.forget(player); if (titles != null) titles.forget(player); if(clans!=null)clans.forget(player); if(chat!=null)chat.service().leave(player);if(tab!=null)tab.forget(player);if(scoreboard!=null)scoreboard.forget(player);if(integrations!=null)integrations.forget(player); }
+    private net.minecraft.text.Text renderMotd(com.shirokai.core.motd.MotdPlan plan){
+        return plan.config().enabled()?plan.render(visualTicks,(int)server.getPlayerManager().getPlayerList().stream().filter(p->!com.shirokai.core.visibility.VisibilityService.isHidden(server,p)).count(),server.getMaxPlayerCount(),server.getVersion()):null;
+    }
+    private void updateMotd(){
+        if(motd!=null)com.shirokai.core.motd.MotdBridge.publish(renderMotd(motd));
+    }
     public void tick() {
+        if(visualTicks%5==0)updateMotd();
         if(++visualTicks%5==0&&customization!=null&&customization.catalog().hasAnimations())for(var player:server.getPlayerManager().getPlayerList()){
             if(player.currentScreenHandler instanceof com.shirokai.core.profiles.ProfileMenu menu)menu.refreshVisuals();
             else if(player.currentScreenHandler instanceof com.shirokai.core.customization.StyleChoiceMenu menu)menu.refreshVisuals();
@@ -245,7 +258,8 @@ public final class CoreRuntime implements AutoCloseable {
                 var presentationPlan=presentation==null?null:new PresentationPlan(PresentationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presentation.json")),candidateStyles,chatConfig==null?ChatConfig.defaults():chatConfig);
                 var presetCatalog=presentation==null?null:PresetCatalog.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/presets.json"),candidateStyles);
                 var integrationConfig=integrations==null?null:IntegrationConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/integrations.json"));
-                return new ReloadCandidate(core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog,extrasPlan,chatAppearance,menuPlan,personalConfig);
+                var motdPlan=new com.shirokai.core.motd.MotdPlan(com.shirokai.core.motd.MotdConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/motd.json")),candidateStyles==null?new StyleEngine(StyleConfig.defaults()):candidateStyles);
+                return new ReloadCandidate(motdPlan,core,catalog,clanConfig,chatConfig,candidateStyles,tabPlan,scoreboardPlan,integrationConfig,presentationPlan,presetCatalog,extrasPlan,chatAppearance,menuPlan,personalConfig);
             } catch (Exception failure) { throw new CompletionException(failure); }
         }, io).whenComplete((candidate, error) -> {
             if (closed) { reloading.set(false); result.completeExceptionally(new IllegalStateException("Servidor encerrando")); return; }
@@ -261,11 +275,13 @@ public final class CoreRuntime implements AutoCloseable {
                     if(tab!=null&&candidate.extras().config().requiresRestartComparedTo(tab.extrasPlan().config()))throw new IllegalStateException("Ownership de extras do TAB exige reinício");
                     if(integrations!=null&&candidate.integrations().requiresRestartComparedTo(integrations.config()))throw new IllegalStateException("Ativação de integrações exige reinício");
                     candidate.menus().validateItems();
+                    var candidateMotd=renderMotd(candidate.motd());
                     menus=candidate.menus();personalization=candidate.personalization();if(customization!=null)customization.policy(personalization);
                     if(titles!=null)titles.menus(menus);
                     if(clans!=null)clans.menuEnabled(menus.config().clanMenuEnabled());
                     if(!menus.config().clanMenuEnabled())for(var player:server.getPlayerManager().getPlayerList())
                         if(player.currentScreenHandler instanceof com.shirokai.core.clans.ClanMenu || player.currentScreenHandler instanceof com.shirokai.core.clans.ClanIdentityEditor || player.currentScreenHandler instanceof com.shirokai.core.clans.ClanHistoryMenu)player.closeHandledScreen();
+                    motd=candidate.motd();com.shirokai.core.motd.MotdBridge.publish(candidateMotd);
                     config = candidate.core();
                     if (titles != null) titles.replaceCatalog(candidate.titles());
                     if (clans != null) clans.replaceConfig(candidate.clans());
@@ -282,8 +298,8 @@ public final class CoreRuntime implements AutoCloseable {
         });
         return result;
     }
-    private record ReloadCandidate(CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras,ChatAppearanceConfig chatAppearance,com.shirokai.core.menus.MenuPlan menus,com.shirokai.core.customization.PersonalizationConfig personalization) {}
-    public void prepareStop(){try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
+    private record ReloadCandidate(com.shirokai.core.motd.MotdPlan motd,CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras,ChatAppearanceConfig chatAppearance,com.shirokai.core.menus.MenuPlan menus,com.shirokai.core.customization.PersonalizationConfig personalization) {}
+    public void prepareStop(){com.shirokai.core.motd.MotdBridge.publish(null);try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;
         if(visibility!=null)visibility.close();

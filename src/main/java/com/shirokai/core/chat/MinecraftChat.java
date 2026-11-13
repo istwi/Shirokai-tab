@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 
 public final class MinecraftChat {
     private final MinecraftServer server;private final ChatService service;private final Supplier<Collection<ServerPlayerEntity>> online;private final Logger logger;private final PermissionService permissions;
+    private final ChatShares shares=new ChatShares();
+    public ChatShares shares(){return shares;}
     private ChatAppearanceConfig appearance=ChatAppearanceConfig.defaults();
     public ChatAppearanceConfig appearance(){return appearance;}
     public void appearance(ChatAppearanceConfig config){appearance=config;}
@@ -42,9 +44,12 @@ public final class MinecraftChat {
     }
     private boolean colors(UUID author){return appearance.enabled()&&appearance.legacyColors()&&(appearance.colorPermission().isEmpty()||permissions.allowed(author,appearance.colorPermission()));}
     private Text body(ChatService.Envelope message,UUID viewer){
+        return shares.render(message.author(),message.body(),fragment->plainBody(message,viewer,fragment));
+    }
+    private Text plainBody(ChatService.Envelope message,UUID viewer,String fragment){
         var base=appearance.enabled()?appearance.color(message.channel()):net.minecraft.util.Formatting.WHITE;
-        if(colors(message.author())&&LegacyChatColors.changes(message.body()))return LegacyChatColors.render(message.body(),base);
-        return (presentation==null?Text.literal(message.body()):presentation.body(message.author(),viewer,message.body())).copy().formatted(base);
+        if(colors(message.author())&&LegacyChatColors.changes(fragment))return LegacyChatColors.render(fragment,base);
+        return (presentation==null?Text.literal(fragment):presentation.body(message.author(),viewer,fragment)).copy().formatted(base);
     }
     private void mention(ChatService.Envelope message,ServerPlayerEntity recipient){
         if(presentation==null)return;
@@ -70,7 +75,7 @@ public final class MinecraftChat {
                 var recipient=player(target);if(recipient!=null){boolean filtered=sender.shouldFilterMessagesSentTo(recipient);
                     var outgoing=sent;
                     // User-requested & colors decorate only unfiltered recipients; signed body/signature remain unchanged.
-                    if(colors(sender.getUuid())&&LegacyChatColors.changes(envelope.body())&&!filtered&&incoming.filterMask().isPassThrough())
+                    if((ChatShares.contains(envelope.body())||colors(sender.getUuid())&&LegacyChatColors.changes(envelope.body()))&&!filtered&&incoming.filterMask().isPassThrough())
                         outgoing=SentMessage.of(incoming.withoutUnsigned().withUnsignedContent(body(envelope,recipient.getUuid())));
                     recipient.sendChatMessage(outgoing,filtered,parameters(envelope.channel(),label(envelope)));
                     // Do not reveal a mention hidden by filtering. Notification is a separate overlay, never unsigned chat decoration.

@@ -1,3 +1,10 @@
+## 0.17.0 — Compartilhamento e MOTD
+
+Marcações são disponíveis nos canais em que o autor já pode falar; não aceitam
+alvo de outro jogador. Sem novos bypass. Mantidos chat.bypass.cooldown/filter
+sob `shirokaicore`. MOTD usa a permissão administrativa existente de reload.
+[Configuração](CHAT_SHARES_MOTD.md).
+
 ## Permissões0.16
 
 `shirokaicore.command.clans.history`, `shirokaicore.command.clans.diagnose` e

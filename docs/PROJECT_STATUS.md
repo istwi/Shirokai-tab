@@ -1,3 +1,40 @@
+# Estado atual — 0.17.0-dev
+
+Base remota: 1d24fc366927a912a68be212bed21f67f2543b5d (0.16.10-dev).
+Java21/Minecraft1.21.1/Fabric preservados, sem mudança de SQLite6.
+
+Implementados `@1`..`@6` (slot próprio Cobblemon) e `@carteira` (cache próprio
+Impactor), sem alvo de outro jogador. Hover com espécie/nível/gênero/shiny/
+natureza/habilidade. Mesmos gates dos canais e privados; corpo/assinatura/máscara
+preservados, expansão visual só para destinatários não filtrados. Filtro de
+palavras normaliza acentos e caracteres invisíveis, além de cores/Unicode.
+
+Novo motd.json schema1: duas linhas por quadro, cores/HEX/gradientes/animações de
+styles, placeholders server:online/max/version. Snapshot na thread do servidor;
+Netty apenas troca description no pacote de status, preservando os outros campos.
+Contagem exclui Vanish pelo adapter existente. Reload validado antes da publicação
+ativa; inválido preserva configuração. Vanilla exibe um quadro por consulta.
+
+Validação atual: **130 testes JUnit aprovados**, 0 falhas/erros/skips.
+**53 verificações Fabric aprovadas** em três boots, com marcações, filtros,
+resposta do handler MOTD transformado, reload válido/inválido e disable.
+**14 verificações de integrações reais aprovadas**, incluindo novas asserções
+sobre equipe própria Cobblemon1.8.3 e saldos próprios Impactor5.3.5.
+JAR/refmap/mixin e ausência de fixtures no artefato de produção conferidos.
+Relatórios locais: build/test-results/test, build/server-smoke/result.json,
+build/integration-smoke/result.json. Cliente real, login autenticado e validação
+criptográfica de mensagens não foram certificados; fixtures usam jogadores sintéticos.
+
+JAR: build/libs/shirokai-core-0.17.0-dev.jar
+SHA256: 5a503abd8f1966c836f346192b1c98e6da8ff9a8b8faea252faa990f71f8a913
+
+[Guia e exemplos](CHAT_SHARES_MOTD.md); exemplo copiável examples/motd.json.
+Substituir o JAR e reiniciar; preservar banco/JSONs. Filtro de palavras exige
+configurar blockedWords no servidor. Fontes/testes/documentação locais;
+nenhuma publicação de ambiente ou release realizada.
+
+---
+
 # Estado atual — 0.16.10-dev
 
 playerHoverInfo em chat-appearance.json, false por padrão inclusive em arquivos

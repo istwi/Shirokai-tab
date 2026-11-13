@@ -1,3 +1,11 @@
+## 0.17.0-dev
+
+Adiciona compartilhamento do próprio Pokémon (`@1`..`@6`) e carteira (`@carteira`)
+no chat, mantendo gates e campos assinados. Filtro de palavras resiste a acentos
+e caracteres invisíveis. Novo MOTD em JSON com cores, placeholders globais e
+quadros alternados por consulta, com reload. Preserva Java21/MC1.21.1 e SQLite6.
+[Guia](CHAT_SHARES_MOTD.md).
+
 ## 0.16.10-dev
 
 - playerHoverInfo opcional, false por padrão, oculta tooltips do nome no chat.

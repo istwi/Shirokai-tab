@@ -1,3 +1,14 @@
+## 0.17.0 — Regressões adicionais
+
+ChatSharesTest: UUID do autor, slots/tokens completos, limite de expansões,
+snapshot repetido, indisponibilidade, texto literal e continuidade de cores.
+ChatConfigAndGateTest: palavras com acento/invisíveis/cores não contornam o filtro.
+MotdTest: configuração estrita, arquivos preservados, quadros, valores literais.
+ChatAppearanceSmoke: corpo/assinatura/máscara e audiência local nas marcações.
+MotdSmoke: handler de status transformado, troca de quadro, disable e metadados.
+server_smoke: reload válido/inválido/disable; IntegrationSmoke: equipe Cobblemon
+e saldos Impactor reais. Cliente real/autenticação continuam fora dos testes sintéticos.
+
 ## Regressão0.16
 
 - ClanMaintenanceTest: líder sem associação, líder de outro clã, histórico após

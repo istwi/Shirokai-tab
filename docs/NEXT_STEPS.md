@@ -1,3 +1,11 @@
+## Continuidade 0.17.0-dev
+
+Marcações próprias e MOTD implementados: [guia](CHAT_SHARES_MOTD.md).
+Validar hover/cores da mensagem e indicador de modificação num cliente real;
+consultar multiplayer em momentos diferentes para ver os quadros. Não prometer
+animação contínua do protocolo vanilla. Preservar destinatários filtrados e
+contexto do autor. Não publicar ambiente/release sem nova solicitação.
+
 > 0.16 entregou as três etapas solicitadas: histórico/diagnóstico/reparos seguros
 > de clãs, presets animados/políticas por área e integração opcional Drex Vanish.
 > As etapas1..3 listadas abaixo são o plano histórico, não tarefas a refazer.

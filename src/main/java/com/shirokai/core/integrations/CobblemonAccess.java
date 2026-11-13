@@ -16,6 +16,22 @@ public final class CobblemonAccess implements AutoCloseable {
     }
     @Override public void close() { if (subscription != null) subscription.unsubscribe(); }
 
+    public Optional<net.minecraft.text.Text> partyShare(ServerPlayerEntity author,int slot) {
+        if (!author.getServer().isOnThread()) throw new IllegalStateException("Equipe exige thread do servidor");
+        if(slot<1||slot>6)return Optional.empty();
+        var pokemon=Cobblemon.INSTANCE.getStorage().getParty(author).get(slot-1);
+        if(pokemon==null)return Optional.empty();
+        // Do not forward nickname actions or parse nickname/species as markup.
+        String name=pokemon.getDisplayName(false).getString();
+        var tooltip=net.minecraft.text.Text.literal("Treinador: "+author.getGameProfile().getName()+" • Slot "+slot)
+            .append("\n"+name+" • Nível "+pokemon.getLevel())
+            .append("\nEspécie: "+pokemon.getSpecies().getName())
+            .append("\nGênero: "+pokemon.getGender().name()+" • Shiny: "+(pokemon.getShiny()?"Sim":"Não"))
+            .append("\nNatureza: "+pokemon.getNature().getName().getPath()+" • Habilidade: "+pokemon.getAbility().getName());
+        return Optional.of(net.minecraft.text.Text.literal("["+name+" Nv. "+pokemon.getLevel()+"]")
+            .formatted(net.minecraft.util.Formatting.AQUA).styled(style->style.withHoverEvent(new net.minecraft.text.HoverEvent(net.minecraft.text.HoverEvent.Action.SHOW_TEXT,tooltip))));
+    }
+
     public Map<String, String> snapshot(ServerPlayerEntity player) {
         if (!player.getServer().isOnThread()) throw new IllegalStateException("Pokédex exige thread do servidor");
         var species = PokemonSpecies.INSTANCE.getImplemented();
