@@ -102,7 +102,8 @@ public final class ScoreboardRuntime implements AutoCloseable {
     public void tick() { if (!closed && (++tick % plan.config().updateTicks() == 0 || dirty)) { dirty = false; update(); } }
     private String resolve(String key, ServerPlayerEntity p, PermissionService.Metadata meta, int count) {
         return switch (key) {
-            case "shirokai:player", "shirokai:viewer" -> p.getGameProfile().getName();
+            case "shirokai:player" -> com.shirokai.core.integrations.EssentialsAccess.display(p);
+            case "shirokai:viewer" -> p.getGameProfile().getName();
             case "shirokai:uuid" -> p.getUuidAsString();
             case "shirokai:online" -> Integer.toString(count);
             case "shirokai:world" -> p.getWorld().getRegistryKey().getValue().toString();

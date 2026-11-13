@@ -1,3 +1,5 @@
+> 0.18.0-dev: ponte opcional com Essentials 0.3.0; [guia e versões](ESSENTIALS.md). Apelido/AFK e gates de chat compartilham estados sem fundir os bancos.
+
 > 0.16.9: dólares/tokens/cash mostram0 quando a moeda existe e o jogador ainda
 > não possui conta. Não cria contas nem altera saldos; moeda inexistente, erro de
 > API ou sessão obsoleta continuam indisponíveis.

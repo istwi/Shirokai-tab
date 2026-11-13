@@ -17,7 +17,7 @@ public final class ConnectionAnnouncements {
         if(!(original.getContent() instanceof TranslatableTextContent content))return original;
         String key=content.getKey();
         if(joined?!key.equals("multiplayer.player.joined")&&!key.equals("multiplayer.player.joined.renamed"):!key.equals("multiplayer.player.left"))return original;
-        return format(player.getGameProfile().getName(),joined);
+        return format(com.shirokai.core.integrations.EssentialsAccess.display(player),joined);
     }
     public static Text format(String player,boolean joined){
         return Text.empty().append(Text.literal(joined?"[+] ":"[-] ").formatted(joined?Formatting.GREEN:Formatting.RED))

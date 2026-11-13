@@ -1,3 +1,5 @@
+> 0.18.0-dev: ponte opcional com Essentials 0.3.0; [guia e versões](ESSENTIALS.md). Apelido/AFK e gates de chat compartilham estados sem fundir os bancos.
+
 ## 0.17.0 — Novos recursos
 
 - Chat: `@1`..`@6`, próprio slot Cobblemon; `@carteira`, próprios saldos Impactor.

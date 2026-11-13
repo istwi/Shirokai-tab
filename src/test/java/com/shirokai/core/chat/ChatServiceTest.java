@@ -81,4 +81,29 @@ class ChatServiceTest {
         on(()->service.mute(null,a,0L,"Reason")).get();assertEquals(Channel.GLOBAL,on(()->service.selected(a)));
         on(()->service.mute(null,a,null,"")).get();assertEquals(Channel.GLOBAL,on(()->service.selected(a)));
     }
+    @Test void essentialsMuteBlocksEveryChannelAndPrivateBeforeAnyDelivery() throws Exception {
+        on(()->{nodes.put(a,Set.of("shirokaicore.chat.staff"));
+            service.bridge(id->{throw new IllegalStateException("Essentials mute");},ids->true,ids->true,id->{},(target,message)->{},(id,target)->false,(id,target)->{});return null;});
+        for(var channel:List.of(Channel.GLOBAL,Channel.LOCAL,Channel.CLAN,Channel.STAFF))
+            assertThrows(ExecutionException.class,()->on(()->service.send(a,channel,"blocked",sink)));
+        assertThrows(ExecutionException.class,()->on(()->{service.privateMessage(a,b,"blocked",sink);return null;}));
+        assertTrue(delivered.isEmpty());
+    }
+    @Test void essentialsPrivateToggleRejectsWithoutReplyOrSpyAndPublicIgnoreRestrictsRecipients() throws Exception {
+        var observed=new ArrayList<UUID>();
+        on(()->{service.bridge(id->{},ids->!ids.get(0).equals(b),ids->false,id->{},(target,message)->observed.add(target),(id,target)->false,(id,target)->{});return null;});
+        assertThrows(ExecutionException.class,()->on(()->{service.privateMessage(a,b,"hidden",sink);return null;}));
+        assertTrue(delivered.isEmpty());assertTrue(observed.isEmpty());
+        assertThrows(ExecutionException.class,()->on(()->service.replyTarget(a)));
+        on(()->service.send(a,Channel.GLOBAL,"visible",sink));assertFalse(delivered.contains(b));assertEquals(3,delivered.size());
+    }
+    @Test void sharedPrivateRouterPreservesBodyAndReplyIdentityAndUnignoreClearsLegacyState() throws Exception {
+        boolean[] ignored={true};var observed=new ArrayList<UUID>();
+        on(()->{service.bridge(id->{},ids->true,ids->true,id->{},(target,message)->observed.add(target),(id,target)->ignored[0],(id,target)->ignored[0]=false);return null;});
+        var profile=on(()->service.ignore(b,a)).get();assertFalse(ignored[0]);assertFalse(profile.ignored().contains(a));
+        on(()->{service.privateMessage(a,b,"<click:run_command:/op>literal",sink);return null;});
+        assertEquals(List.of(b),observed);assertEquals(a,on(()->service.replyTarget(b)));
+        assertTrue(messages.stream().allMatch(message->message.body().equals("<click:run_command:/op>literal")));
+    }
+
 }

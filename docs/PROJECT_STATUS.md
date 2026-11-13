@@ -1,3 +1,26 @@
+# Estado atual — 0.18.0-dev
+
+Base remota:46710f80363ce44482ccbc4625a1e2df627de0cf. Ponte opcional com Essentials0.3.0;
+contrato público1 auditado nos dois projetos. Apelido/AFK, proteções de chat,
+privados compartilhados, socialspy e placeholders: [ESSENTIALS.md](ESSENTIALS.md).
+Preservados SQLite6, JSONs existentes, grupos LP, ownership de recursos, assinatura
+original e máscaras de filtro. Dois JARs e bancos independentes; nenhuma economia nova.
+
+Validação:135 testes JUnit;53 verificações Fabric do Core sem Essentials;19 cenários
+com JARs de produção dos dois mods, clientes de protocolo locais e três boots,
+incluindo restart e remoção do Core. Evidências:ESSENTIALS-RESULTS.json.
+Os14 cenários antigos de providers opcionais não foram repetidos nesta etapa;
+a suíte conjunta utiliza LP5.4.140/Impactor5.3.5/Multiworld1.14.2 reais.
+Sem certificação de cliente gráfico, autenticação ou assinatura criptográfica.
+
+JAR:releases/shirokai-core-0.18.0-dev.jar
+SHA256:10ee63922064674723063673dd5651e2654345e8a9b67814d7e84e6cb29f1504
+
+Substituir os dois JARs e reiniciar. Preservar configurações; ativar nicknames no
+Essentials quando desejado. Nenhum release estável ou ambiente publicado.
+
+---
+
 # Estado atual — 0.17.1-dev
 
 Base:545fcbe (0.17.0-dev), Java21/Minecraft1.21.1/Fabric preservados.

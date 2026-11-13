@@ -33,6 +33,9 @@ public final class ChatRepository {
             return read(c,player,fallback);
         });
     }
+    public CompletableFuture<ChatProfile> unignore(UUID player,UUID target,Channel fallback){
+        return storage.transact(c->{update(c,"DELETE FROM chat_ignores WHERE owner_uuid=? AND target_uuid=?",player,target);return read(c,player,fallback);});
+    }
     public CompletableFuture<ChatProfile> mute(UUID actor,UUID target,Long expiresAt,String reason,Channel fallback){
         if(expiresAt!=null&&(expiresAt<0||reason==null||reason.isBlank()||reason.length()>256||reason.codePoints().anyMatch(Character::isISOControl)))throw new IllegalArgumentException("Mute inválido");
         return storage.transact(c->{

@@ -56,7 +56,7 @@ public final class PresentationRuntime implements SurfaceRenderer {
         if(!plan.config().chatEnabled())return Text.literal(message.label());
         var author=player(message.author());if(author==null)return Text.literal(message.label());
         var tags=Text.empty();if(titles!=null)for(var tag:titles.chatPresentation(message.author())){if(!tags.getString().isEmpty())tags.append(Text.literal(" "));tags.append(tag);}if(!tags.getString().isEmpty())tags.append(Text.literal(" "));
-        var slots=Map.of("chat:name",Text.literal(author.getGameProfile().getName()).formatted(net.minecraft.util.Formatting.WHITE),"chat:channel",Text.literal(message.channel().name()),"chat:target",Text.literal(message.target()).formatted(net.minecraft.util.Formatting.WHITE),"chat:tags",tags);
+        var slots=Map.of("chat:name",Text.literal(com.shirokai.core.integrations.EssentialsAccess.display(author)).formatted(net.minecraft.util.Formatting.WHITE),"chat:channel",Text.literal(message.channel().name()),"chat:target",Text.literal(message.target()).formatted(net.minecraft.util.Formatting.WHITE),"chat:tags",tags);
         var template=plan.chat(message.channel(),permissions.metadata(author.getUuid()),author.getWorld().getRegistryKey().getValue().toString(),node->permissions.allowed(author.getUuid(),node));
         Text result=plan.styles().renderRich(template,key->slots.getOrDefault(key,Text.empty()),0,false);
         if(result.getString().codePointCount(0,result.getString().length())>1024)throw new IllegalArgumentException("Cabeçalho excede1024 caracteres");return result;

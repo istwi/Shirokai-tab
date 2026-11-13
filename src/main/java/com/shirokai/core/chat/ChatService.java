@@ -26,6 +26,14 @@ public final class ChatService {
     }
     private BiConsumer<UUID,String> contentValidator=(author,body)->{};
     public void contentValidator(BiConsumer<UUID,String> validator){contentValidator=Objects.requireNonNull(validator);}
+    private java.util.function.Consumer<UUID> externalGate=id->{};
+    private java.util.function.Predicate<java.util.List<UUID>> externalPublic=ids->true,externalPrivate=ids->true;
+    private java.util.function.Consumer<UUID> activity=id->{};
+    private java.util.function.BiConsumer<UUID,Envelope> privateObserver=(target,message)->{};
+    private java.util.function.BiPredicate<UUID,UUID> externalIgnored=(player,target)->false;
+    private java.util.function.BiConsumer<UUID,UUID> externalUnignore=(player,target)->{};
+    public void bridge(java.util.function.Consumer<UUID> gate,java.util.function.Predicate<java.util.List<UUID>> publicPolicy,java.util.function.Predicate<java.util.List<UUID>> privatePolicy,java.util.function.Consumer<UUID> touch,java.util.function.BiConsumer<UUID,Envelope> observer,java.util.function.BiPredicate<UUID,UUID> ignored,java.util.function.BiConsumer<UUID,UUID> unignore){externalIgnored=ignored;externalUnignore=unignore;externalGate=gate;externalPublic=publicPolicy;externalPrivate=privatePolicy;activity=touch;privateObserver=observer;}
+    public CompletableFuture<ChatProfile> unignore(UUID player,UUID target){var current=session(player);return apply(repository.unignore(player,target,current.profile.channel())).thenApplyAsync(profile->{externalUnignore.accept(player,target);return profile;},server);}
     public ChatConfig config(){return config;}
     public void replaceConfig(ChatConfig value){config=value;}
     public CompletableFuture<ChatProfile> join(UUID player){
@@ -42,7 +50,7 @@ public final class ChatService {
         session(player);if(!permitted(player,channel))throw new IllegalStateException("Sem permissão para canal "+channel);
         if(channel==Channel.CLAN&&participant(player).clan()==null)throw new IllegalStateException("Você não pertence a um clã");return apply(repository.channel(player,channel));
     }
-    public CompletableFuture<ChatProfile> ignore(UUID player,UUID target){var current=session(player);return apply(repository.toggleIgnore(player,target,current.profile.channel()));}
+    public CompletableFuture<ChatProfile> ignore(UUID player,UUID target){var current=session(player);if(!current.profile.ignored().contains(target)&&externalIgnored.test(player,target))return unignore(player,target);return apply(repository.toggleIgnore(player,target,current.profile.channel())).thenApplyAsync(profile->{if(!profile.ignored().contains(target))externalUnignore.accept(player,target);return profile;},server);}
     public CompletableFuture<ChatProfile> mute(UUID actor,UUID target,Long expiry,String reason){
         if(expiry!=null&&expiry!=0&&expiry<=clock.millis())throw new IllegalArgumentException("Expiração deve estar no futuro");
         return apply(repository.mute(actor,target,expiry,reason,fallback(target)));
@@ -55,7 +63,7 @@ public final class ChatService {
     private java.util.function.BiPredicate<UUID,UUID> visible=(viewer,actor)->true;
     public void visibility(java.util.function.BiPredicate<UUID,UUID> policy){visible=java.util.Objects.requireNonNull(policy);}
     private boolean accepts(Participant recipient,Participant sender,Channel channel){
-        if(!visible.test(recipient.id(),sender.id()))return false;
+        if(!visible.test(recipient.id(),sender.id())||!externalPublic.test(List.of(recipient.id(),sender.id())))return false;
         var session=sessions.get(recipient.id());if(session==null||session.profile==null||!permitted(recipient.id(),channel))return false;
         if(session.profile.ignored().contains(sender.id())&&!permissions.allowed(sender.id(),"shirokaicore.chat.bypass.ignore"))return false;
         return switch(channel){
@@ -67,6 +75,7 @@ public final class ChatService {
     }
     private static double distance(Participant a,Participant b){return Math.pow(a.x()-b.x(),2)+Math.pow(a.y()-b.y(),2)+Math.pow(a.z()-b.z(),2);}
     private void gate(UUID sender,String body){
+        externalGate.accept(sender);
         var session=session(sender);var mute=session.profile.mute();
         if(mute!=null&&mute.active(clock.millis())&&!permissions.allowed(sender,"shirokaicore.chat.bypass.mute"))throw new IllegalStateException("Você está silenciado: "+mute.reason());
         session.spam.admit(body,config,clock.millis(),permissions.allowed(sender,"shirokaicore.chat.bypass.cooldown"),permissions.allowed(sender,"shirokaicore.chat.bypass.filter"));
@@ -76,7 +85,7 @@ public final class ChatService {
             if(channel==Channel.PRIVATE)throw new IllegalArgumentException("Canal privado exige destinatário");
             session(sender);if(!permitted(sender,channel))throw new IllegalStateException("Sem permissão para canal "+channel);
             var author=participant(sender);if(channel==Channel.CLAN&&author.clan()==null)throw new IllegalStateException("Você não pertence a um clã");
-            gate(sender,body);contentValidator.accept(sender,body);var envelope=new Envelope(sender,label(author,channel,""),body,channel);int sent=0;
+            gate(sender,body);contentValidator.accept(sender,body);activity.accept(sender);var envelope=new Envelope(sender,label(author,channel,""),body,channel);int sent=0;
             for(var recipient:List.copyOf(audience.online()))if(accepts(recipient,author,channel)){sink.deliver(recipient.id(),envelope);sent++;}
             return sent;
         }catch(RuntimeException error){rejected(sender,error);throw error;}
@@ -86,9 +95,9 @@ public final class ChatService {
             if(sender.equals(target))throw new IllegalArgumentException("Escolha outro jogador");var source=session(sender);session(target);
             if(!permitted(sender,Channel.PRIVATE)||!permitted(target,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
             var author=participant(sender);var recipient=participant(target);
-            if(!visible.test(sender,target)||source.profile.ignored().contains(target)||!accepts(recipient,author,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
-            gate(sender,body);contentValidator.accept(sender,body);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE,recipient.name());
-            sink.deliver(target,envelope);sink.deliver(sender,envelope);source.reply=target;session(target).reply=sender;
+            if(!externalPrivate.test(List.of(target,sender))||!visible.test(sender,target)||source.profile.ignored().contains(target)||!accepts(recipient,author,Channel.PRIVATE))throw new IllegalStateException("Mensagem privada indisponível");
+            gate(sender,body);contentValidator.accept(sender,body);activity.accept(sender);var envelope=new Envelope(sender,label(author,Channel.PRIVATE,recipient.name()),body,Channel.PRIVATE,recipient.name());
+            sink.deliver(target,envelope);sink.deliver(sender,envelope);source.reply=target;session(target).reply=sender;privateObserver.accept(target,envelope);
         }catch(RuntimeException error){rejected(sender,error);throw error;}
     }
     private void rejected(UUID sender,RuntimeException error){var session=sessions.get(sender);if(session!=null&&(session.lastLog==null||clock.millis()-session.lastLog>=5000)){session.lastLog=clock.millis();moderation.accept(sender,error.getMessage());}}

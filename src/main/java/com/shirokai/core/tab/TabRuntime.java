@@ -51,7 +51,7 @@ public final class TabRuntime implements AutoCloseable{
     private String resolve(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count){
         String title=titles==null?"":titles.placeholder(subject.getUuid(),"shirokai:selected_title").orElse("");
         return switch(key){
-            case "shirokai:player"->subject.getGameProfile().getName();case "shirokai:uuid"->subject.getUuidAsString();case "shirokai:viewer"->viewer.getGameProfile().getName();
+            case "shirokai:player"->com.shirokai.core.integrations.EssentialsAccess.display(subject)+com.shirokai.core.integrations.EssentialsAccess.afkSuffix(subject);case "shirokai:uuid"->subject.getUuidAsString();case "shirokai:viewer"->viewer.getGameProfile().getName();
             case "shirokai:online"->Integer.toString(count);case "shirokai:world"->subject.getWorld().getRegistryKey().getValue().toString();case "shirokai:ping"->Integer.toString(subject.networkHandler.getLatency());
             case "shirokai:selected_title"->title;case "shirokai:title_prefix"->title.isEmpty()?"":title+" ";
             case "shirokai:clan"->clans==null?fallback.get():clans.cached(subject.getUuid()).map(c->c.name()).orElse(fallback.get());

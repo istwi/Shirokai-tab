@@ -1,3 +1,13 @@
+## 0.18.0-dev
+
+- Integração opcional de protocolo com Essentials 0.3.0, sem dependência obrigatória.
+- Apelidos em superfícies visuais, nome real no hover/cliques, AFK no TAB padrão.
+- Gate externo de mute/ignore/msgtoggle, roteador privado único e socialspy autorizado.
+- Placeholders internos essentials para homes, kits/cooldown, mail, fly e god.
+- Unignore explícito do Core limpa também registros legados do Essentials.
+- Preservados ranks, estilos, assinatura/filtros, ownership, SQLite6 e configurações.
+- Correção no runner de smoke: expectativa de versão acompanha o JAR compilado.
+
 ## 0.17.1-dev
 
 Slot vazio rejeita envio com aviso só ao autor; chip Pokémon sem nível; IVs e

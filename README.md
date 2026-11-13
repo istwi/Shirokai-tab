@@ -1,3 +1,10 @@
+## Integração Essentials — 0.18.0-dev
+
+Ponte opcional com **Shirokai Essentials 0.3.0**: apelido no chat/TAB/scoreboard/perfil,
+AFK no TAB, mute/ignore/bloqueio de privados compartilhados e placeholders de homes,
+kits, correio e utilidades. Dois JARs e bancos independentes; não altera cargos LP,
+UUIDs ou skins. [Instalação e limites](docs/ESSENTIALS.md).
+
 ## Ajustes de chat 0.17.1-dev
 
 Slot vazio avisa somente ao autor. Compartilhamento mostra só o nome do Pokémon;

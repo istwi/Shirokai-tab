@@ -44,7 +44,7 @@ public final class ProfileMenu extends GenericContainerScreenHandler {
         },player.getServer());
     }
     private static Map<String,Text> context(ServerPlayerEntity player,TitleService titles,TitleState state,int page){
-        var values=new HashMap<String,Text>();values.put("menu:player",Text.literal(player.getGameProfile().getName()));
+        var values=new HashMap<String,Text>();values.put("menu:player",Text.literal(com.shirokai.core.integrations.EssentialsAccess.display(player)));
         values.put("menu:rank",Text.literal(titles.rank(player.getUuid()).map(TitleDefinition::name).orElse("Nenhum")));
         values.put("menu:clan",Text.literal(titles.clanName(player.getUuid()).orElse("Nenhum")));
         values.put("menu:count",Text.literal(Integer.toString(state.chatIds().size())));values.put("menu:page",Text.literal(Integer.toString(page+1)));return values;

@@ -1,3 +1,10 @@
+## Continuidade 0.18.0-dev
+
+Ponte com Essentials 0.3.0 implementada em ESSENTIALS.md. Instalar o par de JARs;
+revalidar com cliente gráfico real, especialmente tooltips, TAB e layouts customizados.
+Não converter apelidos em identidades de conta/seletores nem apagar punições do outro mod.
+PAPI externa continua no namespace shirokai; essentials:* é nativo dos templates Core.
+
 ## Continuidade 0.17.1-dev
 
 Validar no cliente real os novos tooltips e IVs. Preservar validação de slot antes

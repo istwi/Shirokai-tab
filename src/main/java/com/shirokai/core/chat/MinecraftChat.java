@@ -29,7 +29,7 @@ public final class MinecraftChat {
         service=new ChatService(new ChatRepository(storage,Clock.systemUTC()),permissions,server,
             ()->online.get().stream().filter(player->!player.isDisconnected()).map(player->{
                 UUID clan=clans==null?null:clans.cached(player.getUuid()).map(snapshot->snapshot.id()).orElse(null);
-                return new ChatService.Participant(player.getUuid(),player.getGameProfile().getName(),player.getWorld().getRegistryKey().getValue().toString(),player.getX(),player.getY(),player.getZ(),clan);
+                return new ChatService.Participant(player.getUuid(),com.shirokai.core.integrations.EssentialsAccess.display(player),player.getWorld().getRegistryKey().getValue().toString(),player.getX(),player.getY(),player.getZ(),clan);
             }).toList(),id->titles==null?List.of():titles.chatDefinitions(id).stream().map(def->def.display()).toList(),
             Clock.systemUTC(),config,(id,reason)->logger.warn("[chat] Mensagem rejeitada de {}: {}",id,reason));
         service.contentValidator(shares::validate);
@@ -55,11 +55,12 @@ public final class MinecraftChat {
     public Text trainer(UUID id){
         var author=player(id);var result=Text.empty();var cargo=rank(id);
         if(!cargo.getString().isEmpty())result.append(cargo).append(" ");
-        return result.append(Text.literal(author==null?"Indisponível":author.getGameProfile().getName()).formatted(net.minecraft.util.Formatting.WHITE));
+        return result.append(Text.literal(author==null?"Indisponível":com.shirokai.core.integrations.EssentialsAccess.display(author)).formatted(net.minecraft.util.Formatting.WHITE));
     }
     public Text playerSummary(UUID id){
         var text=Text.empty().append(Text.literal("Treinador").formatted(net.minecraft.util.Formatting.AQUA,net.minecraft.util.Formatting.BOLD));
         text.append(Text.literal("\n").setStyle(Style.EMPTY)).append(trainer(id));
+        var account=player(id);if(account!=null&&!com.shirokai.core.integrations.EssentialsAccess.display(account).equals(account.getGameProfile().getName()))text.append(Text.literal("\nConta: "+account.getGameProfile().getName()).setStyle(Style.EMPTY));
         String dex=summaryValues.apply(id,"shirokai:pokedex_percent"),gyms=summaryValues.apply(id,"shirokai:gyms");
         text.append(Text.literal("\nPokédex: ").setStyle(Style.EMPTY.withColor(net.minecraft.util.Formatting.WHITE)))
             .append(Text.literal(dex.equals("N/D")?dex:dex+"%").setStyle(Style.EMPTY.withColor(net.minecraft.util.Formatting.RED)));

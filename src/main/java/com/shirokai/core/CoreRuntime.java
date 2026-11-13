@@ -44,6 +44,7 @@ public final class CoreRuntime implements AutoCloseable {
     private TabRuntime tab;
     private ScoreboardRuntime scoreboard;
     private IntegrationRuntime integrations;
+    private com.shirokai.core.integrations.EssentialsAccess essentials;
     private com.shirokai.core.motd.MotdPlan motd;
     private com.shirokai.core.menus.MenuPlan menus;
     private com.shirokai.core.visibility.VisibilityService visibility;
@@ -166,6 +167,15 @@ public final class CoreRuntime implements AutoCloseable {
             modules.start(id, config.enabled(id));
             logger.info("[{}] {}", id, modules.states().get(id));
         }
+        essentials=new com.shirokai.core.integrations.EssentialsAccess(server,this);
+        if(placeholders!=null)for(String key:com.shirokai.core.integrations.EssentialsAccess.KEYS)placeholders.register("essentials:"+key,context->essentials.value(context.playerId(),key));
+        if(running("chat")){
+            chat.service().bridge(essentials::check,ids->essentials.accepts(ids.get(0),ids.get(1),false),ids->essentials.accepts(ids.get(0),ids.get(1),true),essentials::activity,(target,message)->{
+                try{essentials.delivered(message.author(),target,message.body());}catch(RuntimeException error){logger.warn("[essentials] Socialspy indisponível",error);}
+            },essentials::ignored,essentials::unignore);
+            essentials.connect();
+        }
+        logger.info("[essentials] {}",essentials.status());
         try {
             motd=new com.shirokai.core.motd.MotdPlan(com.shirokai.core.motd.MotdConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/motd.json")),styles==null?new StyleEngine(StyleConfig.defaults()):styles);
             updateMotd();
@@ -306,7 +316,7 @@ public final class CoreRuntime implements AutoCloseable {
         return result;
     }
     private record ReloadCandidate(com.shirokai.core.motd.MotdPlan motd,CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras,ChatAppearanceConfig chatAppearance,com.shirokai.core.menus.MenuPlan menus,com.shirokai.core.customization.PersonalizationConfig personalization) {}
-    public void prepareStop(){com.shirokai.core.motd.MotdBridge.publish(null);try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
+    public void prepareStop(){if(essentials!=null)essentials.close();com.shirokai.core.motd.MotdBridge.publish(null);try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;
         if(visibility!=null)visibility.close();

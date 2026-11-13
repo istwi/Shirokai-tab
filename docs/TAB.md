@@ -1,3 +1,5 @@
+> 0.18.0-dev: ponte opcional com Essentials 0.3.0; [guia e versões](ESSENTIALS.md). Apelido/AFK e gates de chat compartilham estados sem fundir os bancos.
+
 > Atualização 0.14.0: cargos ROLE são fixos pelo grupo principal LuckPerms;
 > SPECIAL/CLAN são opcionais somente no chat. Veja [RANKS.md](RANKS.md).
 > As regras antigas de seleção visual abaixo são históricas e foram substituídas.

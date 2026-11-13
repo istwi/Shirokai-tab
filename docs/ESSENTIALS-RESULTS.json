@@ -1,0 +1,227 @@
+{
+  "version": "0.18.0-dev",
+  "artifact": "shirokai-core-0.18.0-dev.jar",
+  "sha256": "10ee63922064674723063673dd5651e2654345e8a9b67814d7e84e6cb29f1504",
+  "unitPassed": 135,
+  "unitSuites": [
+    {
+      "suite": "com.shirokai.core.chat.ChatAppearanceTest",
+      "passed": 6
+    },
+    {
+      "suite": "com.shirokai.core.chat.ChatConfigAndGateTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.chat.ChatRepositoryTest",
+      "passed": 4
+    },
+    {
+      "suite": "com.shirokai.core.chat.ChatServiceTest",
+      "passed": 13
+    },
+    {
+      "suite": "com.shirokai.core.chat.ChatSharesTest",
+      "passed": 4
+    },
+    {
+      "suite": "com.shirokai.core.clans.ClanIntegrationTest",
+      "passed": 4
+    },
+    {
+      "suite": "com.shirokai.core.clans.ClanMaintenanceTest",
+      "passed": 5
+    },
+    {
+      "suite": "com.shirokai.core.clans.ClanRepositoryTest",
+      "passed": 10
+    },
+    {
+      "suite": "com.shirokai.core.clans.ClanServiceTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.config.ConfigServiceTest",
+      "passed": 4
+    },
+    {
+      "suite": "com.shirokai.core.customization.PersonalizationConfigTest",
+      "passed": 2
+    },
+    {
+      "suite": "com.shirokai.core.customization.PresetFramesTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.customization.StyleChoiceTest",
+      "passed": 8
+    },
+    {
+      "suite": "com.shirokai.core.integrations.IntegrationConfigTest",
+      "passed": 5
+    },
+    {
+      "suite": "com.shirokai.core.menus.MenuConfigTest",
+      "passed": 7
+    },
+    {
+      "suite": "com.shirokai.core.module.ModuleManagerTest",
+      "passed": 6
+    },
+    {
+      "suite": "com.shirokai.core.motd.MotdTest",
+      "passed": 2
+    },
+    {
+      "suite": "com.shirokai.core.permissions.LuckPermsPermissionsTest",
+      "passed": 2
+    },
+    {
+      "suite": "com.shirokai.core.placeholders.PlaceholderServiceTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.presentation.PresentationPlanTest",
+      "passed": 5
+    },
+    {
+      "suite": "com.shirokai.core.scoreboard.ScoreboardPlanTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.storage.SqliteStorageTest",
+      "passed": 5
+    },
+    {
+      "suite": "com.shirokai.core.styles.StyleEngineTest",
+      "passed": 5
+    },
+    {
+      "suite": "com.shirokai.core.tab.TabExtrasPlanTest",
+      "passed": 6
+    },
+    {
+      "suite": "com.shirokai.core.tab.TabPlanTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.tab.TabPreferenceTest",
+      "passed": 2
+    },
+    {
+      "suite": "com.shirokai.core.titles.TitleCatalogTest",
+      "passed": 2
+    },
+    {
+      "suite": "com.shirokai.core.titles.TitleRulesTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.titles.TitleServiceTest",
+      "passed": 3
+    },
+    {
+      "suite": "com.shirokai.core.titles.TitleStorageTest",
+      "passed": 4
+    }
+  ],
+  "standaloneFabricPassed": 53,
+  "standaloneFabric": {
+    "passed": [
+      "clan maintenance database diagnostics and deleted-clan history commands",
+      "real Fabric startup",
+      "module status",
+      "version",
+      "permission fallback",
+      "literal placeholders",
+      "SQLite integrity",
+      "native menu server-side interactions with synthetic players",
+      "native clan menus text editor sent invites cancellation roles transfer and two-step deletion",
+      "native clan transactions limits transfer and confirmed disband",
+      "clan command rejects console",
+      "team ownership scenarios run with Fabric registries",
+      "opt-in listed nametags below-name bossbars ownership diffs collisions and cleanup",
+      "TAB packets selected title layouts delta updates teams and animations",
+      "native scoreboard packets diff shared title visibility and foreign sidebar ownership",
+      "persisted style native menu fallback recovery independent clan choices and stale authorization",
+      "animated personal and clan presets per-area controls live menu and immutable chat snapshots",
+      "rich chat menu title clan presentation permission fallback and filtered mention routing",
+      "MOTD transformed query response colors frames placeholders disabled fallback and metadata preservation",
+      "MOTD reload publishes snapshot; invalid placeholders preserve previous config; disable restores vanilla",
+      "gray global yellow local legacy colors filtering aliases and transformed join quit announcements",
+      "chat transport channels private moderation ignore and literal payloads",
+      "vanilla private aliases remain moderated after datapack reload",
+      "persistent administrative mute",
+      "title catalog registered",
+      "permanent and temporary grants",
+      "revoke persisted",
+      "profile rejects console",
+      "menu slots and registry items validated with atomic reload and clan menu setting preserved",
+      "invalid titles catalog rejects complete reload atomically",
+      "styles and TAB validation preserves active reload",
+      "TAB ownership change requires restart",
+      "invalid scoreboard candidate rejects complete reload atomically",
+      "invalid presentation rejects all reload snapshots atomically",
+      "invalid integration mappings and enablement changes preserve complete reload",
+      "invalid chat config preserves active reload",
+      "private command ownership change requires restart",
+      "invalid preset catalog rejected atomically and corrected catalog reloads",
+      "invalid extra numeric config and ownership reload rejected atomically",
+      "invalid chat appearance rejected atomically and corrected appearance reloads",
+      "valid reload",
+      "invalid reload preserves active state",
+      "restart-only change rejected",
+      "consistent backup",
+      "clean shutdown",
+      "mute survives server restart and unmute persists",
+      "title grant survives server restart",
+      "database survives restart",
+      "custom config survives restart",
+      "backup independently readable",
+      "audit persisted",
+      "storage failure isolated from server and placeholders",
+      "future schema preserved"
+    ],
+    "count": 53,
+    "not_tested": [
+      "player connections",
+      "LuckPerms runtime",
+      "Cobblemon",
+      "Impactor",
+      "visual GUI and packets from a real client",
+      "visual TAB order and scoreboard rendering"
+    ]
+  },
+  "sharedBridge": {
+    "version": "0.3.0",
+    "coreJar": "shirokai-core-0.18.0-dev.jar",
+    "coreSha256": "10ee63922064674723063673dd5651e2654345e8a9b67814d7e84e6cb29f1504",
+    "passed": 19,
+    "checks": [
+      "Essentials nickname updates the Core TAB without replacing player UUID/profile",
+      "Core scoreboard uses nickname and real-account placeholders",
+      "Core chat shows nickname and sends one message despite Essentials public formatting enabled",
+      "Normal player chat is delivered once through the Core gate",
+      "Essentials AFK indicator appears in Core TAB",
+      "Core chat activity removes AFK without changing the nickname",
+      "Essentials mute gates Core global/local/private without leaking messages",
+      "Essentials ignore also filters Core public channels",
+      "Essentials PM and Core reply share the same conversation",
+      "Essentials private toggle blocks Core private delivery",
+      "Opt-in Essentials socialspy sees only successfully delivered Core private messages",
+      "Homes placeholder reads the Essentials profile and permission limit",
+      "Kit readiness placeholders follow a real claim and cooldown without charging",
+      "Fly and god placeholders reflect actual Essentials modes",
+      "Mail placeholder reflects stored Essentials mail",
+      "Nick off restores the account name in TAB",
+      "Both mods restart with nickname, homes and custom scoreboard configuration intact",
+      "Essentials works independently after removing Core",
+      "Standalone Essentials retains its own private messages"
+    ]
+  },
+  "limitations": [
+    "Graphical client, authenticated login and cryptographic signatures not certified.",
+    "No replacement of the base overhead nametag; optional AFK prefix/suffix only.",
+    "Integration remains optional; no database merge or economy changes."
+  ]
+}
