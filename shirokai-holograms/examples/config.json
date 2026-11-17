@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "enabled": true,
+  "updateTicks": 2,
+  "placeholderTicks": 20,
+  "viewDistance": 48,
+  "maxHolograms": 128,
+  "maxLines": 20,
+  "unavailablePlaceholder": "N/D"
+}

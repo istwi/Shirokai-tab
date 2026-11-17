@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1, "id": "shirokai-holograms", "version": "${version}",
+  "name": "Shirokai Holograms", "description": "Hologramas de texto nativos, personalizados e animados para Fabric 1.21.1.",
+  "environment": "server", "entrypoints": {"main": ["com.shirokai.holograms.ShirokaiHolograms"]},
+  "depends": {"fabricloader": ">=0.16.14", "minecraft": "1.21.1", "java": ">=21", "fabric-api": "*"},
+  "suggests": {"luckperms": "*", "placeholder-api": ">=2.4.2", "cobblemon": "1.8.3+1.21.1", "multiworld": "*"}
+}

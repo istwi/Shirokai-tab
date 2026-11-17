@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "holograms": [
+    {
+      "id": "spawn",
+      "world": "minecraft:overworld",
+      "x": 0,
+      "y": 66,
+      "z": 0,
+      "alignment": "CENTER",
+      "lines": [
+        {
+          "text": "<gradient:#ffcc33:#fff4b0><bold>✦ BEM-VINDO AO SHIROKAI ✦</bold></gradient>",
+          "alignment": "CENTER",
+          "animation": "STATIC"
+        },
+        {
+          "text": "<aqua>Explore o mundo Pokémon, %player:name%!</aqua>",
+          "alignment": "LEFT",
+          "animation": "STATIC"
+        },
+        {
+          "text": "&6&lSua jornada começa aqui!",
+          "alignment": "RIGHT",
+          "animation": "welcome_slow"
+        }
+      ],
+      "lineSpacing": 12,
+      "scale": 1,
+      "backgroundColor": 1056816,
+      "backgroundOpacity": 0,
+      "shadow": true,
+      "yaw": 0,
+      "pitch": 0,
+      "billboard": "CENTER"
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+## Shirokai Holograms — mod independente 1.0.0-dev
+
+[Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).
+
 ## 0.17.0 — Regressões adicionais
 
 ChatSharesTest: UUID do autor, slots/tokens completos, limite de expansões,

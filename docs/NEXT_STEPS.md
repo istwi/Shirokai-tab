@@ -1,3 +1,9 @@
+## Shirokai Holograms — mod independente 1.0.0-dev
+
+[Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).
+
+Validar visualmente em cliente vanilla os alinhamentos/animações e executar carga representativa; conferir packs de fontes e mundos de Multiworld reais. Não reaplicar setup nem publicar ambiente.
+
 ## Continuidade 0.18.0-dev
 
 Ponte com Essentials 0.3.0 implementada em ESSENTIALS.md. Instalar o par de JARs;

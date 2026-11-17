@@ -1,3 +1,7 @@
+## Shirokai Holograms — mod independente 1.0.0-dev
+
+[Projeto, comandos, configuração e limites](shirokai-holograms/README.md).
+
 ## Integração Essentials — 0.18.0-dev
 
 Ponte opcional com **Shirokai Essentials 0.3.0**: apelido no chat/TAB/scoreboard/perfil,

@@ -1,3 +1,7 @@
+## Shirokai Holograms — mod independente 1.0.0-dev
+
+[Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).
+
 > 0.18.0-dev: ponte opcional com Essentials 0.3.0; [guia e versões](ESSENTIALS.md). Apelido/AFK e gates de chat compartilham estados sem fundir os bancos.
 
 ## 0.17.0 — Novos recursos

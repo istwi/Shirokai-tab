@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "presets": {
+    "STATIC": {
+      "type": "STATIC",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "MARQUEE_LEFT": {
+      "type": "MARQUEE_LEFT",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "MARQUEE_RIGHT": {
+      "type": "MARQUEE_RIGHT",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "SLIDE_LEFT": {
+      "type": "SLIDE_LEFT",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "SLIDE_RIGHT": {
+      "type": "SLIDE_RIGHT",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "TYPEWRITER": {
+      "type": "TYPEWRITER",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "FADE_IN": {
+      "type": "FADE_IN",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "FADE_OUT": {
+      "type": "FADE_OUT",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "BOUNCE": {
+      "type": "BOUNCE",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "PING_PONG": {
+      "type": "PING_PONG",
+      "speed": 1,
+      "durationTicks": 80,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 20,
+      "width": 160
+    },
+    "welcome_slow": {
+      "type": "TYPEWRITER",
+      "speed": 0.5,
+      "durationTicks": 100,
+      "intervalTicks": 2,
+      "repetitions": 0,
+      "pauseTicks": 60,
+      "width": 160
+    }
+  }
+}

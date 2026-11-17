@@ -138,3 +138,5 @@ rejeita envio inteiro e o aviso é só para autor. Não voltar a anunciar indisp
 publicamente. Chip sem nível; tooltip com cargo colorido, nick e IVs base reais.
 playerSummary defaulttrue é independente de playerHoverInfo vanilla; resumo Core
 usa placeholders de Pokédex/ginásios do autor e mantém campo assinado/filtros.
+
+Hologramas: novo mod independente em `shirokai-holograms/` (AGENTS.md próprio). Não integrar automaticamente ao Core. Leia README/VALIDATION do subprojeto; preserve fontes vanilla, metadata default/interpolation e isolamento dos IDs.

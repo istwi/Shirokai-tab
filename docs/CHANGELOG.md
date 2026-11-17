@@ -1,3 +1,7 @@
+## Shirokai Holograms — mod independente 1.0.0-dev
+
+[Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).
+
 ## 0.18.0-dev
 
 - Integração opcional de protocolo com Essentials 0.3.0, sem dependência obrigatória.

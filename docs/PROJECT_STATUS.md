@@ -1,3 +1,9 @@
+## Shirokai Holograms — mod independente 1.0.0-dev
+
+[Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).
+
+Base auditada em todas as branches: main e zorykai em `025a56b`. Novo mod server-side em `shirokai-holograms/`; Core 0.18.0-dev preservado. Validação: 19 testes JUnit e 40 verificações em dois boots Fabric, repetidas com Cobblemon 1.8.3. Core existente: 135 testes aprovados. Evidências em `shirokai-holograms/VALIDATION.md`. Não houve publicação de ambiente/release.
+
 # Estado atual — 0.18.0-dev
 
 Base remota:46710f80363ce44482ccbc4625a1e2df627de0cf. Ponte opcional com Essentials0.3.0;

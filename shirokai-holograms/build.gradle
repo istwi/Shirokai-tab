@@ -1,0 +1,54 @@
+plugins { id 'fabric-loom' version '1.10.5'; id 'org.jetbrains.kotlin.jvm' version '2.2.20' }
+version = '1.0.0-dev'
+group = 'com.shirokai'
+base { archivesName = 'shirokai-holograms' }
+repositories {
+    mavenCentral()
+    ivy {
+        url = 'https://github.com/Patbox/TextPlaceholderAPI/releases/download'
+        patternLayout { artifact '[revision]/[artifact]-[revision].[ext]' }
+        metadataSources { artifact() }
+        content { includeModule('eu.pb4', 'placeholder-api') }
+    }
+}
+dependencies {
+    minecraft 'com.mojang:minecraft:1.21.1'
+    mappings 'net.fabricmc:yarn:1.21.1+build.3:v2'
+    modImplementation 'net.fabricmc:fabric-loader:0.16.14'
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.116.17+1.21.1'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    compileOnly 'net.luckperms:api:5.4'
+    modCompileOnly('eu.pb4:placeholder-api:2.4.2+1.21') { transitive = false }
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) }; withSourcesJar() }
+tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
+processResources { inputs.property 'version', project.version; filesMatching('fabric.mod.json') { expand version: project.version } }
+test { useJUnitPlatform() }
+sourceSets { smoke { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath } }
+loom {
+    mods {
+        'shirokai-holograms' { sourceSet sourceSets.main }
+        if (project.hasProperty('hologramSmoke')) { 'shirokai-holograms-smoke' { sourceSet sourceSets.smoke } }
+    }
+    runs { server { runDir project.findProperty('hologramRunDir') ?: 'run' } }
+}
+tasks.named('runServer') {
+    standardInput = System.in
+    if (project.hasProperty('hologramSmoke')) { dependsOn tasks.named('smokeClasses'); classpath += sourceSets.smoke.runtimeClasspath }
+}
+
+// Optional compatibility fixture. Never bundled into the production artifact.
+if (project.hasProperty('hologramCobblemon')) {
+    repositories { maven { url = 'https://artefacts.cobblemon.com/releases/'; content { includeGroup 'com.cobblemon' } } }
+    dependencies {
+        modLocalRuntime 'net.fabricmc:fabric-loader:0.17.2'
+        modLocalRuntime('com.cobblemon:fabric:1.8.3+1.21.1') { transitive = false }
+        modLocalRuntime fileTree(dir: 'build/cobblemon-mods', include: '*.jar')
+        runtimeOnly fileTree(dir: 'build/cobblemon-libraries', include: '*.jar')
+        minecraftServerLibraries 'com.ibm.icu:icu4j:71.1'
+    }
+    tasks.named('runServer') { maxHeapSize = '4G' }
+}
