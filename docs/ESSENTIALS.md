@@ -64,3 +64,8 @@ O nick acima da cabeça não é substituído: os nametags do Core continuam send
 A fronteira de API aceita somente a thread do servidor. Leituras visuais usam perfis já carregados e cache por tick, sem consulta de arquivos ou JDBC no render; só comandos explícitos alteram persistência. Falha/incompatibilidade com Essentials instalado bloqueia a rota de chat do Core conservadoramente; atualize o par de JARs. Sem Essentials instalado, o Core preserva seu comportamento original.
 
 Validação e limites de cliente real são descritos em TESTES.md. Os clientes de protocolo locais não certificam aparência gráfica ou assinatura criptográfica de um cliente autenticado.
+
+
+## Cosméticos — Core 0.19.0-dev / Essentials 0.6.13-core-cosmetics.1
+
+Ponte opcional de cosméticos protocolo1, separada do contrato de chat existente. Core adquire um único lease; Essentials libera apenas seus próprios teams e suspende efeitos/registro dos comandos cosméticos. Sem Core novo, Essentials conserva comportamento independente. Instalação exige o par atualizado quando ambos estão presentes. [Migração, permissões e limites](COSMETICS.md).

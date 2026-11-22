@@ -1,3 +1,17 @@
+# Estado atual — 0.19.0-dev / cosméticos
+
+Migração nativa do catálogo do Essentials com persistência SQLite transacional, importação não destrutiva por UUID, preferências, menus e ponte exclusiva de efeitos. Permissões `shirokai.core.cosmetics.*`. Chat/TAB/nametag aplicam somente a cor do apelido; identidades, cargos e clãs preservados. [Guia](COSMETICS.md).
+
+Validação: 144 testes Core + 63 Essentials = 207 testes unitários sem falhas; 111 verificações Fabric em quatro execuções (Core sozinho, par, par com Raids/Cobblemon e reinício). Jogadores simulados; sem certificação de cliente gráfico/autenticação. Raid real 0.1.20-guard.1, Cobblemon 1.8.3, LuckPerms 5.4.140. Evidências em `cosmetics/0.19.0-dev/`. Legado preservado byte a byte nos cenários.
+
+Core SHA256: `4ca325dc5811fee228d480b5ae21fc9c6cfde8b1fc9c0b44d04857d29e5fa200`
+
+Essentials visual SHA256: `9793be4aac3c70c884b4122e7679055a3f46b7560db6586e6576314b8489ee60`
+
+Pacote candidato: `releases/cosmetics-0.19.0-dev/`. Sem publicação estável ou implantação no servidor. Histórico abaixo.
+
+---
+
 ## Shirokai Holograms — mod independente 1.0.0-dev
 
 [Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).

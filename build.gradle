@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '2.2.20'
 }
-version = '0.18.0-dev'
+version = '0.19.0-dev'
 group = 'com.shirokai'
 base { archivesName = 'shirokai-core' }
 repositories {
@@ -89,4 +89,9 @@ if (project.hasProperty('integrationSmoke')) {
             if (value != null) systemProperty(key, value)
         }
     }
+}
+
+if (project.hasProperty('profileSmoke')) {
+    tasks.register('cosmeticsSmokeJar', Jar) { dependsOn smokeClasses; from sourceSets.smoke.output; archiveClassifier='cosmetics-smoke-dev' }
+    tasks.register('remapCosmeticsSmokeJar', net.fabricmc.loom.task.RemapJarTask) { dependsOn cosmeticsSmokeJar; inputFile=tasks.cosmeticsSmokeJar.archiveFile; archiveFileName='core-cosmetics-smoke.jar'; classpath.from(sourceSets.main.compileClasspath,sourceSets.main.output) }
 }

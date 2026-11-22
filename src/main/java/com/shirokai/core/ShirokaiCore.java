@@ -22,6 +22,7 @@ public final class ShirokaiCore implements ModInitializer {
         var commands = new AdminCommands(() -> runtime, version);
         CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
             commands.register(dispatcher);
+            new com.shirokai.core.cosmetics.CosmeticCommands(()->runtime).register(dispatcher);
             new com.shirokai.core.customization.StyleChoiceCommands(()->runtime).register(dispatcher);
             new ProfileCommands(() -> runtime).register(dispatcher);
             new com.shirokai.core.clans.ClanCommands(() -> runtime).register(dispatcher);
@@ -56,6 +57,11 @@ public final class ShirokaiCore implements ModInitializer {
         });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             if (runtime != null) runtime.playerLeft(handler.player.getUuid());
+        });
+        net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents.AFTER_DEATH.register((entity,source)->{
+            if(entity instanceof net.minecraft.server.network.ServerPlayerEntity victim && source.getAttacker() instanceof net.minecraft.server.network.ServerPlayerEntity winner && winner!=victim){
+                var active=com.shirokai.core.cosmetics.CosmeticService.active(winner.getServer());if(active!=null)active.celebrate(winner,"victory");
+            }
         });
         ServerTickEvents.END_SERVER_TICK.register(server -> { if (runtime != null) runtime.tick(); });
         LOGGER.info("Shirokai Core {}: configuração, storage e administração registrados", version);

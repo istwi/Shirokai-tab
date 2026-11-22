@@ -32,6 +32,7 @@ public final class MinecraftChat {
                 return new ChatService.Participant(player.getUuid(),com.shirokai.core.integrations.EssentialsAccess.display(player),player.getWorld().getRegistryKey().getValue().toString(),player.getX(),player.getY(),player.getZ(),clan);
             }).toList(),id->titles==null?List.of():titles.chatDefinitions(id).stream().map(def->def.display()).toList(),
             Clock.systemUTC(),config,(id,reason)->logger.warn("[chat] Mensagem rejeitada de {}: {}",id,reason));
+        service.nameRenderer((id,value)->{var p=player(id);return p==null?Text.literal(value).formatted(net.minecraft.util.Formatting.WHITE):com.shirokai.core.cosmetics.CosmeticService.name(p);},value->com.shirokai.core.cosmetics.CosmeticNames.target(server,value));
         service.contentValidator(shares::validate);
         service.visibility((viewer,actor)->com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,actor));
     }
@@ -55,7 +56,7 @@ public final class MinecraftChat {
     public Text trainer(UUID id){
         var author=player(id);var result=Text.empty();var cargo=rank(id);
         if(!cargo.getString().isEmpty())result.append(cargo).append(" ");
-        return result.append(Text.literal(author==null?"Indisponível":com.shirokai.core.integrations.EssentialsAccess.display(author)).formatted(net.minecraft.util.Formatting.WHITE));
+        return result.append(author==null?Text.literal("Indisponível").formatted(net.minecraft.util.Formatting.WHITE):com.shirokai.core.cosmetics.CosmeticService.name(author));
     }
     public Text playerSummary(UUID id){
         var text=Text.empty().append(Text.literal("Treinador").formatted(net.minecraft.util.Formatting.AQUA,net.minecraft.util.Formatting.BOLD));

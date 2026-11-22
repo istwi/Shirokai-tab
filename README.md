@@ -1,3 +1,9 @@
+# Cosméticos no Core — 0.19.0-dev
+
+Catálogo de 63 opções, seis categorias, menu e personalização migrados do Essentials. Cor do nome integrada ao chat, TAB e nametag; prefixos de cargo/clã preservados. Permissões novas `shirokai.core.cosmetics.*`; sem concessões automáticas. [Instalação, comandos e permissões](docs/COSMETICS.md).
+
+[Baixar o par de JARs](releases/cosmetics-0.19.0-dev/Zorykai-Core-Cosmeticos-0.19.0-dev.zip). Substitua Core e Essentials juntos, preservando configurações e dados. Inclui a correção anterior de `/speed`. Candidato de desenvolvimento.
+
 ## Shirokai Holograms — mod independente 1.0.0-dev
 
 [Projeto, comandos, configuração e limites](shirokai-holograms/README.md).

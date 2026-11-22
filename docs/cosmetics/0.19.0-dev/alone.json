@@ -1,0 +1,33 @@
+{
+  "realClients": 0,
+  "error": "",
+  "passed": true,
+  "checks": [
+    "Core cosmetic runtime becomes ready",
+    "legacy or previously saved Core nick is loaded",
+    "legacy permission does not implicitly grant new Core nodes",
+    "new Core LuckPerms nodes activate menu and personalization",
+    "legacy particle personalization is preserved",
+    "Core owns the original cosmetics menu command",
+    "opening cosmetics menu grants no items",
+    "saved Core selection changes nickname color",
+    "nickname component carries cosmetic color without changing account name",
+    "Core-owned nametag team uses cosmetic color",
+    "rank prefix remains present on the nametag",
+    "actual TAB display packets contain colored nickname",
+    "fallback chat header respects nickname color",
+    "rich chat header respects nickname color",
+    "actual chat packet preserves cosmetic nickname color",
+    "name color leaves message body, signature field and unsigned content untouched",
+    "Core emits actual aura particles using imported selection",
+    "Core victory category produces a bounded celebration",
+    "celebration cooldown prevents repeated burst",
+    "permission revocation suspends color without deleting choice",
+    "grant restoration reactivates saved color without reselecting",
+    "hide-all disables cosmetic name color",
+    "hide-all stops Core particles",
+    "cosmetic changes preserve UUID and real account name",
+    "cosmetics leave inventory intact",
+    "in-flight save publishes to replacement player after synthetic respawn"
+  ]
+}

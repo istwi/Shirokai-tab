@@ -101,6 +101,9 @@ public final class ChatService {
         }catch(RuntimeException error){rejected(sender,error);throw error;}
     }
     private void rejected(UUID sender,RuntimeException error){var session=sessions.get(sender);if(session!=null&&(session.lastLog==null||clock.millis()-session.lastLog>=5000)){session.lastLog=clock.millis();moderation.accept(sender,error.getMessage());}}
+    private java.util.function.BiFunction<UUID,String,net.minecraft.text.Text> cosmeticName=(id,value)->net.minecraft.text.Text.literal(value).formatted(net.minecraft.util.Formatting.WHITE);
+    private java.util.function.Function<String,net.minecraft.text.Text> cosmeticTarget=value->net.minecraft.text.Text.literal(value).formatted(net.minecraft.util.Formatting.WHITE);
+    public void nameRenderer(java.util.function.BiFunction<UUID,String,net.minecraft.text.Text> names,java.util.function.Function<String,net.minecraft.text.Text> targets){cosmeticName=names;cosmeticTarget=targets;}
     /** Plain fallback keeps nickname components distinct from channel/tag/body colors. */
     public net.minecraft.text.Text header(Envelope message){
         var author=participant(message.author());
@@ -112,7 +115,8 @@ public final class ChatService {
         while(matcher.find()){
             result.append(net.minecraft.text.Text.literal(template.substring(cursor,matcher.start())));
             var value=net.minecraft.text.Text.literal(values.get(matcher.group(1)));
-            if(matcher.group(1).equals("name")||matcher.group(1).equals("target"))value.formatted(net.minecraft.util.Formatting.WHITE);
+            if(matcher.group(1).equals("name")){result.append(cosmeticName.apply(author.id(),author.name()));cursor=matcher.end();continue;}
+            if(matcher.group(1).equals("target")){result.append(cosmeticTarget.apply(message.target()));cursor=matcher.end();continue;}
             result.append(value);cursor=matcher.end();
         }
         return result.append(net.minecraft.text.Text.literal(template.substring(cursor)));

@@ -30,6 +30,7 @@ public final class ProfileSmoke implements ModInitializer {
     private long tick;
     private boolean running;
     @Override public void onInitialize() {
+        if(Boolean.getBoolean("core.cosmeticsSmoke")){new CosmeticsSmoke().onInitialize();return;}
         if(net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("vanish")||net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("melius-vanish"))new VanishSmoke(this::until).onInitialize();
         new ClanSmoke().onInitialize();
         new ChatSmoke().onInitialize();

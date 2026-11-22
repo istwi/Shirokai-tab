@@ -62,6 +62,8 @@ public final class TabRuntime implements AutoCloseable{
     }
     private Text resolveRich(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count){return resolveRich(key,subject,viewer,metadata,count,com.shirokai.core.customization.VisualTarget.TAB,animationsEnabled(subject.getUuid())&&animationsEnabled(viewer.getUuid()));}
     private Text resolveRich(String key,ServerPlayerEntity subject,ServerPlayerEntity viewer,PermissionService.Metadata metadata,int count,com.shirokai.core.customization.VisualTarget target,boolean animate){
+        if(key.equals("shirokai:player"))return com.shirokai.core.cosmetics.CosmeticService.name(subject).copy().append(Text.literal(com.shirokai.core.integrations.EssentialsAccess.afkSuffix(subject)).formatted(net.minecraft.util.Formatting.WHITE));
+        if(key.equals("essentials:displayname")||key.equals("essentials:nickname"))return Text.literal(resolve(key,subject,viewer,metadata,count)).formatted(com.shirokai.core.cosmetics.CosmeticService.color(subject));
         if(titles!=null&&(key.equals("shirokai:selected_title")||key.equals("shirokai:title_prefix"))){
             Text title=titles.visualPresentation(subject.getUuid(),target,tick,animate);return key.equals("shirokai:title_prefix")&&!title.getString().isEmpty()?Text.empty().append(title).append(Text.literal(" ")):title;
         }

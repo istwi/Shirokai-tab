@@ -138,3 +138,11 @@ O teste Fabric serializa com jogador online, verifica ausência só dos teams
 próprios no NBT e sua presença intacta no scoreboard ativo, restaura o save em
 outro scoreboard e muda OWNER para ADMIN sem team leave. Também confirma save de
 teams externos, modificados e com membros estrangeiros. Não simula login real.
+
+## Cosméticos0.19 (revisão solicitada pelo usuário)
+
+O nick permanece branco por padrão, mas uma cor de cosmético autorizada pode
+colorir somente o nome no chat/TAB/nametag. Cargo principal, peso, prefixo de
+cargo e identificação opcional não passam a ser selecionáveis nem recebem a
+cor do nick. Consulte COSMETICS.md. Essa escolha substitui a antiga regra de
+nick sempre branco exclusivamente quando há cosmético válido equipado.

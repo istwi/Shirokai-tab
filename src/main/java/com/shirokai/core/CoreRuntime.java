@@ -33,6 +33,9 @@ public final class CoreRuntime implements AutoCloseable {
     private volatile CoreConfig config;
     private volatile boolean closed;
     private SqliteStorage storage;
+    private com.shirokai.core.cosmetics.CosmeticService cosmetics;
+    public com.shirokai.core.cosmetics.CosmeticService cosmetics(){return cosmetics;}
+    public void cosmeticsChanged(java.util.UUID id){if(tab!=null)tab.refresh(id);if(scoreboard!=null)scoreboard.invalidate();}
     private PermissionService permissions;
     private PlaceholderService placeholders;
     private TitleService titles;
@@ -176,6 +179,7 @@ public final class CoreRuntime implements AutoCloseable {
             essentials.connect();
         }
         logger.info("[essentials] {}",essentials.status());
+        if(running("storage")&&running("permissions"))cosmetics=new com.shirokai.core.cosmetics.CosmeticService(this,server);
         try {
             motd=new com.shirokai.core.motd.MotdPlan(com.shirokai.core.motd.MotdConfig.load(FabricLoader.getInstance().getConfigDir().resolve("shirokai-core/motd.json")),styles==null?new StyleEngine(StyleConfig.defaults()):styles);
             updateMotd();
@@ -203,6 +207,7 @@ public final class CoreRuntime implements AutoCloseable {
         return titles;
     }
     public void playerJoined(java.util.UUID player) {
+        if(cosmetics!=null)cosmetics.join(player);
         if(customization()!=null)customization.join(player).whenComplete((v,e)->{if(e!=null)logger.warn("[styles] Escolhas indisponíveis "+player,e);});
         if(running("integrations"))integrations.join(player);
         if(running("tab"))tab.join(player);
@@ -218,7 +223,7 @@ public final class CoreRuntime implements AutoCloseable {
             if (error != null) logger.warn("[titles] Falha ao carregar perfil " + player, error);
         });
     }
-    public void playerLeft(java.util.UUID player) { if(customization!=null)customization.forget(player); if (titles != null) titles.forget(player); if(clans!=null)clans.forget(player); if(chat!=null)chat.service().leave(player);if(tab!=null)tab.forget(player);if(scoreboard!=null)scoreboard.forget(player);if(integrations!=null)integrations.forget(player); }
+    public void playerLeft(java.util.UUID player) { if(cosmetics!=null)cosmetics.forget(player); if(customization!=null)customization.forget(player); if (titles != null) titles.forget(player); if(clans!=null)clans.forget(player); if(chat!=null)chat.service().leave(player);if(tab!=null)tab.forget(player);if(scoreboard!=null)scoreboard.forget(player);if(integrations!=null)integrations.forget(player); }
     private net.minecraft.text.Text renderMotd(com.shirokai.core.motd.MotdPlan plan){
         return plan.config().enabled()?plan.render(visualTicks,(int)server.getPlayerManager().getPlayerList().stream().filter(p->!com.shirokai.core.visibility.VisibilityService.isHidden(server,p)).count(),server.getMaxPlayerCount(),server.getVersion()):null;
     }
@@ -226,6 +231,7 @@ public final class CoreRuntime implements AutoCloseable {
         if(motd!=null)com.shirokai.core.motd.MotdBridge.publish(renderMotd(motd));
     }
     public void tick() {
+        if(cosmetics!=null)cosmetics.tick(server);
         if(visualTicks%5==0)updateMotd();
         if(++visualTicks%5==0&&customization!=null&&customization.catalog().hasAnimations())for(var player:server.getPlayerManager().getPlayerList()){
             if(player.currentScreenHandler instanceof com.shirokai.core.profiles.ProfileMenu menu)menu.refreshVisuals();
@@ -316,7 +322,7 @@ public final class CoreRuntime implements AutoCloseable {
         return result;
     }
     private record ReloadCandidate(com.shirokai.core.motd.MotdPlan motd,CoreConfig core,TitleCatalog titles,ClanConfig clans,ChatConfig chat,StyleEngine styles,TabPlan tab,ScoreboardPlan scoreboard,IntegrationConfig integrations,PresentationPlan presentation,PresetCatalog presets,TabExtrasPlan extras,ChatAppearanceConfig chatAppearance,com.shirokai.core.menus.MenuPlan menus,com.shirokai.core.customization.PersonalizationConfig personalization) {}
-    public void prepareStop(){if(essentials!=null)essentials.close();com.shirokai.core.motd.MotdBridge.publish(null);try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
+    public void prepareStop(){if(cosmetics!=null)cosmetics.close();if(essentials!=null)essentials.close();com.shirokai.core.motd.MotdBridge.publish(null);try{if(integrations!=null)integrations.close();}catch(Exception error){logger.error("[integrations] Falha ao encerrar adaptadores",error);}try{if(scoreboard!=null)scoreboard.close();}catch(Exception error){logger.error("[scoreboard] Falha ao liberar recursos",error);}try{if(tab!=null)tab.close();}catch(Exception error){logger.error("[tab] Falha ao liberar recursos antes do save",error);}}
     @Override public void close() throws Exception {
         closed = true;
         if(visibility!=null)visibility.close();

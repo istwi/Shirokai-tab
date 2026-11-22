@@ -10,7 +10,8 @@
     "PlayerQuitAnnouncement",
     "ScoreboardTeamPersistence",
     "PlayerNameHover",
-    "ServerListMotd"
+    "ServerListMotd",
+    "RaidCosmeticsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

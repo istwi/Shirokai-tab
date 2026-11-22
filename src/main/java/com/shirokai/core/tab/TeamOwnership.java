@@ -6,7 +6,8 @@ import java.util.function.*;
 
 /** Opt-in scoreboard ownership: never adopts existing teams or moves foreign members. */
 public final class TeamOwnership implements AutoCloseable{
-    public record Player(UUID id,String name,int priority,net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility){
+    public record Player(UUID id,String name,int priority,net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility,net.minecraft.util.Formatting color){
+        public Player(UUID id,String name,int priority,net.minecraft.text.Text prefix,net.minecraft.text.Text suffix,AbstractTeam.VisibilityRule visibility){this(id,name,priority,prefix,suffix,visibility,net.minecraft.util.Formatting.RESET);}
         public Player(UUID id,String name,int priority){this(id,name,priority,null,null,null);}
     }
     private static final List<java.lang.ref.WeakReference<TeamOwnership>> LIVE=new ArrayList<>();
@@ -60,6 +61,7 @@ public final class TeamOwnership implements AutoCloseable{
                 var target=desired;
                 boolean foreignMember=target.getPlayerList().stream().anyMatch(member->assigned.get(member)!=target);
                 if(foreignMember){note("Nametag de team com integrantes externos preservado: "+name);release(player.name());continue;}
+                if(desired.getColor()!=player.color())desired.setColor(player.color());
                 if(!Objects.equals(desired.getPrefix(),player.prefix()))desired.setPrefix(player.prefix().copy());
                 if(!Objects.equals(desired.getSuffix(),player.suffix()))desired.setSuffix(player.suffix().copy());
                 if(desired.getNameTagVisibilityRule()!=player.visibility())desired.setNameTagVisibilityRule(player.visibility());

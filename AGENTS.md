@@ -140,3 +140,12 @@ playerSummary defaulttrue é independente de playerHoverInfo vanilla; resumo Cor
 usa placeholders de Pokédex/ginásios do autor e mantém campo assinado/filtros.
 
 Hologramas: novo mod independente em `shirokai-holograms/` (AGENTS.md próprio). Não integrar automaticamente ao Core. Leia README/VALIDATION do subprojeto; preserve fontes vanilla, metadata default/interpolation e isolamento dos IDs.
+
+Cosméticos0.19: migração solicitada do Essentials, docs/COSMETICS.md. Prefixo LP
+shirokai.core.cosmetics; não conceder permissões/grupos automaticamente. A cor
+escolhida pode substituir o branco só no nome (pedido atual), preservando cargo,
+clã, corpo e campos assinados. Cache/efeitos na thread do servidor, SQL/importação
+no worker. Importar legado uma vez, sem sobrescrever escolhas Core nem escrever
+no arquivo legado. Ponte exclusiva com Essentials atualizado evita duplo efeito.
+Usar teams já próprios do Core; não adotar teams externos. CAS e tokens de sessão
+protegem saves/reconexão; respawn pode substituir o objeto mantendo o UUID.

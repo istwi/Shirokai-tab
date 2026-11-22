@@ -1,0 +1,29 @@
+{
+  "unitTests": {
+    "Shirokai-tab": {
+      "tests": 144,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "Essentials-Speed-Fix": {
+      "tests": 63,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "nativeChecks": 111,
+  "nativeRuns": [
+    "alone.json",
+    "paired.json",
+    "raid.json",
+    "paired-restart.json"
+  ],
+  "realClients": 0,
+  "limitations": "Jogadores simulados; sem certifica\u00e7\u00e3o visual em cliente gr\u00e1fico ou autentica\u00e7\u00e3o real.",
+  "artifacts": {
+    "shirokai-core-0.19.0-dev.jar": "4ca325dc5811fee228d480b5ae21fc9c6cfde8b1fc9c0b44d04857d29e5fa200",
+    "shirokai-essentials-0.6.13-core-cosmetics.1-zorykai-visual.jar": "9793be4aac3c70c884b4122e7679055a3f46b7560db6586e6576314b8489ee60"
+  }
+}

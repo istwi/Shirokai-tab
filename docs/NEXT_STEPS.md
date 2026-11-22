@@ -1,3 +1,9 @@
+## Cosméticos0.19.0-dev
+
+Migração nativa documentada em COSMETICS.md. Validar no cliente real menus, cores
+e partículas com os JARs pareados e conceder os novos nós LP manualmente. Não
+reimportar nem apagar escolhas Core; não reaplicar setup/publicar ambiente.
+
 ## Shirokai Holograms — mod independente 1.0.0-dev
 
 [Projeto, comandos, configuração e limites](../shirokai-holograms/README.md).

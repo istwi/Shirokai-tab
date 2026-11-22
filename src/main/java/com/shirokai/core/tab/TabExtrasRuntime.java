@@ -46,7 +46,7 @@ public final class TabExtrasRuntime implements AutoCloseable {
     public TeamOwnership.Player nametag(ServerPlayerEntity subject,int priority,long tick){
         this.tick=tick;
         Text prefix=render(plan.prefix(),subject,subject,128),suffix=render(plan.suffix(),subject,subject,128);
-        return new TeamOwnership.Player(subject.getUuid(),subject.getGameProfile().getName(),priority,prefix,suffix,AbstractTeam.VisibilityRule.valueOf(plan.config().nametags().visibility()));
+        return new TeamOwnership.Player(subject.getUuid(),subject.getGameProfile().getName(),priority,prefix,suffix,AbstractTeam.VisibilityRule.valueOf(plan.config().nametags().visibility()),com.shirokai.core.cosmetics.CosmeticService.teamColor(subject));
     }
     private void send(View view,Packet<?> packet){TabExtrasPackets.send(view.player.networkHandler,packet);packets++;}
     public void update(List<ServerPlayerEntity> players,long tick){
