@@ -48,6 +48,7 @@ public final class CosmeticsSmoke implements ModInitializer {
         var api=LuckPermsProvider.get();var loaded=api.getUserManager().loadUser(ID,"CosmeticAlice");
         return service.ready().thenCompose(v->loaded).thenComposeAsync(user->{
             check(service.status().equals("READY"),"Core cosmetic runtime becomes ready");
+            check(CosmeticCatalog.ENTRIES.size()==48&&CosmeticCatalog.ENTRIES.stream().noneMatch(e->Set.of("cloud","enchant","electric").contains(e.style())),"removed effects are absent from every category");
             user.data().clear();user.data().add(PermissionNode.builder("shirokai.essentials.cosmetics.*").build());user.getCachedData().invalidate();
             core.playerJoined(ID);core.playerJoined(observer.getUuid());
             return service.join(ID).thenComposeAsync(v->service.join(observer.getUuid()),server).thenComposeAsync(v->{
@@ -80,7 +81,9 @@ public final class CosmeticsSmoke implements ModInitializer {
                 check(sent.body().content().equals(incoming.getSignedContent())&&Objects.equals(sent.signature(),incoming.signature())&&sent.unsignedContent()==null,"name color leaves message body, signature field and unsigned content untouched");
                 observerPackets.clear();for(int i=0;i<6;i++)service.tick(server);check(observerPackets.stream().anyMatch(x->x instanceof ParticleS2CPacket),"Core emits actual aura particles using imported selection");
                 if(FabricLoader.getInstance().isModLoaded("shirokai_raids"))CosmeticRaidSmoke.verify(p,service,observerPackets,(condition,label)->check(condition,label));
-                service.tick(server);check(service.celebrate(p,"victory"),"Core victory category produces a bounded celebration");check(!service.celebrate(p,"victory"),"celebration cooldown prevents repeated burst");
+                service.tick(server);observerPackets.clear();check(service.celebrate(p,"victory"),"Core victory category produces a bounded celebration");
+                check(observerPackets.stream().anyMatch(x->x instanceof net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket),"victory emits firework sound packet");
+                check(observerPackets.stream().filter(ParticleS2CPacket.class::isInstance).map(ParticleS2CPacket.class::cast).anyMatch(x->Math.hypot(x.getX()-p.getX(),x.getZ()-p.getZ())>=2.7),"victory particles cover larger area");check(!service.celebrate(p,"victory"),"celebration cooldown prevents repeated burst");
                 user.data().add(PermissionNode.builder("shirokai.core.cosmetics.nick_cyan").value(false).build());user.getCachedData().invalidate();
                 check(CosmeticService.color(p)==Formatting.WHITE&&state(service,p).cosmetics.get("nick").equals("nick_cyan"),"permission revocation suspends color without deleting choice");
                 user.data().remove(PermissionNode.builder("shirokai.core.cosmetics.nick_cyan").value(false).build());user.data().add(PermissionNode.builder("shirokai.core.cosmetics.nick_cyan").build());user.getCachedData().invalidate();

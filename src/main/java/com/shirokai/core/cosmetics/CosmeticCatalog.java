@@ -21,13 +21,10 @@ public final class CosmeticCatalog {
             entries.add(new Entry(category+"_fire",category,"Fogo","fire"));
             entries.add(new Entry(category+"_water",category,"Água","water"));
             entries.add(new Entry(category+"_nature",category,"Natureza","nature"));
-            entries.add(new Entry(category+"_electric",category,"Elétrico","electric"));
             entries.add(new Entry(category+"_soul",category,"Fantasma","soul"));
             entries.add(new Entry(category+"_snow",category,"Neve","snow"));
             entries.add(new Entry(category+"_heart",category,"Corações","heart"));
             entries.add(new Entry(category+"_magic",category,"Magia","magic"));
-            entries.add(new Entry(category+"_enchant",category,"Encantado","enchant"));
-            entries.add(new Entry(category+"_cloud",category,"Nuvem","cloud"));
             entries.add(new Entry(category+"_cherry",category,"Cerejeira","cherry"));
         }
         ENTRIES=List.copyOf(entries);

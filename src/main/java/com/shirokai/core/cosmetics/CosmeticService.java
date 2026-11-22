@@ -158,9 +158,12 @@ public final class CosmeticService {
                 var trail=equipped(p,"trail");
                 if(!same||!p.isOnGround()||trail==null||trailDistance>=16)resetTrail(p);
                 else if(trailDistance>.0004) {
-                    var pref=preferences(p);double credit=trailCredits.getOrDefault(p.getUuid(),0d)+(config.trailBaseDensity*pref.density*trailMultiplier(trail.style()))/(double)config.trailIntervalTicks;
+                    var pref=preferences(p);boolean heart=trail.style().equals("heart");
+                    double rate=(config.trailBaseDensity*pref.density*trailMultiplier(trail.style()))/(double)config.trailIntervalTicks;
+                    if(heart)rate=Math.max(rate,config.trailMinimumPerTick*pref.density)*.25;
+                    double credit=trailCredits.getOrDefault(p.getUuid(),0d)+rate;
                     int earned=(int)Math.floor(credit);trailCredits.put(p.getUuid(),credit-earned);
-                    int minimum=config.trailMinimumPerTick*pref.density*trailMultiplier(trail.style());
+                    int minimum=heart?0:config.trailMinimumPerTick*pref.density*trailMultiplier(trail.style());
                     trail(p,anchor,p.getPos(),Math.max(earned,minimum));trailAnchors.put(p.getUuid(),p.getPos());
                 }
                 if(ticks%config.intervalTicks==0)shape(p,"aura",p.getPos());
@@ -179,8 +182,14 @@ public final class CosmeticService {
     }
     private void burst(ServerPlayerEntity p,String category,Vec3d origin) {
         var e=equipped(p,category);if(e==null)return;
-        var pref=preferences(p);int count=pref.density*12;double radius=.4+pref.size*.2;
-        for(int i=0;i<count;i++){double a=i*Math.PI*2/count;emit(p,e.style(),origin.add(Math.cos(a)*radius,.15+i*(1.45/count),Math.sin(a)*radius));}
+        var pref=preferences(p);boolean celebration=category.equals("victory")||category.equals("raid");
+        int count=pref.density*12;double radius=celebration?2+pref.size*.8:.4+pref.size*.2;
+        if(celebration)for(var viewer:p.getServerWorld().getPlayers()){
+            var state=selected.get(viewer.getUuid());
+            if(state!=null&&!state.cosmeticsHidden&&com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,p)&&viewer.squaredDistanceTo(p)<=config.viewDistance*config.viewDistance)
+                viewer.playSoundToPlayer(net.minecraft.sound.SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST,net.minecraft.sound.SoundCategory.PLAYERS,.8f,1f);
+        }
+        for(int i=0;i<count;i++){double a=i*Math.PI*2/count;emit(p,e.style(),origin.add(Math.cos(a)*radius,.15+i*((celebration?3.5:1.45)/count),Math.sin(a)*radius));}
     }
     private void shape(ServerPlayerEntity p,String category,Vec3d origin) {
         var e=equipped(p,category);if(e==null)return;
@@ -196,7 +205,7 @@ public final class CosmeticService {
     private void trail(ServerPlayerEntity p,Vec3d from,Vec3d to,int planned) {
         var e=equipped(p,"trail");if(e==null)return;var pref=preferences(p);
         Vec3d delta=to.subtract(from);double horizontal=Math.sqrt(delta.x*delta.x+delta.z*delta.z);if(horizontal<.001)return;
-        int count=Math.min(config.maxParticlesPerPlayer,Math.max(planned,(int)Math.ceil(horizontal/.12)));
+        int count=Math.min(config.maxParticlesPerPlayer,e.style().equals("heart")?planned:Math.max(planned,(int)Math.ceil(horizontal/.12)));
         double rightX=-delta.z/horizontal,rightZ=delta.x/horizontal;
         double lead=Math.min(.12,horizontal*.75);Vec3d projected=to.add(delta.x/horizontal*lead,0,delta.z/horizontal*lead);
         for(int i=0;i<count;i++){

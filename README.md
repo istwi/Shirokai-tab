@@ -1,3 +1,7 @@
+# Cosméticos 0.19.2-dev
+
+Removidos Nuvem, Encantado e Elétrico de todas as categorias. Rastros de coração com75% menos emissões no movimento. Lore sem nodes de permissão. Vitória e raid com maior área e som de fogos, respeitando cooldown e visibilidade. Cor de nick continua somente no chat/nametag. [Baixar pacote atualizado](releases/cosmetics-0.19.2-dev/Zorykai-Core-Cosmeticos-0.19.2-dev.zip). Atualize somente Core se já usa Essentials0.6.13-core-cosmetics.1. [Guia](docs/COSMETICS.md).
+
 # Ajuste 0.19.1-dev — cor do nick somente no chat e nametag
 
 O cosmético não colore o nome no TAB, inclusive placeholders de apelido. Cargo e clã preservam seus estilos. [Baixar par atualizado](releases/cosmetics-0.19.1-dev/Zorykai-Core-Cosmeticos-0.19.1-dev.zip). Essentials permanece na versão 0.6.13-core-cosmetics.1; atualize o Core para 0.19.1-dev. [Guia](docs/COSMETICS.md).

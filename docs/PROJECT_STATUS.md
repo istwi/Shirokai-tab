@@ -1,3 +1,15 @@
+# Estado atual — 0.19.2-dev / cosméticos
+
+Removidos nuvem/encantado/elétrico das cinco categorias de partículas:48 opções atuais. IDs legados preservados inativos. Lore sem permissões, autorização mantida. Rastro de coração reduzido75%, sem mínimo por distância que anulasse a redução. Vitória/raid com raio2,8–4,4 blocos e altura3,5, som de fogos por destinatário respeitando opt-out/visibilidade. Sem entidades/dano; limites/cooldown preservados. TAB continua branco.
+
+Validação: 144 testes unitários Core; 63 verificações Fabric com Essentials e com Raids/Cobblemon reais. Catálogo removido, som enviado, área aumentada e ausência de duplicação verificados. Jogadores simulados; sem cliente gráfico. Evidências em `cosmetics/0.19.2-dev/`.
+
+Core SHA256: `435190f969da7a14d8118369b309937b3d2e9ddc3f83b26db8a37e60e4698f28`
+
+Essentials permanece0.6.13-core-cosmetics.1. Pacote em `releases/cosmetics-0.19.2-dev/`. Histórico abaixo.
+
+---
+
 # Estado atual — 0.19.1-dev / cor do nick
 
 Pedido atual: cor cosmética somente no chat e nametag; nome no TAB permanece branco, incluindo placeholders de apelido. Prefixos de cargo/clã e demais efeitos preservados. Essentials continua 0.6.13-core-cosmetics.1.

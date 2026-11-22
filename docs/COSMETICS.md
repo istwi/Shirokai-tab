@@ -1,11 +1,11 @@
-# Cosméticos nativos do Core — 0.19.1-dev
+# Cosméticos nativos do Core — 0.19.2-dev
 
-Migração solicitada do catálogo/menu do Essentials0.6.12-teleport-speed.2 para o Core. Mantidos63 IDs, seis categorias e os ajustes de partículas. O Core passa a persistir/aplicar as escolhas; o Essentials continua com homes, comandos e teleportes, incluindo a correção de `/speed`.
+Migração solicitada do catálogo/menu do Essentials0.6.12-teleport-speed.2 para o Core. Catálogo atual com48 IDs, seis categorias e os ajustes de partículas. O Core passa a persistir/aplicar as escolhas; o Essentials continua com homes, comandos e teleportes, incluindo a correção de `/speed`.
 
 ## Instalação e migração
 
 1. Pare o servidor e guarde backup dos JARs, diretório `shirokai-core`, configurações e dados do mundo.
-2. Substitua o Core por `shirokai-core-0.19.1-dev.jar` e o Essentials por `shirokai-essentials-0.6.13-core-cosmetics.1-zorykai-visual.jar`, sem duplicados. São candidatos de desenvolvimento, não publicação de release estável.
+2. Substitua o Core por `shirokai-core-0.19.2-dev.jar` e o Essentials por `shirokai-essentials-0.6.13-core-cosmetics.1-zorykai-visual.jar`, sem duplicados. São candidatos de desenvolvimento, não publicação de release estável.
 3. Preserve os arquivos existentes. Conceda as permissões **novas** do Core descritas abaixo. Reinicie o servidor completo.
 4. Consulte `/cosmeticos`. Se houver outro controlador desse comando, existe `/shirokaicore:cosmeticos`.
 
@@ -45,7 +45,7 @@ lp group magma permission set shirokai.core.cosmetics.aura_stars true
 
 Para administração, conceda `.admin` ao grupo administrativo apropriado. O wildcard `shirokai.core.cosmetics.*` inclui esse acesso administrativo; prefira os IDs específicos para VIPs. O console pode usar comandos administrativos. Remover permissão suspende a opção, preservando a escolha; conceder novamente a reativa sem reequipar.
 
-IDs de efeitos: combine uma categoria `trail`, `aura`, `join`, `victory` ou `raid` com `_` e um estilo: `stars`, `fire`, `water`, `nature`, `electric`, `soul`, `snow`, `heart`, `magic`, `enchant`, `cloud`, `cherry`. Exemplo: `raid_cherry`, `join_fire`. Os três IDs `nick_*` são os listados acima.
+IDs de efeitos: combine uma categoria `trail`, `aura`, `join`, `victory` ou `raid` com `_` e um estilo: `stars`, `fire`, `water`, `nature`, `soul`, `snow`, `heart`, `magic`, `cherry`. Exemplo: `raid_cherry`, `join_fire`. Os três IDs `nick_*` são os listados acima.
 
 ## Funcionalidades preservadas
 
@@ -81,6 +81,13 @@ Aliases protegidos: `/shirokaicore:cosmeticos` e `/shirokaicore:cosmeticosadmin`
 
 ## Validação e limites
 
-Evidências e hashes em `docs/cosmetics/0.19.1-dev/`. Testes de importação não destrutiva, CAS concorrente, restart, configuração e rollback; servidores reais com Core sozinho e com o par, LuckPerms real, captura de pacotes e jogador sintético. O cenário de raid usa o JAR real indicado no relatório e chama sua transição de vitória; não completa uma raid inteira. A troca do objeto do jogador simula respawn durante save; não testa morte/login autenticado de cliente humano. Não houve cliente gráfico ou certificação criptográfica; o teste de chat usa mensagem sintética e compara os campos preservados.
+Evidências e hashes em `docs/cosmetics/0.19.2-dev/`. Testes de importação não destrutiva, CAS concorrente, restart, configuração e rollback; servidores reais com Core sozinho e com o par, LuckPerms real, captura de pacotes e jogador sintético. O cenário de raid usa o JAR real indicado no relatório e chama sua transição de vitória; não completa uma raid inteira. A troca do objeto do jogador simula respawn durante save; não testa morte/login autenticado de cliente humano. Não houve cliente gráfico ou certificação criptográfica; o teste de chat usa mensagem sintética e compara os campos preservados.
 
 O código do catálogo/efeitos/menu foi portado do Essentials, com sua licença MIT preservada em `META-INF/licenses/essentials-cosmetics-MIT.txt`. Nenhum client mod, publicação de ambiente ou alteração do servidor real foi realizada.
+
+
+## Ajuste 0.19.2-dev
+
+Removidos Nuvem, Encantado e Elétrico em todas as categorias. Seleções antigas desses IDs ficam preservadas no banco, mas inativas; não aparecem no menu nem emitem efeitos. O catálogo tem48 opções. A lore dos itens não exibe os nodes de permissão; o controle de acesso permanece ativo. Rastros de coração durante movimento têm75% menos partículas no ritmo contínuo, sem afetar auras ou celebrações.
+
+Vitória e raid agora cobrem raio de2,8 a4,4 blocos, conforme tamanho escolhido, com espiral de3,5 blocos de altura e som de explosão de fogos. Mantidos os limites de partículas e cooldown; o som respeita ocultação e visibilidade dos efeitos. Sem entidades de fogos, dano ou itens.

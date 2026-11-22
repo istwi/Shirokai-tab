@@ -68,7 +68,6 @@ public final class CosmeticScreen extends GenericContainerScreenHandler {
                     lore.add(equipped?(!unlocked?"Selecionado · indisponível":state.cosmeticsHidden?"Selecionado · efeitos desativados":"Equipado"):unlocked?"Disponível":"Bloqueado");
                     if(!unlocked)lore.add(service.config().disabled.contains(entry.id())?"Desativado pelo servidor.":"Sem acesso a esta opção.");
                     lore.add(description(entry.category()));
-                    lore.add("Permissão: shirokai.core.cosmetics."+entry.id());
                     lore.add("Clique para equipar. Não concede vantagens.");
                     if(entry.category().equals("nick"))lore.add("A cor afeta só seu nome; cargos são preservados.");
                     button(POSITIONS[i++],unlocked?icon(entry.category()):Items.IRON_BARS,entry.label(),lore,equipped?Formatting.GREEN:unlocked?Formatting.AQUA:Formatting.DARK_GRAY,()->{service.equip(owner,entry);render();});

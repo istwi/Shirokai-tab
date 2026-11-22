@@ -1,3 +1,7 @@
+## Cosméticos0.19.2-dev
+
+Validar visualmente rastro de coração reduzido, catálogo sem Nuvem/Encantado/Elétrico e lore sem nodes de permissão.
+
 ## Cosméticos0.19.1-dev
 
 Cor cosmética somente no chat e acima do personagem; TAB mantém nick branco. Validar visualmente em cliente real.
