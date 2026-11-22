@@ -67,17 +67,17 @@ public final class CosmeticsSmoke implements ModInitializer {
                 return until(()->service.revision(p)>before&&state(service,p).cosmetics.get("nick").equals("nick_cyan"));
             },server).thenComposeAsync(v->{
                 check(CosmeticService.color(p)==Formatting.AQUA,"saved Core selection changes nickname color");
-                check(color(CosmeticService.name(p),"CosmeticAlice",Formatting.AQUA),"nickname component carries cosmetic color without changing account name");
+                check(color(CosmeticService.name(p),"CosmeticAlice",Formatting.WHITE),"chat nickname component stays white without changing account name");
                 core.cosmeticsChanged(ID);return until(()->server.getScoreboard().getScoreHolderTeam(p.getGameProfile().getName())!=null);
             },server).thenComposeAsync(v->{
                 var team=server.getScoreboard().getScoreHolderTeam(p.getGameProfile().getName());check(team.getColor()==Formatting.AQUA,"Core-owned nametag team uses cosmetic color");check(!team.getPrefix().getString().isEmpty(),"rank prefix remains present on the nametag");
                 var tab=observerPackets.stream().filter(PlayerListS2CPacket.class::isInstance).map(PlayerListS2CPacket.class::cast).flatMap(x->x.getEntries().stream()).filter(x->x.profileId().equals(ID)&&x.displayName()!=null).map(PlayerListS2CPacket.Entry::displayName).toList();
                 check(!tab.isEmpty()&&tab.stream().allMatch(x->color(x,"CosmeticAlice",Formatting.WHITE)&&!color(x,"CosmeticAlice",Formatting.AQUA)),"actual TAB packets keep nickname white while nametag and chat use cosmetics");
-                var envelope=new ChatService.Envelope(ID,"","hello",Channel.GLOBAL);check(color(core.chat().service().header(envelope),"CosmeticAlice",Formatting.AQUA),"fallback chat header respects nickname color");
-                try{var presentationField=CoreRuntime.class.getDeclaredField("presentation");presentationField.setAccessible(true);var presentation=(com.shirokai.core.presentation.PresentationRuntime)presentationField.get(core);check(color(presentation.header(envelope),"CosmeticAlice",Formatting.AQUA),"rich chat header respects nickname color");}catch(ReflectiveOperationException e){throw new CompletionException(e);}
+                var envelope=new ChatService.Envelope(ID,"","hello",Channel.GLOBAL);check(color(core.chat().service().header(envelope),"CosmeticAlice",Formatting.WHITE),"fallback chat header keeps nickname white");
+                try{var presentationField=CoreRuntime.class.getDeclaredField("presentation");presentationField.setAccessible(true);var presentation=(com.shirokai.core.presentation.PresentationRuntime)presentationField.get(core);check(color(presentation.header(envelope),"CosmeticAlice",Formatting.WHITE),"rich chat header keeps nickname white");}catch(ReflectiveOperationException e){throw new CompletionException(e);}
                 observerPackets.clear();var incoming=net.minecraft.network.message.SignedMessage.ofUnsigned(ID,"Cosmetics smoke message");core.chat().signed(p,incoming);
                 var sent=observerPackets.stream().filter(ChatMessageS2CPacket.class::isInstance).map(ChatMessageS2CPacket.class::cast).findFirst().orElseThrow();
-                check(color(sent.serializedParameters().name(),"CosmeticAlice",Formatting.AQUA),"actual chat packet preserves cosmetic nickname color");
+                check(color(sent.serializedParameters().name(),"CosmeticAlice",Formatting.WHITE),"actual chat packet keeps nickname white while nametag is colored");
                 check(sent.body().content().equals(incoming.getSignedContent())&&Objects.equals(sent.signature(),incoming.signature())&&sent.unsignedContent()==null,"name color leaves message body, signature field and unsigned content untouched");
                 observerPackets.clear();for(int i=0;i<6;i++)service.tick(server);check(observerPackets.stream().anyMatch(x->x instanceof ParticleS2CPacket),"Core emits actual aura particles using imported selection");
                 if(FabricLoader.getInstance().isModLoaded("shirokai_raids"))CosmeticRaidSmoke.verify(p,service,observerPackets,(condition,label)->check(condition,label));

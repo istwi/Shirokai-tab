@@ -243,5 +243,5 @@ public final class CosmeticService {
         return switch(entry.style()){case "gold"->Formatting.GOLD;case "rainbow"->RAINBOW[(int)((service.ticks/10)%RAINBOW.length)];default->Formatting.AQUA;};
     }
     public static Formatting teamColor(ServerPlayerEntity p){var color=color(p);return color==Formatting.WHITE?Formatting.RESET:color;}
-    public static Text name(ServerPlayerEntity p){return Text.literal(com.shirokai.core.integrations.EssentialsAccess.display(p)).formatted(color(p));}
+    public static Text name(ServerPlayerEntity p){return Text.literal(com.shirokai.core.integrations.EssentialsAccess.display(p)).formatted(Formatting.WHITE);}
 }

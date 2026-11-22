@@ -151,3 +151,5 @@ Usar teams já próprios do Core; não adotar teams externos. CAS e tokens de se
 protegem saves/reconexão; respawn pode substituir o objeto mantendo o UUID.
 
 Cosméticos0.19.1: pedido atual limita cor cosmética ao chat e nametag; TAB/headers/footers e placeholders de nick no contexto TAB continuam brancos, sem mudar estilos de cargos/clãs.
+
+Cosméticos0.19.4: pedido atual restringe a cor ao nametag acima do personagem. Chat, privados, hover e TAB usam nick branco; manter cores de cargos/clãs.

@@ -1,3 +1,14 @@
+# Estado atual — 0.19.4-dev / cor somente na nametag
+
+Pedido atual: retirar cor cosmética do chat, mantendo somente acima do personagem. Nome do autor, destinatário privado e hover usam branco; TAB permanece branco. Nametag mantém cor/arco-íris0,5s. Cargo/clã e corpo/assinatura/filtros preservados. Lore atualizada para indicar alcance da cor.
+
+Validação: 144 testes unitários Core; 31 verificações Fabric com Essentials e perfis persistidos, incluindo nome branco em cabeçalho simples/rico/pacote real de chat e TAB, nametag colorida. Jogadores simulados; sem cliente gráfico. Evidências em `cosmetics/0.19.4-dev/paired-restart.json`.
+
+JAR: `releases/cosmetics-0.19.4-dev/shirokai-core-0.19.4-dev.jar`
+SHA256: `07a055abf78ff0c9fd75b0795bb95c138857505447eab4fa74c42931c88316b5`
+
+---
+
 # Estado atual — 0.19.3-dev / arco-íris
 
 Cor arco-íris troca a cada10ticks (0,5s a20TPS), antes40ticks. Atualiza apresentação a cada troca quando há jogador com arco-íris autorizado; não invalida caches de viewer nem depende do intervalo configurado para TAB. TAB continua branco. Demais cosméticos preservados.

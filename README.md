@@ -1,3 +1,7 @@
+# Cosméticos 0.19.4-dev — cor somente acima do personagem
+
+Nick branco no chat e TAB; cor cosmética somente na nametag, incluindo arco-íris a cada0,5s. [Baixar Core atualizado](releases/cosmetics-0.19.4-dev/shirokai-core-0.19.4-dev.jar). Substitua somente Core e reinicie; Essentials e dados existentes preservados.
+
 # Arco-íris 0.19.3-dev
 
 Cor da nametag troca a cada0,5segundo (a20TPS). [Baixar Core atualizado](releases/cosmetics-0.19.3-dev/shirokai-core-0.19.3-dev.jar). Substitua somente Core e reinicie; Essentials permanece igual. TAB branco e mensagens já enviadas preservados.

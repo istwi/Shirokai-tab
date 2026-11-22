@@ -69,7 +69,7 @@ public final class CosmeticScreen extends GenericContainerScreenHandler {
                     if(!unlocked)lore.add(service.config().disabled.contains(entry.id())?"Desativado pelo servidor.":"Sem acesso a esta opção.");
                     lore.add(description(entry.category()));
                     lore.add("Clique para equipar. Não concede vantagens.");
-                    if(entry.category().equals("nick"))lore.add("A cor afeta só seu nome; cargos são preservados.");
+                    if(entry.category().equals("nick"))lore.add("A cor aparece só acima do personagem.");
                     button(POSITIONS[i++],unlocked?icon(entry.category()):Items.IRON_BARS,entry.label(),lore,equipped?Formatting.GREEN:unlocked?Formatting.AQUA:Formatting.DARK_GRAY,()->{service.equip(owner,entry);render();});
                 }
                 button(49,Items.BARRIER,"Remover desta categoria",List.of("As outras categorias serão mantidas."),Formatting.RED,()->{service.remove(owner,page);render();});

@@ -1,3 +1,7 @@
+## Cosméticos0.19.4-dev
+
+Validar visualmente nome branco no chat/privados/hover/TAB e cor somente acima do personagem.
+
 ## Arco-íris0.19.3-dev
 
 Validar visualmente a cadência de0,5s na nametag com cliente real.

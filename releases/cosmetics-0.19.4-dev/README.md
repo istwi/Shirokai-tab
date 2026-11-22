@@ -1,0 +1,1 @@
+Nick branco no chat, privados e TAB; cor cosmética somente acima do personagem. Arco-íris mantém cadência de0,5s a20TPS. Substitua somente Core, preserve dados/configurações e reinicie. Essentials permanece0.6.13-core-cosmetics.1.
