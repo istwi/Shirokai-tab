@@ -1,3 +1,7 @@
+# Ajuste 0.19.1-dev — cor do nick somente no chat e nametag
+
+O cosmético não colore o nome no TAB, inclusive placeholders de apelido. Cargo e clã preservam seus estilos. [Baixar par atualizado](releases/cosmetics-0.19.1-dev/Zorykai-Core-Cosmeticos-0.19.1-dev.zip). Essentials permanece na versão 0.6.13-core-cosmetics.1; atualize o Core para 0.19.1-dev. [Guia](docs/COSMETICS.md).
+
 # Cosméticos no Core — 0.19.0-dev
 
 Catálogo de 63 opções, seis categorias, menu e personalização migrados do Essentials. Cor do nome integrada ao chat, TAB e nametag; prefixos de cargo/clã preservados. Permissões novas `shirokai.core.cosmetics.*`; sem concessões automáticas. [Instalação, comandos e permissões](docs/COSMETICS.md).

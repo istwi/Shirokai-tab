@@ -1,3 +1,17 @@
+# Estado atual — 0.19.1-dev / cor do nick
+
+Pedido atual: cor cosmética somente no chat e nametag; nome no TAB permanece branco, incluindo placeholders de apelido. Prefixos de cargo/clã e demais efeitos preservados. Essentials continua 0.6.13-core-cosmetics.1.
+
+Validação deste ajuste: 144 testes unitários Core e 28 verificações Fabric com o par e estado após reinício, incluindo pacotes reais de TAB brancos, chat e nametag coloridos. Jogadores simulados, sem cliente gráfico. Evidências em `cosmetics/0.19.1-dev/`.
+
+Core SHA256: `cadf9d2f86111ecb483f87a0ce2b5de14969423d868250e3d691f2a379d8a1c5`
+
+Essentials SHA256: `9793be4aac3c70c884b4122e7679055a3f46b7560db6586e6576314b8489ee60`
+
+Pacote: `releases/cosmetics-0.19.1-dev/`. Histórico abaixo.
+
+---
+
 # Estado atual — 0.19.0-dev / cosméticos
 
 Migração nativa do catálogo do Essentials com persistência SQLite transacional, importação não destrutiva por UUID, preferências, menus e ponte exclusiva de efeitos. Permissões `shirokai.core.cosmetics.*`. Chat/TAB/nametag aplicam somente a cor do apelido; identidades, cargos e clãs preservados. [Guia](COSMETICS.md).

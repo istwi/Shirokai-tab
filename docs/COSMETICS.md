@@ -1,11 +1,11 @@
-# Cosméticos nativos do Core — 0.19.0-dev
+# Cosméticos nativos do Core — 0.19.1-dev
 
 Migração solicitada do catálogo/menu do Essentials0.6.12-teleport-speed.2 para o Core. Mantidos63 IDs, seis categorias e os ajustes de partículas. O Core passa a persistir/aplicar as escolhas; o Essentials continua com homes, comandos e teleportes, incluindo a correção de `/speed`.
 
 ## Instalação e migração
 
 1. Pare o servidor e guarde backup dos JARs, diretório `shirokai-core`, configurações e dados do mundo.
-2. Substitua o Core por `shirokai-core-0.19.0-dev.jar` e o Essentials por `shirokai-essentials-0.6.13-core-cosmetics.1-zorykai-visual.jar`, sem duplicados. São candidatos de desenvolvimento, não publicação de release estável.
+2. Substitua o Core por `shirokai-core-0.19.1-dev.jar` e o Essentials por `shirokai-essentials-0.6.13-core-cosmetics.1-zorykai-visual.jar`, sem duplicados. São candidatos de desenvolvimento, não publicação de release estável.
 3. Preserve os arquivos existentes. Conceda as permissões **novas** do Core descritas abaixo. Reinicie o servidor completo.
 4. Consulte `/cosmeticos`. Se houver outro controlador desse comando, existe `/shirokaicore:cosmeticos`.
 
@@ -58,9 +58,9 @@ IDs de efeitos: combine uma categoria `trail`, `aura`, `join`, `victory` ou `rai
 
 ## Cor do nome
 
-Sem escolha válida, o nick continua branco. Com opção concedida, o Core aplica a cor somente ao componente do nome no chat, no TAB padrão/placeholder de nome e no nametag gerenciado pelo Core. Corpo, assinatura, máscara, cargo principal, tag/clã e identidade de conta permanecem separados. Os dados dinâmicos não viram templates.
+Sem escolha válida, o nick continua branco. Com opção concedida, o Core aplica a cor somente ao componente do nome no chat e no nametag gerenciado pelo Core. O nome no TAB permanece branco, inclusive nos placeholders de apelido; cabeçalho, rodapé, cargo e clã mantêm seus estilos. Corpo, assinatura, máscara, cargo principal, tag/clã e identidade de conta permanecem separados. Os dados dinâmicos não viram templates.
 
-A nametag usa o team **já próprio do Core**, sem criar outro time cosmético por cima. A cor não altera o prefixo/sufixo com seus estilos. `nametags.enabled` precisa estar ativo para colorir acima da cabeça. Templates de TAB precisam usar o placeholder de nome, não um nome hardcoded. Teams e controladores externos continuam preservados; o Core não rouba seu ownership. Ícones, cores de cargos e grupos LP não são alterados pelo cosmético.
+A nametag usa o team **já próprio do Core**, sem criar outro time cosmético por cima. A cor não altera o prefixo/sufixo com seus estilos. `nametags.enabled` precisa estar ativo para colorir acima da cabeça. Teams e controladores externos continuam preservados; o Core não rouba seu ownership. Ícones, cores de cargos e grupos LP não são alterados pelo cosmético.
 
 Arco-íris mantém a alternância suave da origem (paleta vanilla, não gradiente por letra). Acima da cabeça isso é uma cor por vez, limitação normal do team vanilla. O nick/apelido segue a ponte de identidade existente; UUID, nome real, skin e seletores não mudam.
 
@@ -81,6 +81,6 @@ Aliases protegidos: `/shirokaicore:cosmeticos` e `/shirokaicore:cosmeticosadmin`
 
 ## Validação e limites
 
-Evidências e hashes em `docs/cosmetics/0.19.0-dev/`. Testes de importação não destrutiva, CAS concorrente, restart, configuração e rollback; servidores reais com Core sozinho e com o par, LuckPerms real, captura de pacotes e jogador sintético. O cenário de raid usa o JAR real indicado no relatório e chama sua transição de vitória; não completa uma raid inteira. A troca do objeto do jogador simula respawn durante save; não testa morte/login autenticado de cliente humano. Não houve cliente gráfico ou certificação criptográfica; o teste de chat usa mensagem sintética e compara os campos preservados.
+Evidências e hashes em `docs/cosmetics/0.19.1-dev/`. Testes de importação não destrutiva, CAS concorrente, restart, configuração e rollback; servidores reais com Core sozinho e com o par, LuckPerms real, captura de pacotes e jogador sintético. O cenário de raid usa o JAR real indicado no relatório e chama sua transição de vitória; não completa uma raid inteira. A troca do objeto do jogador simula respawn durante save; não testa morte/login autenticado de cliente humano. Não houve cliente gráfico ou certificação criptográfica; o teste de chat usa mensagem sintética e compara os campos preservados.
 
 O código do catálogo/efeitos/menu foi portado do Essentials, com sua licença MIT preservada em `META-INF/licenses/essentials-cosmetics-MIT.txt`. Nenhum client mod, publicação de ambiente ou alteração do servidor real foi realizada.

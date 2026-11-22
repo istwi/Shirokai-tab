@@ -149,3 +149,5 @@ no worker. Importar legado uma vez, sem sobrescrever escolhas Core nem escrever
 no arquivo legado. Ponte exclusiva com Essentials atualizado evita duplo efeito.
 Usar teams já próprios do Core; não adotar teams externos. CAS e tokens de sessão
 protegem saves/reconexão; respawn pode substituir o objeto mantendo o UUID.
+
+Cosméticos0.19.1: pedido atual limita cor cosmética ao chat e nametag; TAB/headers/footers e placeholders de nick no contexto TAB continuam brancos, sem mudar estilos de cargos/clãs.

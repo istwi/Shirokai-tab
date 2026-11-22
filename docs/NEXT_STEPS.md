@@ -1,3 +1,7 @@
+## Cosméticos0.19.1-dev
+
+Cor cosmética somente no chat e acima do personagem; TAB mantém nick branco. Validar visualmente em cliente real.
+
 ## Cosméticos0.19.0-dev
 
 Migração nativa documentada em COSMETICS.md. Validar no cliente real menus, cores

@@ -1,0 +1,7 @@
+{
+  "unitTests": 144,
+  "nativeChecks": 28,
+  "realClients": 0,
+  "coreSha256": "cadf9d2f86111ecb483f87a0ce2b5de14969423d868250e3d691f2a379d8a1c5",
+  "essentialsSha256": "9793be4aac3c70c884b4122e7679055a3f46b7560db6586e6576314b8489ee60"
+}
