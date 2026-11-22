@@ -1,3 +1,7 @@
+## Arco-íris0.19.3-dev
+
+Validar visualmente a cadência de0,5s na nametag com cliente real.
+
 ## Cosméticos0.19.2-dev
 
 Validar visualmente rastro de coração reduzido, catálogo sem Nuvem/Encantado/Elétrico e lore sem nodes de permissão.

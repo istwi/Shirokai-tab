@@ -145,6 +145,7 @@ public final class CosmeticService {
         ticks++;globalBudget=config.maxParticlesPerTick;
         var players=server.getPlayerManager().getPlayerList();
         if(players.isEmpty())return;
+        if(ticks%10==0&&players.stream().anyMatch(p->{var e=equipped(p,"nick");return e!=null&&e.style().equals("rainbow");}))app.cosmeticAnimationFrame();
         // Rotate priority so a busy server cannot permanently starve the last players.
         for(int i=0;i<players.size();i++) {
             var p=players.get((i+rotation)%players.size());
@@ -239,7 +240,7 @@ public final class CosmeticService {
     public static Formatting color(ServerPlayerEntity p){
         var service=ACTIVE.get(p.getServer());if(service==null)return Formatting.WHITE;
         var entry=service.equipped(p,"nick");if(entry==null)return Formatting.WHITE;
-        return switch(entry.style()){case "gold"->Formatting.GOLD;case "rainbow"->RAINBOW[(int)((service.ticks/40)%RAINBOW.length)];default->Formatting.AQUA;};
+        return switch(entry.style()){case "gold"->Formatting.GOLD;case "rainbow"->RAINBOW[(int)((service.ticks/10)%RAINBOW.length)];default->Formatting.AQUA;};
     }
     public static Formatting teamColor(ServerPlayerEntity p){var color=color(p);return color==Formatting.WHITE?Formatting.RESET:color;}
     public static Text name(ServerPlayerEntity p){return Text.literal(com.shirokai.core.integrations.EssentialsAccess.display(p)).formatted(color(p));}

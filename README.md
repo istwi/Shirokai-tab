@@ -1,3 +1,7 @@
+# Arco-íris 0.19.3-dev
+
+Cor da nametag troca a cada0,5segundo (a20TPS). [Baixar Core atualizado](releases/cosmetics-0.19.3-dev/shirokai-core-0.19.3-dev.jar). Substitua somente Core e reinicie; Essentials permanece igual. TAB branco e mensagens já enviadas preservados.
+
 # Cosméticos 0.19.2-dev
 
 Removidos Nuvem, Encantado e Elétrico de todas as categorias. Rastros de coração com75% menos emissões no movimento. Lore sem nodes de permissão. Vitória e raid com maior área e som de fogos, respeitando cooldown e visibilidade. Cor de nick continua somente no chat/nametag. [Baixar pacote atualizado](releases/cosmetics-0.19.2-dev/Zorykai-Core-Cosmeticos-0.19.2-dev.zip). Atualize somente Core se já usa Essentials0.6.13-core-cosmetics.1. [Guia](docs/COSMETICS.md).

@@ -91,3 +91,8 @@ O código do catálogo/efeitos/menu foi portado do Essentials, com sua licença 
 Removidos Nuvem, Encantado e Elétrico em todas as categorias. Seleções antigas desses IDs ficam preservadas no banco, mas inativas; não aparecem no menu nem emitem efeitos. O catálogo tem48 opções. A lore dos itens não exibe os nodes de permissão; o controle de acesso permanece ativo. Rastros de coração durante movimento têm75% menos partículas no ritmo contínuo, sem afetar auras ou celebrações.
 
 Vitória e raid agora cobrem raio de2,8 a4,4 blocos, conforme tamanho escolhido, com espiral de3,5 blocos de altura e som de explosão de fogos. Mantidos os limites de partículas e cooldown; o som respeita ocultação e visibilidade dos efeitos. Sem entidades de fogos, dano ou itens.
+
+
+## Arco-íris 0.19.3-dev
+
+Troca de cor a cada10 ticks (0,5 segundo a20TPS), antes40 ticks (2 segundos). Frame de nametag atualizado enquanto há arco-íris equipado/autorizado, sem depender do intervalo normal do TAB. TAB permanece branco; mensagens enviadas guardam a cor do momento.

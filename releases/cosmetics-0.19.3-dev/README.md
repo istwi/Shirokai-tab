@@ -1,0 +1,1 @@
+Core0.19.3-dev: arco-íris troca a cada10ticks (0,5s a20TPS), com atualização da nametag independente do intervalo do TAB. TAB continua branco; chat mantém a cor do instante do envio. Substitua somente o Core e reinicie. Essentials0.6.13-core-cosmetics.1 permanece igual. Configurações, dados e permissões preservados.

@@ -1,3 +1,14 @@
+# Estado atual — 0.19.3-dev / arco-íris
+
+Cor arco-íris troca a cada10ticks (0,5s a20TPS), antes40ticks. Atualiza apresentação a cada troca quando há jogador com arco-íris autorizado; não invalida caches de viewer nem depende do intervalo configurado para TAB. TAB continua branco. Demais cosméticos preservados.
+
+Build aprovado; 144 testes unitários Core aprovados. Sem repetição do smoke/cliente gráfico neste ajuste pontual.
+
+JAR: `releases/cosmetics-0.19.3-dev/shirokai-core-0.19.3-dev.jar`
+SHA256: `ba9d4c9cae395559321be57054c8ad8dafc72281c45b37d3e901493f50314f46`
+
+---
+
 # Estado atual — 0.19.2-dev / cosméticos
 
 Removidos nuvem/encantado/elétrico das cinco categorias de partículas:48 opções atuais. IDs legados preservados inativos. Lore sem permissões, autorização mantida. Rastro de coração reduzido75%, sem mínimo por distância que anulasse a redução. Vitória/raid com raio2,8–4,4 blocos e altura3,5, som de fogos por destinatário respeitando opt-out/visibilidade. Sem entidades/dano; limites/cooldown preservados. TAB continua branco.

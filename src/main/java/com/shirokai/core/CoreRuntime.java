@@ -35,6 +35,7 @@ public final class CoreRuntime implements AutoCloseable {
     private SqliteStorage storage;
     private com.shirokai.core.cosmetics.CosmeticService cosmetics;
     public com.shirokai.core.cosmetics.CosmeticService cosmetics(){return cosmetics;}
+    public void cosmeticAnimationFrame(){if(tab!=null)tab.update();}
     public void cosmeticsChanged(java.util.UUID id){if(tab!=null)tab.refresh(id);if(scoreboard!=null)scoreboard.invalidate();}
     private PermissionService permissions;
     private PlaceholderService placeholders;
