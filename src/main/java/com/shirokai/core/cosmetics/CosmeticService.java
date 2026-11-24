@@ -183,23 +183,23 @@ public final class CosmeticService {
     }
     private void burst(ServerPlayerEntity p,String category,Vec3d origin) {
         var e=equipped(p,category);if(e==null)return;
-        var pref=preferences(p);boolean celebration=category.equals("victory")||category.equals("raid");
-        int count=pref.density*12;double radius=celebration?2+pref.size*.8:.4+pref.size*.2;
+        var pref=preferences(p);boolean celebration=category.equals("victory")||category.equals("raid");double scale=bodyScale(p);
+        int count=pref.density*12;double radius=(celebration?2+pref.size*.8:.4+pref.size*.2)*scale;
         if(celebration)for(var viewer:p.getServerWorld().getPlayers()){
             var state=selected.get(viewer.getUuid());
             if(state!=null&&!state.cosmeticsHidden&&com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,p)&&viewer.squaredDistanceTo(p)<=config.viewDistance*config.viewDistance)
                 viewer.playSoundToPlayer(net.minecraft.sound.SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST,net.minecraft.sound.SoundCategory.PLAYERS,.8f,1f);
         }
-        for(int i=0;i<count;i++){double a=i*Math.PI*2/count;emit(p,e.style(),origin.add(Math.cos(a)*radius,.15+i*((celebration?3.5:1.45)/count),Math.sin(a)*radius));}
+        for(int i=0;i<count;i++){double a=i*Math.PI*2/count;emit(p,e.style(),origin.add(Math.cos(a)*radius,(.15+i*((celebration?3.5:1.45)/count))*scale,Math.sin(a)*radius));}
     }
     private void shape(ServerPlayerEntity p,String category,Vec3d origin) {
         var e=equipped(p,category);if(e==null)return;
-        var pref=preferences(p);double phase=ticks*(.04*pref.speed)*pref.direction,radius=.25+pref.size*.2;
+        var pref=preferences(p);double scale=bodyScale(p),phase=ticks*(.04*pref.speed)*pref.direction,radius=(.25+pref.size*.2)*scale;
         switch(category) {
             case "trail" -> {
-                double yaw=Math.toRadians(p.getBodyYaw());int count=Math.min(config.maxParticlesPerPlayer,config.trailBaseDensity*pref.density*trailMultiplier(e.style()));trail(p,origin.add(Math.sin(yaw)*-.6,0,Math.cos(yaw)*.6),origin,count);
+                double yaw=Math.toRadians(p.getBodyYaw());int count=Math.min(config.maxParticlesPerPlayer,config.trailBaseDensity*pref.density*trailMultiplier(e.style()));trail(p,origin.add(Math.sin(yaw)*-.6*scale,0,Math.cos(yaw)*.6*scale),origin,count);
             }
-            case "aura" -> {int count=pref.density*2;for(int i=0;i<count;i++){double progress=i/(double)Math.max(1,count-1),a=phase+progress*Math.PI*4*pref.direction;emit(p,e.style(),origin.add(Math.cos(a)*radius,2-progress*1.9,Math.sin(a)*radius));}}
+            case "aura" -> {int count=pref.density*2;for(int i=0;i<count;i++){double progress=i/(double)Math.max(1,count-1),a=phase+progress*Math.PI*4*pref.direction;emit(p,e.style(),origin.add(Math.cos(a)*radius,(2-progress*1.9)*scale,Math.sin(a)*radius));}}
         }
     }
     private void resetTrail(ServerPlayerEntity p) {trailAnchors.put(p.getUuid(),p.getPos());trailCredits.put(p.getUuid(),0d);}
@@ -208,13 +208,14 @@ public final class CosmeticService {
         Vec3d delta=to.subtract(from);double horizontal=Math.sqrt(delta.x*delta.x+delta.z*delta.z);if(horizontal<.001)return;
         int count=Math.min(config.maxParticlesPerPlayer,e.style().equals("heart")?planned:Math.max(planned,(int)Math.ceil(horizontal/.12)));
         double rightX=-delta.z/horizontal,rightZ=delta.x/horizontal;
-        double lead=Math.min(.12,horizontal*.75);Vec3d projected=to.add(delta.x/horizontal*lead,0,delta.z/horizontal*lead);
+        double scale=bodyScale(p),lead=Math.min(.12*scale,horizontal*.75);Vec3d projected=to.add(delta.x/horizontal*lead,0,delta.z/horizontal*lead);
         for(int i=0;i<count;i++){
-            boolean endpoint=i>=count-2;double side=endpoint?0:(i%2==0?-1:1)*.11*pref.size;
+            boolean endpoint=i>=count-2;double side=endpoint?0:(i%2==0?-1:1)*.11*pref.size*scale;
             Vec3d center=count==1||i==count-2?to:i==count-1?projected:from.add(delta.multiply((i+1d)/(count-1d)));
-            emit(p,e.style(),center.add(rightX*side,.035,rightZ*side));
+            emit(p,e.style(),center.add(rightX*side,.035*scale,rightZ*side));
         }
     }
+    static double bodyScale(ServerPlayerEntity player) {return Math.max(.0625,player.getScale());}
     private CosmeticState.Preferences preferences(ServerPlayerEntity p) {
         var state=selected.get(p.getUuid());return bounded(state==null||state.cosmeticPreferences==null?new CosmeticState.Preferences():state.cosmeticPreferences);
     }
