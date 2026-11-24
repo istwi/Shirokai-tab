@@ -184,13 +184,38 @@ public final class CosmeticService {
     private void burst(ServerPlayerEntity p,String category,Vec3d origin) {
         var e=equipped(p,category);if(e==null)return;
         var pref=preferences(p);boolean celebration=category.equals("victory")||category.equals("raid");double scale=bodyScale(p);
-        int count=pref.density*12;double radius=(celebration?2+pref.size*.8:.4+pref.size*.2)*scale;
-        if(celebration)for(var viewer:p.getServerWorld().getPlayers()){
+        if(celebration){celebration(p,e.style(),origin,pref,scale);return;}
+        int count=pref.density*12;double radius=(.4+pref.size*.2)*scale;
+        for(int i=0;i<count;i++){double a=i*Math.PI*2/count;emit(p,e.style(),origin.add(Math.cos(a)*radius,(.15+i*(1.45/count))*scale,Math.sin(a)*radius));}
+    }
+    private void celebration(ServerPlayerEntity p,String style,Vec3d origin,CosmeticState.Preferences pref,double scale) {
+        double base=(1.35+pref.size*.38)*scale;
+        for(var viewer:p.getServerWorld().getPlayers()){
             var state=selected.get(viewer.getUuid());
-            if(state!=null&&!state.cosmeticsHidden&&com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,p)&&viewer.squaredDistanceTo(p)<=config.viewDistance*config.viewDistance)
+            if(state!=null&&!state.cosmeticsHidden&&com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,p)&&viewer.squaredDistanceTo(p)<=config.viewDistance*config.viewDistance){
+                viewer.playSoundToPlayer(net.minecraft.sound.SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH,net.minecraft.sound.SoundCategory.PLAYERS,.65f,1.15f);
                 viewer.playSoundToPlayer(net.minecraft.sound.SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST,net.minecraft.sound.SoundCategory.PLAYERS,.8f,1f);
+            }
         }
-        for(int i=0;i<count;i++){double a=i*Math.PI*2/count;emit(p,e.style(),origin.add(Math.cos(a)*radius,(.15+i*((celebration?3.5:1.45)/count))*scale,Math.sin(a)*radius));}
+        // Three staggered rings make a crown around the winner.
+        int ringPoints=8+pref.density;
+        for(int ring=0;ring<3;ring++)for(int i=0;i<ringPoints;i++){
+            double a=i*Math.PI*2/ringPoints+ring*Math.PI/ringPoints;
+            double radius=base*(.62+ring*.2),y=(.25+ring*.68)*scale;
+            emit(p,style,origin.add(Math.cos(a)*radius,y,Math.sin(a)*radius));
+        }
+        // A ten-point star above the player gives the burst a second silhouette.
+        double top=2.55*scale;
+        for(int i=0;i<10;i++){
+            double a=-Math.PI/2+i*Math.PI/5,r=(i%2==0?base*.72:base*.3);
+            emit(p,style,origin.add(Math.cos(a)*r,top+Math.sin(a)*r*.55,0));
+        }
+        // Safe visual fireworks: no entity, item, explosion damage or reward is created.
+        for(int burst=-1;burst<=1;burst++){
+            Vec3d center=origin.add(burst*base*.7,3.15*scale,burst==0?base*.3:0);
+            emitType(p,ParticleTypes.FIREWORK,center);
+            for(int i=0;i<4;i++){double a=i*Math.PI/2+burst*.35;emitType(p,ParticleTypes.FIREWORK,center.add(Math.cos(a)*base*.38,Math.sin(a)*base*.38,Math.sin(a)*base*.22));}
+        }
     }
     private void shape(ServerPlayerEntity p,String category,Vec3d origin) {
         var e=equipped(p,category);if(e==null)return;
@@ -226,14 +251,15 @@ public final class CosmeticService {
         return switch(style) {case "fire"->ParticleTypes.FLAME;case "water"->ParticleTypes.SPLASH;case "nature"->ParticleTypes.HAPPY_VILLAGER;case "electric"->ParticleTypes.ELECTRIC_SPARK;case "soul"->ParticleTypes.SOUL;case "snow"->ParticleTypes.SNOWFLAKE;case "heart"->ParticleTypes.HEART;case "magic"->ParticleTypes.WITCH;case "enchant"->ParticleTypes.ENCHANT;case "cloud"->ParticleTypes.CLOUD;case "cherry"->ParticleTypes.CHERRY_LEAVES;default->ParticleTypes.END_ROD;};
     }
     private static int trailMultiplier(String style) {return switch(style){case "water"->3;case "electric","soul","snow","magic","enchant"->2;default->1;};}
-    private void emit(ServerPlayerEntity p,String style,Vec3d pos) {
+    private void emit(ServerPlayerEntity p,String style,Vec3d pos) {emitType(p,particle(style),pos);}
+    private void emitType(ServerPlayerEntity p,SimpleParticleType type,Vec3d pos) {
         if(globalBudget<=0||playerBudget<=0)return;
         globalBudget--;playerBudget--;
         for(var viewer:p.getServerWorld().getPlayers()) {
             var state=selected.get(viewer.getUuid());
             if(state==null||state.cosmeticsHidden||!com.shirokai.core.visibility.VisibilityService.canSee(server,viewer,p))continue; // personal opt-out also hides other players' effects
             if(viewer.getPos().squaredDistanceTo(pos)<=config.viewDistance*config.viewDistance)
-                p.getServerWorld().spawnParticles(viewer,particle(style),false,pos.x,pos.y,pos.z,1,0,0,0,0);
+                p.getServerWorld().spawnParticles(viewer,type,false,pos.x,pos.y,pos.z,1,0,0,0,0);
         }
     }
     private static final Formatting[] RAINBOW={Formatting.AQUA,Formatting.BLUE,Formatting.LIGHT_PURPLE,Formatting.RED,Formatting.GOLD,Formatting.YELLOW,Formatting.GREEN};
